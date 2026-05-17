@@ -1,58 +1,204 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SpeakLoud — Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[Laravel](https://laravel.com) API and web application for **SpeakLoud** ([speakloud.app](https://speakloud.app)): a language-exchange platform where learners find partners, publish practice slots, send claims, and chat after a match is accepted.
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Layer | Technology |
+|-------|------------|
+| Framework | Laravel 13, PHP 8.3+ |
+| UI | Livewire 4, Volt (single-file components), Flux UI, Tailwind CSS v4 |
+| Database | MySQL 8 |
+| Cache / queues | Redis |
+| Tests | Pest |
+| Local runtime | Laravel Sail (Docker) |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Prerequisites
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or compatible Docker engine)
+- [Node.js](https://nodejs.org/) 20+ (for Vite on the host)
+- Composer (used via Sail; host install optional)
 
-## Learning Laravel
+## Quick start
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+All PHP, Artisan, and Composer commands run **inside Sail**. Do not run `php` or `composer` on the host unless you know the environment matches the container.
 
 ```bash
-composer require laravel/boost --dev
+cd backend
 
-php artisan boost:install
+# 1. Environment
+cp .env.example .env
+# Edit .env if needed (APP_PORT, DB_*, etc.)
+
+# 2. Install PHP dependencies (first time)
+docker run --rm \
+  -u "$(id -u):$(id -g)" \
+  -v "$(pwd):/var/www/html" \
+  -w /var/www/html \
+  laravelsail/php83-composer:latest \
+  composer install --ignore-platform-reqs
+
+# 3. Start containers (app, MySQL, Redis)
+./vendor/bin/sail up -d
+
+# 4. Application key & database
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
+
+# 5. Frontend (separate terminal, on host)
+npm install
+npm run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Open the app at the URL in `.env` (default **`http://localhost:8100`** when `APP_PORT=8100`).
 
-## Contributing
+Optional Sail alias:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+```
 
-## Code of Conduct
+## Demo data
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+After `migrate --seed`, the database includes ~100 demo users plus sample schedules, claims, conversations, blog posts, and FAQs.
 
-## Security Vulnerabilities
+| Role | Email | Password |
+|------|--------|----------|
+| Admin | `admin@speakloud.test` | `123456789` |
+| Users | `user1@speakloud.test` … `user100@speakloud.test` | `123456789` |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Reset and reseed (local only — **wipes all data**):
+
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+```
+
+Seeders: `LanguageSeeder`, `InterestSeeder`, `ContentSeeder`, `DemoDataSeeder` (see `database/seeders/`).
+
+## Common commands
+
+```bash
+# Containers
+./vendor/bin/sail up -d
+./vendor/bin/sail down
+
+# Database
+./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan db:seed
+
+# Queue worker
+./vendor/bin/sail artisan queue:work redis
+
+# Tests
+./vendor/bin/sail pest
+./vendor/bin/sail pest --parallel
+./vendor/bin/sail pest tests/Feature/SomeTest.php
+./vendor/bin/sail pest --coverage --min=80   # requires PCOV
+
+# Code style
+./vendor/bin/sail pint
+
+# Shell inside container
+./vendor/bin/sail shell
+```
+
+Frontend hot reload runs on the host:
+
+```bash
+npm run dev    # Vite, typically :5173
+npm run build  # production assets
+```
+
+## Architecture
+
+```
+HTTP / Volt page
+ └── Action          (one use-case: SendClaim, AcceptClaim, …)
+      ├── Service    (reusable logic)
+      └── Repository (Eloquent, behind interfaces)
+```
+
+- **Actions** — `app/Actions/`, verb+noun naming.
+- **Repositories** — `app/Repositories/` + `Contracts/I*Repository`; bound in `AppServiceProvider`.
+- **UI** — Volt components in `resources/views/volt/` (not class-based Livewire in `app/Livewire/`).
+- **Routes** — `routes/web.php`; full-page Volt routes via `Volt::route()`.
+
+Domain overview: users publish **schedules** (recurring or one-off), others send **claims**, hosts accept → **conversation** + **messages** unlock.
+
+Full database DDL and relationships: [`../project-files/SCHEMA.md`](../project-files/SCHEMA.md).
+
+## Main routes (local)
+
+| Path | Description | Auth |
+|------|-------------|------|
+| `/` | Landing | Guest |
+| `/discover` | Partner grid | Yes |
+| `/search` | Partner list search | Yes |
+| `/schedule` | Your availability | Yes |
+| `/claims` | Incoming / outgoing claims | Yes |
+| `/messages` | Conversations | Yes |
+| `/profile` | Profile overview | Yes |
+| `/blog` | Blog + FAQ | Public |
+| `/login`, `/register` | Auth | Guest |
+
+## Project layout
+
+```
+app/
+├── Actions/
+├── Http/Controllers/
+├── Models/
+├── Repositories/
+│   └── Contracts/
+└── Providers/
+database/
+├── migrations/
+├── seeders/
+└── factories/
+resources/
+├── views/volt/      # Livewire Volt pages
+├── views/components/
+└── css/app.css      # Tailwind + Flux theme
+routes/web.php
+compose.yaml         # Sail services
+```
+
+## Database (Docker)
+
+MySQL is exposed on the host via `FORWARD_DB_PORT` in `.env` (default **3309** → container 3306).
+
+| Setting | Typical local value |
+|---------|---------------------|
+| Host (from Mac) | `127.0.0.1` |
+| Port | `3309` |
+| Database | `speakloud` |
+| User / password | `sail` / `password` |
+
+CLI:
+
+```bash
+./vendor/bin/sail mysql
+```
+
+## Testing
+
+Feature tests use `RefreshDatabase` (see `tests/Pest.php`). Target **≥ 80%** coverage in CI.
+
+```bash
+./vendor/bin/sail pest
+```
+
+## Environment notes
+
+- Copy `.env.example` to `.env` and set `APP_URL` / `APP_PORT` to match how you access the app.
+- `DB_HOST=mysql` is correct **inside** Sail; use `127.0.0.1` and `FORWARD_DB_PORT` from GUI clients on the host.
+- Session and queue drivers are configured for MySQL/Redis in the shipped `.env`.
+
+## Further documentation
+
+- Repo-wide dev guide: [`../CLAUDE.md`](../CLAUDE.md)
+- Detailed setup: [`../project-files/SETUP.md`](../project-files/SETUP.md)
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT (Laravel application skeleton). SpeakLoud application code is part of the SpeakLoud project.
