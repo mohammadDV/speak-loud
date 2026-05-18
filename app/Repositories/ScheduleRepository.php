@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ScheduleRepository implements IScheduleRepository
 {
@@ -27,6 +29,7 @@ class ScheduleRepository implements IScheduleRepository
     {
         $schedule = Schedule::findOrFail($id);
         $schedule->update($data);
+
         return $schedule->fresh();
     }
 
@@ -40,5 +43,71 @@ class ScheduleRepository implements IScheduleRepository
         return \App\Models\Claim::where('schedule_id', $scheduleId)
             ->where('status', 'accepted')
             ->count();
+    }
+
+    public function searchOpenSchedules(array $filters, int $viewerId): LengthAwarePaginator
+    {
+        $blockedIds = DB::table('user_blocks')
+            ->where('blocker_id', $viewerId)
+            ->orWhere('blocked_id', $viewerId)
+            ->pluck(DB::raw("CASE WHEN blocker_id = {$viewerId} THEN blocked_id ELSE blocker_id END"))
+            ->all();
+
+        $query = Schedule::query()
+            ->with([
+                'user.profile',
+                'language',
+                'recurringRule',
+                'oneTimeSlot',
+                'claims' => fn ($q) => $q->where('sender_id', $viewerId),
+            ])
+            ->withCount([
+                'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+            ])
+            ->where('schedules.status', 'active')
+            ->where('schedules.user_id', '!=', $viewerId)
+            ->whereNotIn('schedules.user_id', $blockedIds)
+            ->whereHas('user', fn ($q) => $q->where('status', 'active'))
+            ->whereRaw(
+                '(SELECT COUNT(*) FROM claims WHERE claims.schedule_id = schedules.id AND claims.status = ?) < schedules.max_participants',
+                ['accepted']
+            )
+            ->where(function ($q) {
+                $q->where('schedules.type', 'recurring')
+                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('end_datetime', '>', now()));
+            })
+            ->whereDoesntHave('claims', fn ($q) => $q->where('sender_id', $viewerId));
+
+        if (! empty($filters['language_id'])) {
+            $query->where('schedules.language_id', $filters['language_id']);
+        }
+
+        if (! empty($filters['type'])) {
+            $query->where('schedules.type', $filters['type']);
+        }
+
+        if (! empty($filters['level'])) {
+            $query->whereHas('user.languages', function ($q) use ($filters) {
+                $q->whereColumn('user_languages.language_id', 'schedules.language_id')
+                    ->where('user_languages.level', $filters['level']);
+            });
+        }
+
+        if (! empty($filters['country_code'])) {
+            $query->whereHas('user.profile', fn ($q) => $q->where('country_code', strtoupper($filters['country_code'])));
+        }
+
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
+            $query->where(function ($q) use ($search) {
+                $q->where('schedules.description', 'like', $search)
+                    ->orWhere('schedules.title', 'like', $search)
+                    ->orWhereHas('user.profile', fn ($profile) => $profile->where('display_name', 'like', $search));
+            });
+        }
+
+        return $query
+            ->latest('schedules.created_at')
+            ->paginate(20, ['*'], 'page', $filters['page'] ?? 1);
     }
 }

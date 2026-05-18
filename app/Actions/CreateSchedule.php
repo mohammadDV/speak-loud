@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
+use App\Support\ScheduleDayOfWeek;
 
 class CreateSchedule
 {
@@ -14,7 +15,7 @@ class CreateSchedule
         $schedule = $this->schedules->create([
             'user_id'          => $userId,
             'title'            => $data['title'] ?? null,
-            'description'      => $data['description'] ?? null,
+            'description'      => $data['description'],
             'type'             => $data['type'],
             'language_id'      => $data['language_id'],
             'max_participants' => $data['max_participants'] ?? 1,
@@ -22,7 +23,7 @@ class CreateSchedule
 
         if ($data['type'] === 'recurring') {
             $schedule->recurringRule()->create([
-                'day_of_week' => $data['day_of_week'],
+                'day_of_week' => ScheduleDayOfWeek::normalize($data['day_of_week'] ?? ''),
                 'start_time'  => $data['start_time'],
                 'end_time'    => $data['end_time'],
                 'valid_from'  => $data['valid_from'] ?? null,

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Claim;
+use App\Support\ScheduleDescription;
 use App\Models\Conversation;
 use App\Models\Interest;
 use App\Models\Language;
@@ -205,7 +206,7 @@ class DemoDataSeeder extends Seeder
                 $schedule = Schedule::create([
                     'user_id'          => $host->id,
                     'title'            => fake()->randomElement(['Weekly chat', 'Saturday practice', 'Morning session']),
-                    'description'      => fake()->optional()->sentence(),
+                    'description'      => fake()->randomElement(ScheduleDescription::EXAMPLES),
                     'type'             => 'recurring',
                     'language_id'      => $language->id,
                     'max_participants' => fake()->numberBetween(1, 3),
@@ -229,7 +230,7 @@ class DemoDataSeeder extends Seeder
                 $schedule = Schedule::create([
                     'user_id'          => $host->id,
                     'title'            => fake()->randomElement(['One-off session', 'Trial call', 'Open slot']),
-                    'description'      => fake()->optional()->sentence(),
+                    'description'      => fake()->randomElement(ScheduleDescription::EXAMPLES),
                     'type'             => 'one_time',
                     'language_id'      => $language->id,
                     'max_participants' => 1,

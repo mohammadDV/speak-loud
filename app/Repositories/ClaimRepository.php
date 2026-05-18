@@ -28,21 +28,30 @@ class ClaimRepository implements IClaimRepository
     public function updateStatus(int $id, string $status): Claim
     {
         $claim = Claim::findOrFail($id);
-        $claim->update(['status' => $status]);
+
+        $claim->update([
+            'status'       => $status,
+            'responded_at' => now(),
+        ]);
+
         return $claim->fresh();
     }
 
     public function incomingForUser(int $userId): Collection
     {
-        return Claim::whereHas('schedule', function ($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })->with(['sender', 'schedule'])->get();
+        return Claim::query()
+            ->where('receiver_id', $userId)
+            ->with(['sender.profile', 'schedule.language', 'conversation'])
+            ->latest()
+            ->get();
     }
 
     public function outgoingForUser(int $userId): Collection
     {
-        return Claim::where('sender_id', $userId)
-            ->with(['schedule', 'schedule.user'])
+        return Claim::query()
+            ->where('sender_id', $userId)
+            ->with(['receiver.profile', 'schedule', 'schedule.user', 'conversation'])
+            ->latest()
             ->get();
     }
 }

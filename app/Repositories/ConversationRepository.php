@@ -22,7 +22,7 @@ class ConversationRepository implements IConversationRepository
     {
         return Conversation::query()
             ->where(fn ($q) => $q->where('user_a_id', $userId)->orWhere('user_b_id', $userId))
-            ->with(['userA.profile', 'userB.profile'])
+            ->with(['userA.profile', 'userB.profile', 'claim'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('created_at')
             ->get();

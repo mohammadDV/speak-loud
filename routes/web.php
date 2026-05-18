@@ -17,7 +17,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Volt::route('/discover', 'discover.index')->name('discover');
-    Volt::route('/search', 'discover.search')->name('search');
     Volt::route('/schedule', 'schedule.index')->name('schedule');
     Volt::route('/messages', 'messages.index')->name('messages');
     Volt::route('/messages/{id}', 'messages.show')->name('messages.show');

@@ -5,7 +5,9 @@ namespace App\Actions;
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
+use App\Repositories\Contracts\IMessageRepository;
 use App\Repositories\Contracts\IScheduleRepository;
+use RuntimeException;
 
 class AcceptClaim
 {
@@ -13,14 +15,19 @@ class AcceptClaim
         private readonly IClaimRepository $claims,
         private readonly IConversationRepository $conversations,
         private readonly IScheduleRepository $schedules,
+        private readonly IMessageRepository $messages,
     ) {}
 
-    public function execute(int $claimId): Claim
+    public function execute(int $claimId, int $receiverId): Claim
     {
         $claim = $this->claims->findById($claimId);
 
-        if (!$claim) {
-            throw new \RuntimeException('Claim not found.');
+        if (! $claim || $claim->receiver_id !== $receiverId) {
+            throw new RuntimeException('Claim not found.');
+        }
+
+        if ($claim->status !== 'pending') {
+            throw new RuntimeException('This claim can no longer be accepted.');
         }
 
         if ($claim->schedule_id) {
@@ -28,18 +35,27 @@ class AcceptClaim
             $schedule = $this->schedules->findById($claim->schedule_id);
 
             if ($accepted >= $schedule->max_participants) {
-                throw new \RuntimeException('This schedule is already at capacity.');
+                throw new RuntimeException('This schedule is already at capacity.');
             }
         }
 
         $claim = $this->claims->updateStatus($claimId, 'accepted');
 
-        $this->conversations->create([
+        $conversation = $this->conversations->create([
             'claim_id'  => $claim->id,
             'user_a_id' => $claim->receiver_id,
             'user_b_id' => $claim->sender_id,
         ]);
 
-        return $claim;
+        if ($claim->message) {
+            $this->messages->create([
+                'conversation_id' => $conversation->id,
+                'sender_id'       => $claim->sender_id,
+                'body'            => $claim->message,
+            ]);
+            $conversation->update(['last_message_at' => now()]);
+        }
+
+        return $claim->fresh(['conversation']);
     }
 }
