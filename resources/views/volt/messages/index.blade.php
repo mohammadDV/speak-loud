@@ -8,7 +8,6 @@ use App\Repositories\Contracts\IMessageRepository;
 state([
     'conversations'      => [],
     'activeConversation' => null,
-    'activeClaimStatus'  => null,
     'messages'           => [],
     'newMessage'         => '',
 ]);
@@ -18,10 +17,13 @@ mount(function () {
 });
 
 $selectConversation = function (int $conversationId) {
-    $conversation = Conversation::with('claim')->find($conversationId);
+    $conversation = Conversation::find($conversationId);
+
+    if (! $conversation || ! in_array(auth()->id(), [$conversation->user_a_id, $conversation->user_b_id], true)) {
+        return;
+    }
 
     $this->activeConversation = $conversationId;
-    $this->activeClaimStatus  = $conversation?->claim?->status;
     $this->messages           = app(IMessageRepository::class)->forConversation($conversationId);
     app(IMessageRepository::class)->markRead($conversationId, auth()->id());
 };
@@ -31,16 +33,19 @@ $sendMessage = function () {
         return;
     }
 
-    if ($this->activeClaimStatus !== 'accepted') {
+    $conversation = Conversation::find($this->activeConversation);
+
+    if (! $conversation) {
         return;
     }
 
     app(IMessageRepository::class)->create([
         'conversation_id' => $this->activeConversation,
         'sender_id'       => auth()->id(),
-        'body'            => $this->newMessage,
+        'body'            => trim($this->newMessage),
     ]);
 
+    $conversation->update(['last_message_at' => now()]);
     $this->messages = app(IMessageRepository::class)->forConversation($this->activeConversation);
     $this->newMessage = '';
 };
@@ -55,7 +60,6 @@ $sendMessage = function () {
         @foreach ($conversations as $conv)
             @php
                 $partner = $conv->user_a_id === auth()->id() ? $conv->userB : $conv->userA;
-                $isRejected = $conv->claim?->status === 'rejected';
             @endphp
             <button wire:click="selectConversation({{ $conv->id }})"
                 class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}">
@@ -65,9 +69,6 @@ $sendMessage = function () {
                     </div>
                     <div class="min-w-0">
                         <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $partner->profile->display_name ?? 'User' }}</p>
-                        @if ($isRejected)
-                            <p class="text-[10px] text-red-600/80">Declined</p>
-                        @endif
                     </div>
                 </div>
             </button>
@@ -76,11 +77,6 @@ $sendMessage = function () {
 
     <main class="flex-1 flex flex-col">
         @if ($activeConversation)
-            @if ($activeClaimStatus === 'rejected')
-                <div class="px-4 py-2 bg-red-50 text-red-700 text-sm text-center border-b border-red-100">
-                    This claim was declined. You can read messages but cannot send new ones.
-                </div>
-            @endif
             <div class="flex-1 overflow-y-auto p-6 space-y-4">
                 @foreach ($messages as $msg)
                     <div class="flex {{ $msg->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
@@ -90,12 +86,10 @@ $sendMessage = function () {
                     </div>
                 @endforeach
             </div>
-            @if ($activeClaimStatus === 'accepted')
-                <div class="p-4 border-t border-[#3D2B1F]/10 flex gap-3">
-                    <flux:textarea wire:model="newMessage" placeholder="Type a message..." rows="1" class="flex-1" />
-                    <flux:button wire:click="sendMessage" variant="primary">Send</flux:button>
-                </div>
-            @endif
+            <div class="p-4 border-t border-[#3D2B1F]/10 flex gap-3">
+                <flux:textarea wire:model="newMessage" placeholder="Type a message..." rows="1" class="flex-1" />
+                <flux:button wire:click="sendMessage" variant="primary">Send</flux:button>
+            </div>
         @else
             <div class="flex-1 flex items-center justify-center text-[#3D2B1F]/40">
                 Select a conversation to start chatting

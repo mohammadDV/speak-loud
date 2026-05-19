@@ -60,8 +60,7 @@ test('discover page lists other users open schedules', function () {
         'end_time'    => '19:00:00',
     ]);
 
-    Volt::test('discover.index')
-        ->actingAs($viewer)
+    Volt::actingAs($viewer)->test('discover.index')
         ->assertSee('Open slots')
         ->assertSee('Host Discover')
         ->assertSee(ScheduleDescription::EXAMPLES[0]);
@@ -117,8 +116,7 @@ test('discover page can send a claim for a schedule', function () {
         'end_time'    => '19:00:00',
     ]);
 
-    Volt::test('discover.index')
-        ->actingAs($viewer)
+    Volt::actingAs($viewer)->test('discover.index')
         ->call('openClaimModal', $schedule->id)
         ->set('claimMessage', 'Would love to join!')
         ->call('sendClaim')
@@ -202,8 +200,7 @@ test('discover page hides schedules the user already claimed', function () {
         'end_time'    => '21:00:00',
     ]);
 
-    Volt::test('discover.index')
-        ->actingAs($viewer)
+    Volt::actingAs($viewer)->test('discover.index')
         ->assertDontSee(ScheduleDescription::EXAMPLES[0])
         ->assertSee(ScheduleDescription::EXAMPLES[1]);
 });

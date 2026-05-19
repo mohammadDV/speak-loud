@@ -25,8 +25,7 @@ test('schedule page can open and close new slot modal', function () {
         'display_name' => 'Schedule Test',
     ]);
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->assertSet('showModal', false)
         ->call('openModal')
         ->assertSet('showModal', true)
@@ -54,8 +53,7 @@ test('schedule page can save a recurring slot', function () {
         'display_name' => 'Schedule Save',
     ]);
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
         ->set('type', 'recurring')
         ->set('language_id', (string) $language->id)
@@ -90,8 +88,7 @@ test('schedule page can edit a recurring slot', function () {
         'display_name' => 'Schedule Edit',
     ]);
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
         ->set('type', 'recurring')
         ->set('language_id', (string) $language->id)
@@ -103,8 +100,7 @@ test('schedule page can edit a recurring slot', function () {
 
     $schedule = $user->schedules()->first();
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->call('editSchedule', $schedule->id)
         ->assertSet('editingScheduleId', $schedule->id)
         ->set('selected_days', ['Mon', 'Wed'])
@@ -139,8 +135,7 @@ test('schedule page can delete a slot', function () {
         'display_name' => 'Schedule Delete',
     ]);
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
         ->set('type', 'recurring')
         ->set('language_id', (string) $language->id)
@@ -152,8 +147,7 @@ test('schedule page can delete a slot', function () {
 
     $schedule = $user->schedules()->first();
 
-    Volt::test('schedule.index')
-        ->actingAs($user)
+    Volt::actingAs($user)->test('schedule.index')
         ->call('deleteSchedule', $schedule->id);
 
     expect($user->schedules()->count())->toBe(0);

@@ -41,11 +41,10 @@ class AcceptClaim
 
         $claim = $this->claims->updateStatus($claimId, 'accepted');
 
-        $conversation = $this->conversations->create([
-            'claim_id'  => $claim->id,
-            'user_a_id' => $claim->receiver_id,
-            'user_b_id' => $claim->sender_id,
-        ]);
+        $conversation = $this->conversations->findOrCreateBetweenUsers(
+            $claim->sender_id,
+            $claim->receiver_id,
+        );
 
         if ($claim->message) {
             $this->messages->create([
@@ -56,6 +55,8 @@ class AcceptClaim
             $conversation->update(['last_message_at' => now()]);
         }
 
-        return $claim->fresh(['conversation']);
+        $claim->setRelation('conversation', $conversation->fresh());
+
+        return $claim;
     }
 }

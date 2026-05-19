@@ -9,7 +9,9 @@ interface IConversationRepository
 {
     public function findById(int $id): ?Conversation;
 
-    public function findByClaim(int $claimId): ?Conversation;
+    public function findBetweenUsers(int $userId1, int $userId2): ?Conversation;
+
+    public function findOrCreateBetweenUsers(int $userId1, int $userId2): Conversation;
 
     public function forUser(int $userId): Collection;
 
