@@ -4,10 +4,15 @@ namespace App\Repositories;
 
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
+use App\Repositories\Contracts\IConversationRepository;
 use Illuminate\Support\Collection;
 
 class ClaimRepository implements IClaimRepository
 {
+    public function __construct(
+        private readonly IConversationRepository $conversations,
+    ) {}
+
     public function findById(int $id): ?Claim
     {
         return Claim::find($id);
@@ -39,19 +44,37 @@ class ClaimRepository implements IClaimRepository
 
     public function incomingForUser(int $userId): Collection
     {
-        return Claim::query()
+        $claims = Claim::query()
             ->where('receiver_id', $userId)
-            ->with(['sender.profile', 'schedule.language', 'conversation'])
+            ->with(['sender.profile', 'schedule.language'])
             ->latest()
             ->get();
+
+        return $this->attachPartnerConversations($claims);
     }
 
     public function outgoingForUser(int $userId): Collection
     {
-        return Claim::query()
+        $claims = Claim::query()
             ->where('sender_id', $userId)
-            ->with(['receiver.profile', 'schedule', 'schedule.user', 'conversation'])
+            ->with(['receiver.profile', 'schedule', 'schedule.user'])
             ->latest()
             ->get();
+
+        return $this->attachPartnerConversations($claims);
+    }
+
+    private function attachPartnerConversations(Collection $claims): Collection
+    {
+        $claims->each(function (Claim $claim) {
+            $conversation = $this->conversations->findBetweenUsers(
+                $claim->sender_id,
+                $claim->receiver_id,
+            );
+
+            $claim->setRelation('conversation', $conversation);
+        });
+
+        return $claims;
     }
 }

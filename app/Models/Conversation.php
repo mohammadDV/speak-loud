@@ -10,16 +10,11 @@ class Conversation extends Model
 {
     const UPDATED_AT = null;
 
-    protected $fillable = ['claim_id', 'user_a_id', 'user_b_id', 'last_message_at'];
+    protected $fillable = ['user_a_id', 'user_b_id', 'last_message_at'];
 
     protected $casts = [
         'last_message_at' => 'datetime',
     ];
-
-    public function claim(): BelongsTo
-    {
-        return $this->belongsTo(Claim::class);
-    }
 
     public function userA(): BelongsTo
     {

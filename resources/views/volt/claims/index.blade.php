@@ -106,7 +106,7 @@ $withdraw = function (int $claimId) {
                             <div class="flex gap-2 shrink-0">
                                 <flux:button
                                     wire:click="accept({{ $claim->id }})"
-                                    wire:confirm="Accept this claim? A chat will be opened so you can practice together."
+                                    wire:confirm="Accept this claim? You can coordinate in your existing chat with this person."
                                     variant="primary"
                                     size="sm"
                                 >Accept</flux:button>
@@ -117,9 +117,9 @@ $withdraw = function (int $claimId) {
                                     size="sm"
                                 >Decline</flux:button>
                             </div>
-                        @elseif ($claim->conversation)
+                        @elseif (in_array($claim->status, ['accepted', 'rejected'], true) && $claim->conversation)
                             <flux:button href="{{ route('messages.show', $claim->conversation->id) }}" variant="ghost" size="sm">
-                                {{ $claim->status === 'accepted' ? 'Chat' : 'View messages' }}
+                                Chat
                             </flux:button>
                         @endif
                     </div>
@@ -146,9 +146,9 @@ $withdraw = function (int $claimId) {
                                     variant="ghost"
                                     size="sm"
                                 >Withdraw</flux:button>
-                            @elseif ($claim->conversation)
+                            @elseif (in_array($claim->status, ['accepted', 'rejected'], true) && $claim->conversation)
                                 <flux:button href="{{ route('messages.show', $claim->conversation->id) }}" variant="ghost" size="sm">
-                                    {{ $claim->status === 'accepted' ? 'Chat' : 'View messages' }}
+                                    Chat
                                 </flux:button>
                             @endif
                         </div>

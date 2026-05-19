@@ -42,7 +42,7 @@ class ContentSeeder extends Seeder
             ['getting-started', 'What is SpeakLoud?', 'SpeakLoud connects language learners with partners for scheduled or direct practice sessions.'],
             ['getting-started', 'Is SpeakLoud free?', 'Yes. Core features are free while we grow the community.'],
             ['schedules-claims', 'How do I publish a time slot?', 'Open Schedule, create a recurring or one-off slot, and set your practice language.'],
-            ['schedules-claims', 'What happens when I accept a claim?', 'A private conversation opens so you can coordinate before your session.'],
+            ['schedules-claims', 'What happens when I accept a claim?', 'You share one chat thread with that person to coordinate before your session.'],
             ['account-safety', 'How do I block someone?', 'Visit their profile and use the block option. Blocked users never appear in search.'],
             ['account-safety', 'How do I report a user?', 'Use the report button on their profile or in chat. Our team reviews reports promptly.'],
         ];

@@ -254,6 +254,7 @@ class DemoDataSeeder extends Seeder
     {
         $statuses = ['pending', 'accepted', 'rejected', 'withdrawn'];
         $usedPairs = [];
+        $conversationPairs = [];
         $acceptedClaims = 0;
 
         foreach ($schedules->shuffle()->take(70) as $schedule) {
@@ -283,9 +284,16 @@ class DemoDataSeeder extends Seeder
                 'expires_at'   => now()->addDays(7),
             ]);
 
-            if ($status === 'accepted') {
-                $acceptedClaims++;
-                $this->createConversationWithMessages($claim);
+            if (in_array($status, ['accepted', 'rejected'], true)) {
+                if ($status === 'accepted') {
+                    $acceptedClaims++;
+                }
+
+                $pairKey = min($claim->sender_id, $claim->receiver_id).'-'.max($claim->sender_id, $claim->receiver_id);
+
+                if (! isset($conversationPairs[$pairKey])) {
+                    $conversationPairs[$pairKey] = $this->createConversationWithMessages($claim);
+                }
             }
         }
 
@@ -305,12 +313,14 @@ class DemoDataSeeder extends Seeder
         }
     }
 
-    private function createConversationWithMessages(Claim $claim): void
+    private function createConversationWithMessages(Claim $claim): Conversation
     {
+        $userAId = min($claim->sender_id, $claim->receiver_id);
+        $userBId = max($claim->sender_id, $claim->receiver_id);
+
         $conversation = Conversation::create([
-            'claim_id'        => $claim->id,
-            'user_a_id'       => $claim->receiver_id,
-            'user_b_id'       => $claim->sender_id,
+            'user_a_id'       => $userAId,
+            'user_b_id'       => $userBId,
             'last_message_at' => now(),
         ]);
         $conversation->created_at = now()->subDays(rand(1, 10));
@@ -337,6 +347,8 @@ class DemoDataSeeder extends Seeder
         }
 
         $conversation->update(['last_message_at' => $lastAt]);
+
+        return $conversation;
     }
 
     private function seedTickets(Collection $users): void

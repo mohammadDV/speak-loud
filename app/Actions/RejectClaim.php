@@ -30,15 +30,16 @@ class RejectClaim
 
         $claim = $this->claims->updateStatus($claimId, 'rejected');
 
-        $conversation = $this->conversations->create([
-            'claim_id'  => $claim->id,
-            'user_a_id' => $claim->receiver_id,
-            'user_b_id' => $claim->sender_id,
-        ]);
+        $conversation = $this->conversations->findOrCreateBetweenUsers(
+            $claim->sender_id,
+            $claim->receiver_id,
+        );
 
         $this->seedClaimThread($conversation->id, $claim, $message);
 
-        return $claim->fresh(['conversation']);
+        $claim->setRelation('conversation', $conversation->fresh());
+
+        return $claim;
     }
 
     private function seedClaimThread(int $conversationId, Claim $claim, ?string $rejectionMessage): void
