@@ -42,7 +42,10 @@ $claimTarget = computed(function () {
     }
 
     return Schedule::query()
-        ->with(['user.profile', 'language', 'recurringRule', 'oneTimeSlot'])
+        ->with(['user.profile', 'user.languages', 'language', 'recurringRule', 'oneTimeSlot'])
+        ->withCount([
+            'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+        ])
         ->find($this->claimScheduleId);
 });
 
@@ -162,19 +165,14 @@ $sendClaim = function (SendClaim $action) {
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
             <div class="absolute inset-0 bg-[#3D2B1F]/40" wire:click="closeClaimModal"></div>
 
-            <div class="relative w-full max-w-md rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[90vh] overflow-y-auto">
+            <div class="relative w-full max-w-lg rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold text-[#3D2B1F]">Send claim</h2>
                     <p class="text-sm text-[#3D2B1F]/60 mt-1">
-                        Request to join <strong>{{ $schedule->user->profile->display_name ?? 'this host' }}</strong>'s
-                        {{ $schedule->language->name_en }} slot.
+                        Review the slot below, then send your request to the host.
                     </p>
 
-                    @if ($schedule->description)
-                        <div class="mt-4 rounded-lg bg-[#FFF0E0] p-3 text-sm text-[#3D2B1F]/80">
-                            {{ $schedule->description }}
-                        </div>
-                    @endif
+                    <x-schedule-details :schedule="$schedule" class="mt-4" />
 
                     <form wire:submit="sendClaim" class="mt-6 space-y-4">
                         <flux:textarea

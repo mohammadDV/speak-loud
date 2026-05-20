@@ -24,9 +24,9 @@ mount(function (string $slug) {
             @if ($post->category) · {{ $post->category->name }} @endif
         </p>
 
-        <div class="prose prose-stone max-w-none">
-            {!! nl2br(e($post->body)) !!}
-        </div>
+        <article class="prose prose-stone max-w-none text-[#3D2B1F] prose-p:text-[#3D2B1F]/80 prose-headings:text-[#3D2B1F]">
+            {!! $post->body !!}
+        </article>
 
         @if ($post->tags->isNotEmpty())
             <div class="flex flex-wrap gap-2 mt-8 pt-6 border-t border-[#3D2B1F]/10">

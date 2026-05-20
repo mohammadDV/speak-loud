@@ -118,6 +118,14 @@ test('discover page can send a claim for a schedule', function () {
 
     Volt::actingAs($viewer)->test('discover.index')
         ->call('openClaimModal', $schedule->id)
+        ->assertSee('Send claim')
+        ->assertSee('Host Claim')
+        ->assertSee('English')
+        ->assertSee('Mon')
+        ->assertSee('18:00')
+        ->assertSee('Session rules')
+        ->assertSee(ScheduleDescription::EXAMPLES[0])
+        ->assertSee('1 spot left')
         ->set('claimMessage', 'Would love to join!')
         ->call('sendClaim')
         ->assertSet('showClaimModal', false);

@@ -31,7 +31,7 @@ $posts = computed(function () {
                             <flux:card class="bg-[#FFF0E0] hover:shadow-md transition-shadow p-5">
                                 <h3 class="font-semibold text-[#3D2B1F]">{{ $post->title }}</h3>
                                 @if ($post->excerpt)
-                                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ Str::limit($post->excerpt, 80) }}</p>
+                                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ Str::limit(strip_tags($post->excerpt), 80) }}</p>
                                 @endif
                                 <p class="text-xs text-[#3D2B1F]/40 mt-2">{{ $post->author->profile->display_name ?? '' }} · {{ $post->published_at?->format('M j') }}</p>
                             </flux:card>

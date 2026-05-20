@@ -38,6 +38,15 @@
 
         <div class="flex items-center gap-2 shrink-0">
             @auth
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="text-[13px] text-[#3D2B1F]/60 hover:text-[#3D2B1F] px-2 py-1.5 rounded-lg hover:bg-black/[0.04] transition-colors"
+                    >
+                        Log out
+                    </button>
+                </form>
                 <a href="{{ route('profile') }}"
                     @class([
                         'w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold transition-all',
