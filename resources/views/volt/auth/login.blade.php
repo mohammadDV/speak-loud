@@ -22,7 +22,15 @@ $login = function () {
     }
 
     session()->regenerate();
-    $this->redirect(route('discover'), navigate: true);
+
+    if ($pendingDirect = session('pending_direct_claim')) {
+        $this->redirect(route('users.show', $pendingDirect['profile_slug']), navigate: true);
+
+        return;
+    }
+
+    $redirect = session()->pull('pending_claim_return', route('discover'));
+    $this->redirect($redirect, navigate: true);
 };
 
 ?>

@@ -11,6 +11,8 @@ interface IClaimRepository
 
     public function findBySenderAndSchedule(int $senderId, int $scheduleId): ?Claim;
 
+    public function findDirectClaimBetweenUsers(int $senderId, int $receiverId): ?Claim;
+
     public function create(array $data): Claim;
 
     public function updateStatus(int $id, string $status): Claim;

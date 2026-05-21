@@ -1,36 +1,45 @@
 <?php
 
 use App\Support\CountryCodes;
+use App\Support\ProfileSlug;
 use function Livewire\Volt\{state, mount, rules};
 use App\Models\Language;
 use App\Models\Interest;
 
 state([
-    'display_name' => '',
-    'username'     => '',
-    'bio'          => '',
-    'country_code' => '',
-    'languages'    => [],
-    'interests'    => [],
+    'display_name'  => '',
+    'profile_slug'  => '',
+    'bio'           => '',
+    'country_code'  => '',
+    'is_private'    => false,
+    'languages'     => [],
+    'interests'     => [],
 ]);
 
 mount(function () {
     $user = auth()->user()->load(['profile', 'tags']);
     if ($user->profile) {
         $this->display_name = $user->profile->display_name;
-        $this->username     = $user->profile->username;
+        $this->profile_slug = $user->profile->profile_slug ?? $user->profile->username;
         $this->bio          = $user->profile->bio ?? '';
         $this->country_code = $user->profile->country_code ?? '';
+        $this->is_private   = (bool) $user->profile->is_private;
     }
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
     $this->interests = Interest::orderBy('name_en')->get();
 });
 
-rules([
-    'display_name' => 'required|string|max:100',
-    'bio'          => 'nullable|string|max:500',
-    'country_code' => 'nullable|string|size:2|in:'.implode(',', array_keys(CountryCodes::LIST)),
-]);
+rules(function () {
+    $profileId = auth()->user()?->profile?->id;
+
+    return [
+        'display_name' => 'required|string|max:100',
+        'profile_slug' => ProfileSlug::validationRules($profileId),
+        'bio'          => 'nullable|string|max:500',
+        'country_code' => 'nullable|string|size:2|in:'.implode(',', array_keys(CountryCodes::LIST)),
+        'is_private'   => 'boolean',
+    ];
+});
 
 $save = function () {
     $this->validate();
@@ -39,9 +48,11 @@ $save = function () {
     if ($user->profile) {
         $user->profile->update([
             'display_name' => $this->display_name,
+            'profile_slug' => strtolower($this->profile_slug),
             'bio'          => $this->bio,
             'country_code' => $this->country_code ?: null,
             'nationality'  => null,
+            'is_private'   => (bool) $this->is_private,
         ]);
     }
 
@@ -54,7 +65,7 @@ $save = function () {
     <div class="flex items-center justify-between gap-4 mb-8">
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">Edit profile</h1>
-            <p class="text-sm text-[#3D2B1F]/50 mt-1">This is what other learners see on Discover.</p>
+            <p class="text-sm text-[#3D2B1F]/50 mt-1">Control your public profile and link.</p>
         </div>
         <a href="{{ route('profile') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Profile</a>
     </div>
@@ -66,8 +77,36 @@ $save = function () {
     <form wire:submit="save" class="space-y-5">
         <flux:input wire:model="display_name" label="Display name" placeholder="Alex" />
 
-        <flux:input wire:model="username" label="Username" disabled
-            description="Username cannot be changed after registration." />
+        <div>
+            <flux:input
+                wire:model="profile_slug"
+                label="Public profile link"
+                placeholder="12345678"
+                description="Letters and numbers only. Your page: {{ url('/u') }}/…"
+            />
+            @if ($profile_slug)
+                <p class="text-xs text-[#3D2B1F]/50 mt-1.5">
+                    Preview:
+                    <a href="{{ route('users.show', strtolower($profile_slug)) }}" class="text-[#FF8C42] hover:underline" target="_blank" rel="noopener">
+                        {{ route('users.show', strtolower($profile_slug)) }}
+                    </a>
+                </p>
+            @endif
+        </div>
+
+        <label class="flex items-start gap-3 cursor-pointer rounded-lg border border-[#3D2B1F]/10 bg-[#FFF0E0] px-4 py-3">
+            <input
+                type="checkbox"
+                wire:model.boolean.live="is_private"
+                class="mt-0.5 h-4 w-4 shrink-0 rounded border-[#FF8C42]/50 text-[#FF8C42] focus:ring-[#FF8C42]"
+            />
+            <span>
+                <span class="block text-sm font-medium text-[#3D2B1F]">Private profile</span>
+                <span class="block text-xs text-[#3D2B1F]/60 mt-1">
+                    Visitors only see your display name. Country, languages, interests, and open slots are hidden.
+                </span>
+            </span>
+        </label>
 
         <flux:select wire:model="country_code" label="Country" placeholder="Select your country">
             <flux:select.option value="">Not set</flux:select.option>

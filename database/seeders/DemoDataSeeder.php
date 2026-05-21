@@ -93,6 +93,7 @@ class DemoDataSeeder extends Seeder
             ['user_id' => $admin->id],
             [
                 'username'     => 'admin',
+                'profile_slug' => 'admin',
                 'display_name' => 'SpeakLoud Admin',
                 'bio'          => 'Platform administrator account for local development.',
                 'nationality'  => 'Global',
@@ -125,6 +126,7 @@ class DemoDataSeeder extends Seeder
                 ['user_id' => $user->id],
                 [
                     'username'     => $username,
+                    'profile_slug' => $username,
                     'display_name' => $firstName.' '.fake()->lastName(),
                     'bio'          => fake()->optional(0.85)->paragraph(),
                     'gender'       => fake()->randomElement($this->genders),

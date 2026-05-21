@@ -23,14 +23,32 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
                     <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#FF8C42] border-4 border-[#FFF8F0] flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
                         {{ strtoupper(substr($profile->display_name, 0, 1)) }}
                     </div>
-                    <flux:button href="{{ route('profile.edit') }}" variant="primary" size="sm" class="shrink-0 self-start sm:self-auto">
-                        Edit profile
-                    </flux:button>
+                    <div class="flex flex-wrap gap-2 shrink-0 self-start sm:self-auto">
+                        <flux:button href="{{ route('profile.edit') }}" variant="primary" size="sm">
+                            Edit profile
+                        </flux:button>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <flux:button type="submit" variant="ghost" size="sm">
+                                Log out
+                            </flux:button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="mt-5">
                     <h1 class="text-2xl sm:text-3xl font-bold text-[#3D2B1F]">{{ $profile->display_name }}</h1>
-                    <p class="text-sm text-[#3D2B1F]/55 mt-1">{{ '@'.$profile->username }}</p>
+
+                    <div class="flex flex-wrap items-center gap-2 mt-3">
+                        @if ($profile->profile_slug)
+                            <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="text-sm text-[#FF8C42] hover:underline break-all">
+                                {{ route('users.show', $profile->profile_slug) }}
+                            </a>
+                        @endif
+                        @if ($profile->is_private)
+                            <span class="text-xs font-medium bg-[#3D2B1F]/10 text-[#3D2B1F]/70 px-2.5 py-1 rounded-full">Private</span>
+                        @endif
+                    </div>
 
                     <div class="flex flex-wrap items-center gap-2 mt-4">
                         @if ($countryName)

@@ -23,6 +23,18 @@ class SendClaim
                     return $this->claims->reopen($existing->id, $data['message'] ?? null);
                 }
             }
+        } else {
+            $existing = $this->claims->findDirectClaimBetweenUsers($data['sender_id'], $data['receiver_id']);
+
+            if ($existing) {
+                if (in_array($existing->status, ['pending', 'accepted'], true)) {
+                    throw new \RuntimeException('You have already sent a claim to this user.');
+                }
+
+                if (in_array($existing->status, ['rejected', 'withdrawn', 'expired'], true)) {
+                    return $this->claims->reopen($existing->id, $data['message'] ?? null);
+                }
+            }
         }
 
         return $this->claims->create([

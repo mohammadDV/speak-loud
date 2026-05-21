@@ -24,6 +24,32 @@ class UserRepository implements IUserRepository
         return User::where('uuid', $uuid)->first();
     }
 
+    public function findPublicProfileBySlug(string $profileSlug): ?User
+    {
+        return User::query()
+            ->where('status', 'active')
+            ->whereHas('profile', fn ($q) => $q->where('profile_slug', $profileSlug))
+            ->with([
+                'profile',
+                'languages.language',
+                'interests',
+                'tags',
+            ])
+            ->first();
+    }
+
+    public function areBlocked(int $userId1, int $userId2): bool
+    {
+        return DB::table('user_blocks')
+            ->where(function ($q) use ($userId1, $userId2) {
+                $q->where('blocker_id', $userId1)->where('blocked_id', $userId2);
+            })
+            ->orWhere(function ($q) use ($userId1, $userId2) {
+                $q->where('blocker_id', $userId2)->where('blocked_id', $userId1);
+            })
+            ->exists();
+    }
+
     public function create(array $data): User
     {
         return User::create($data);
