@@ -132,7 +132,7 @@ Full database DDL and relationships: [`../project-files/SCHEMA.md`](../project-f
 | Path | Description | Auth |
 |------|-------------|------|
 | `/` | Landing | Guest |
-| `/discover` | Partner grid | Yes |
+| `/discover` | Open slots (claim requires login) | Guest browse |
 | `/search` | Partner list search | Yes |
 | `/schedule` | Your availability | Yes |
 | `/claims` | Incoming / outgoing claims | Yes |

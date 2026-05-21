@@ -15,6 +15,8 @@ interface IClaimRepository
 
     public function updateStatus(int $id, string $status): Claim;
 
+    public function reopen(int $id, ?string $message): Claim;
+
     public function incomingForUser(int $userId): Collection;
 
     public function outgoingForUser(int $userId): Collection;

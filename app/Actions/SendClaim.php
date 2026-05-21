@@ -13,8 +13,15 @@ class SendClaim
     {
         if (isset($data['schedule_id'])) {
             $existing = $this->claims->findBySenderAndSchedule($data['sender_id'], $data['schedule_id']);
+
             if ($existing) {
-                throw new \RuntimeException('You have already sent a claim for this schedule.');
+                if (in_array($existing->status, ['pending', 'accepted'], true)) {
+                    throw new \RuntimeException('You have already sent a claim for this schedule.');
+                }
+
+                if (in_array($existing->status, ['rejected', 'withdrawn', 'expired'], true)) {
+                    return $this->claims->reopen($existing->id, $data['message'] ?? null);
+                }
             }
         }
 

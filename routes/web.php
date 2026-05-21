@@ -9,6 +9,7 @@ Route::get('/contact', fn() => view('pages.contact'))->name('contact');
 Route::get('/support', fn() => view('pages.support'))->name('support');
 Volt::route('/blog', 'blog.index')->name('blog.index');
 Volt::route('/blog/{slug}', 'blog.show')->name('blog.show');
+Volt::route('/discover', 'discover.index')->name('discover');
 
 Route::middleware('guest')->group(function () {
     Volt::route('/login', 'auth.login')->name('login');
@@ -16,7 +17,6 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Volt::route('/discover', 'discover.index')->name('discover');
     Volt::route('/schedule', 'schedule.index')->name('schedule');
     Volt::route('/messages', 'messages.index')->name('messages');
     Volt::route('/messages/{id}', 'messages.show')->name('messages.show');

@@ -45,28 +45,27 @@ class ScheduleRepository implements IScheduleRepository
             ->count();
     }
 
-    public function searchOpenSchedules(array $filters, int $viewerId): LengthAwarePaginator
+    public function searchOpenSchedules(array $filters, ?int $viewerId): LengthAwarePaginator
     {
-        $blockedIds = DB::table('user_blocks')
-            ->where('blocker_id', $viewerId)
-            ->orWhere('blocked_id', $viewerId)
-            ->pluck(DB::raw("CASE WHEN blocker_id = {$viewerId} THEN blocked_id ELSE blocker_id END"))
-            ->all();
+        $with = [
+            'user.profile',
+            'language',
+            'recurringRule',
+            'oneTimeSlot',
+        ];
+
+        if ($viewerId !== null) {
+            $with['claims'] = fn ($q) => $q
+                ->where('sender_id', $viewerId)
+                ->whereIn('status', ['pending', 'accepted']);
+        }
 
         $query = Schedule::query()
-            ->with([
-                'user.profile',
-                'language',
-                'recurringRule',
-                'oneTimeSlot',
-                'claims' => fn ($q) => $q->where('sender_id', $viewerId),
-            ])
+            ->with($with)
             ->withCount([
                 'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
             ])
             ->where('schedules.status', 'active')
-            ->where('schedules.user_id', '!=', $viewerId)
-            ->whereNotIn('schedules.user_id', $blockedIds)
             ->whereHas('user', fn ($q) => $q->where('status', 'active'))
             ->whereRaw(
                 '(SELECT COUNT(*) FROM claims WHERE claims.schedule_id = schedules.id AND claims.status = ?) < schedules.max_participants',
@@ -75,8 +74,22 @@ class ScheduleRepository implements IScheduleRepository
             ->where(function ($q) {
                 $q->where('schedules.type', 'recurring')
                     ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('end_datetime', '>', now()));
-            })
-            ->whereDoesntHave('claims', fn ($q) => $q->where('sender_id', $viewerId));
+            });
+
+        if ($viewerId !== null) {
+            $blockedIds = DB::table('user_blocks')
+                ->where('blocker_id', $viewerId)
+                ->orWhere('blocked_id', $viewerId)
+                ->pluck(DB::raw("CASE WHEN blocker_id = {$viewerId} THEN blocked_id ELSE blocker_id END"))
+                ->all();
+
+            $query
+                ->where('schedules.user_id', '!=', $viewerId)
+                ->whereNotIn('schedules.user_id', $blockedIds)
+                ->whereDoesntHave('claims', fn ($q) => $q
+                    ->where('sender_id', $viewerId)
+                    ->whereIn('status', ['pending', 'accepted']));
+        }
 
         if (! empty($filters['language_id'])) {
             $query->where('schedules.language_id', $filters['language_id']);

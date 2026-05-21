@@ -20,5 +20,5 @@ interface IScheduleRepository
 
     public function countAcceptedClaims(int $scheduleId): int;
 
-    public function searchOpenSchedules(array $filters, int $viewerId): LengthAwarePaginator;
+    public function searchOpenSchedules(array $filters, ?int $viewerId): LengthAwarePaginator;
 }

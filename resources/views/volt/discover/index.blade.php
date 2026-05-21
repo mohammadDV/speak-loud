@@ -23,6 +23,11 @@ state([
 
 mount(function () {
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
+
+    if (auth()->check() && session()->has('pending_claim_schedule_id')) {
+        $this->claimScheduleId = session()->pull('pending_claim_schedule_id');
+        $this->showClaimModal  = true;
+    }
 });
 
 $openSchedules = computed(function () {
@@ -60,6 +65,12 @@ $updatedCountryCode = $resetPageOnFilter;
 $updatedType = $resetPageOnFilter;
 
 $openClaimModal = function (int $scheduleId) {
+    if (! auth()->check()) {
+        session(['pending_claim_schedule_id' => $scheduleId]);
+
+        return $this->redirect(route('login'), navigate: true);
+    }
+
     $this->claimScheduleId = $scheduleId;
     $this->claimMessage    = '';
     $this->resetValidation();
@@ -73,6 +84,10 @@ $closeClaimModal = function () {
 };
 
 $sendClaim = function (SendClaim $action) {
+    if (! auth()->check()) {
+        return $this->redirect(route('login'), navigate: true);
+    }
+
     $schedule = Schedule::query()
         ->where('status', 'active')
         ->where('user_id', '!=', auth()->id())
@@ -143,7 +158,13 @@ $sendClaim = function (SendClaim $action) {
         <main class="flex-1 min-w-0">
             <div class="mb-6">
                 <h1 class="text-2xl font-bold text-[#3D2B1F]">Open slots</h1>
-                <p class="text-sm text-[#3D2B1F]/60 mt-1">Open slots you haven't applied to yet. Track existing claims under Claims.</p>
+                <p class="text-sm text-[#3D2B1F]/60 mt-1">
+                    @auth
+                        Open slots you haven't applied to yet. Track existing claims under Claims.
+                    @else
+                        Browse open practice slots from hosts. Sign in to send a claim.
+                    @endauth
+                </p>
             </div>
 
             @if ($this->openSchedules->isEmpty())

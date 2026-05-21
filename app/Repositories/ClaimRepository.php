@@ -42,6 +42,19 @@ class ClaimRepository implements IClaimRepository
         return $claim->fresh();
     }
 
+    public function reopen(int $id, ?string $message): Claim
+    {
+        $claim = Claim::findOrFail($id);
+
+        $claim->update([
+            'status'       => 'pending',
+            'message'      => $message,
+            'responded_at' => null,
+        ]);
+
+        return $claim->fresh();
+    }
+
     public function incomingForUser(int $userId): Collection
     {
         $claims = Claim::query()
