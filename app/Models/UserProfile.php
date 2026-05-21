@@ -13,6 +13,7 @@ class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'username',
+        'profile_slug',
         'display_name',
         'bio',
         'gender',
@@ -22,12 +23,14 @@ class UserProfile extends Model
         'profile_image_path',
         'background_image_path',
         'is_available',
+        'is_private',
     ];
 
     protected function casts(): array
     {
         return [
             'is_available' => 'boolean',
+            'is_private'   => 'boolean',
             'birthdate'    => 'date',
         ];
     }

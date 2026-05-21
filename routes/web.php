@@ -10,6 +10,7 @@ Route::get('/support', fn() => view('pages.support'))->name('support');
 Volt::route('/blog', 'blog.index')->name('blog.index');
 Volt::route('/blog/{slug}', 'blog.show')->name('blog.show');
 Volt::route('/discover', 'discover.index')->name('discover');
+Volt::route('/u/{profileSlug}', 'users.show')->name('users.show');
 
 Route::middleware('guest')->group(function () {
     Volt::route('/login', 'auth.login')->name('login');

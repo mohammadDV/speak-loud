@@ -123,4 +123,37 @@ class ScheduleRepository implements IScheduleRepository
             ->latest('schedules.created_at')
             ->paginate(20, ['*'], 'page', $filters['page'] ?? 1);
     }
+
+    public function openSchedulesForHost(int $hostId, ?int $viewerId): Collection
+    {
+        $with = [
+            'language',
+            'recurringRule',
+            'oneTimeSlot',
+        ];
+
+        if ($viewerId !== null) {
+            $with['claims'] = fn ($q) => $q
+                ->where('sender_id', $viewerId)
+                ->whereIn('status', ['pending', 'accepted']);
+        }
+
+        return Schedule::query()
+            ->with($with)
+            ->withCount([
+                'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+            ])
+            ->where('user_id', $hostId)
+            ->where('status', 'active')
+            ->whereRaw(
+                '(SELECT COUNT(*) FROM claims WHERE claims.schedule_id = schedules.id AND claims.status = ?) < schedules.max_participants',
+                ['accepted']
+            )
+            ->where(function ($q) {
+                $q->where('type', 'recurring')
+                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('end_datetime', '>', now()));
+            })
+            ->latest('created_at')
+            ->get();
+    }
 }

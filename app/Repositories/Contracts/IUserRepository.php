@@ -13,6 +13,10 @@ interface IUserRepository
 
     public function findByUuid(string $uuid): ?User;
 
+    public function findPublicProfileBySlug(string $profileSlug): ?User;
+
+    public function areBlocked(int $userId1, int $userId2): bool;
+
     public function create(array $data): User;
 
     public function update(int $id, array $data): User;

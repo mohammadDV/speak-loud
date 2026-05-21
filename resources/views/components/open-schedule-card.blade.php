@@ -35,7 +35,11 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
-                        <p class="font-semibold text-[#3D2B1F]">{{ $profile->display_name ?? 'Host' }}</p>
+                        @if ($profile?->profile_slug)
+                            <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] hover:text-[#FF8C42]">{{ $profile->display_name ?? 'Host' }}</a>
+                        @else
+                            <p class="font-semibold text-[#3D2B1F]">{{ $profile->display_name ?? 'Host' }}</p>
+                        @endif
                         <span class="text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">{{ $badge }}</span>
                         <span class="text-xs text-[#3D2B1F]/50">{{ $schedule->language->name_en }}</span>
                         @if ($hostCountry)
@@ -71,7 +75,11 @@
                     {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
                 </div>
                 <div class="mt-2 flex flex-wrap items-center gap-1.5">
-                    <p class="font-semibold text-[#3D2B1F] leading-snug">{{ $profile->display_name ?? 'Host' }}</p>
+                    @if ($profile?->profile_slug)
+                        <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] leading-snug hover:text-[#FF8C42]">{{ $profile->display_name ?? 'Host' }}</a>
+                    @else
+                        <p class="font-semibold text-[#3D2B1F] leading-snug">{{ $profile->display_name ?? 'Host' }}</p>
+                    @endif
                     <span class="text-[10px] px-1.5 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">{{ $badge }}</span>
                 </div>
                 <p class="text-xs text-[#3D2B1F]/50 mt-0.5">

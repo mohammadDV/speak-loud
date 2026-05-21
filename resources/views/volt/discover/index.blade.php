@@ -66,7 +66,10 @@ $updatedType = $resetPageOnFilter;
 
 $openClaimModal = function (int $scheduleId) {
     if (! auth()->check()) {
-        session(['pending_claim_schedule_id' => $scheduleId]);
+        session([
+            'pending_claim_schedule_id' => $scheduleId,
+            'pending_claim_return'      => route('discover'),
+        ]);
 
         return $this->redirect(route('login'), navigate: true);
     }

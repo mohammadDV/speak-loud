@@ -23,6 +23,7 @@ class RegisterUser
         UserProfile::create([
             'user_id'      => $user->id,
             'username'     => $data['username'],
+            'profile_slug' => $data['username'],
             'display_name' => $data['display_name'] ?? $data['username'],
         ]);
 

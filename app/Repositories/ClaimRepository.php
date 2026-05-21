@@ -25,6 +25,16 @@ class ClaimRepository implements IClaimRepository
             ->first();
     }
 
+    public function findDirectClaimBetweenUsers(int $senderId, int $receiverId): ?Claim
+    {
+        return Claim::query()
+            ->where('sender_id', $senderId)
+            ->where('receiver_id', $receiverId)
+            ->where('type', 'direct')
+            ->whereNull('schedule_id')
+            ->first();
+    }
+
     public function create(array $data): Claim
     {
         return Claim::create($data);
