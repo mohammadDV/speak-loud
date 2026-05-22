@@ -19,7 +19,13 @@ mount(function () {
 $selectConversation = function (int $conversationId) {
     $conversation = Conversation::find($conversationId);
 
-    if (! $conversation || ! in_array(auth()->id(), [$conversation->user_a_id, $conversation->user_b_id], true)) {
+    if (! $conversation || ! $conversation->userCanAccess(auth()->id())) {
+        return;
+    }
+
+    if ($conversation->isScheduleGroup()) {
+        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+
         return;
     }
 
@@ -59,19 +65,43 @@ $sendMessage = function () {
         </div>
         @foreach ($conversations as $conv)
             @php
-                $partner = $conv->user_a_id === auth()->id() ? $conv->userB : $conv->userA;
+                if ($conv->isScheduleGroup()) {
+                    $label = ($conv->schedule?->language?->name_en ?? 'Schedule').' group';
+                    $initial = 'G';
+                    $href = route('schedules.show', $conv->schedule_id);
+                } else {
+                    $partner = $conv->user_a_id === auth()->id() ? $conv->userB : $conv->userA;
+                    $label = $partner->profile->display_name ?? 'User';
+                    $initial = strtoupper(substr($label, 0, 1));
+                    $href = null;
+                }
             @endphp
-            <button wire:click="selectConversation({{ $conv->id }})"
-                class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
-                        {{ strtoupper(substr($partner->profile->display_name ?? '?', 0, 1)) }}
+            @if ($href)
+                <a href="{{ $href }}" wire:navigate
+                    class="block w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
+                            {{ $initial }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $label }}</p>
+                            <p class="text-xs text-[#3D2B1F]/45">Group chat</p>
+                        </div>
                     </div>
-                    <div class="min-w-0">
-                        <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $partner->profile->display_name ?? 'User' }}</p>
+                </a>
+            @else
+                <button wire:click="selectConversation({{ $conv->id }})"
+                    class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
+                            {{ $initial }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $label }}</p>
+                        </div>
                     </div>
-                </div>
-            </button>
+                </button>
+            @endif
         @endforeach
     </aside>
 

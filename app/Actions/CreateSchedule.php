@@ -8,7 +8,10 @@ use App\Support\ScheduleDayOfWeek;
 
 class CreateSchedule
 {
-    public function __construct(private readonly IScheduleRepository $schedules) {}
+    public function __construct(
+        private readonly IScheduleRepository $schedules,
+        private readonly SyncScheduleGroupChat $syncGroupChat,
+    ) {}
 
     public function execute(int $userId, array $data): Schedule
     {
@@ -36,6 +39,10 @@ class CreateSchedule
             ]);
         }
 
-        return $schedule->load(['recurringRule', 'oneTimeSlot']);
+        $schedule->load(['recurringRule', 'oneTimeSlot']);
+
+        $this->syncGroupChat->execute($schedule);
+
+        return $schedule;
     }
 }

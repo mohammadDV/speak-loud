@@ -164,6 +164,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                     </div>
                     <div class="flex items-center gap-3 shrink-0">
                         <span class="text-sm text-[#3D2B1F]/50 hidden sm:inline">Max {{ $schedule->max_participants }} {{ Str::plural('claim', $schedule->max_participants) }}</span>
+                        <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate size="sm" variant="ghost">View</flux:button>
                         <flux:button type="button" size="sm" variant="ghost" wire:click="editSchedule({{ $schedule->id }})">Edit</flux:button>
                         <flux:button
                             type="button"
