@@ -110,23 +110,29 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         $rules['start_time']      = 'required';
         $rules['end_time']        = 'required';
     } else {
-        $rules['start_datetime'] = 'required|date';
+        $rules['start_datetime'] = 'required|date|after_or_equal:tomorrow';
         $rules['end_datetime']   = 'required|date|after:start_datetime';
     }
 
-    $this->validate($rules);
+    $this->validate($rules, [
+        'start_datetime.after_or_equal' => 'Start time must be tomorrow or later.',
+    ]);
 
     $payload = [
         'type'             => $this->type,
         'language_id'      => $this->language_id,
         'description'      => trim($this->description),
         'max_participants' => $this->max_participants,
-        'day_of_week'      => ScheduleDayOfWeek::normalize($this->selected_days),
-        'start_time'       => $this->start_time,
-        'end_time'         => $this->end_time,
-        'start_datetime'   => $this->start_datetime,
-        'end_datetime'     => $this->end_datetime,
     ];
+
+    if ($this->type === 'recurring') {
+        $payload['day_of_week'] = ScheduleDayOfWeek::normalize($this->selected_days);
+        $payload['start_time']  = $this->start_time;
+        $payload['end_time']    = $this->end_time;
+    } else {
+        $payload['start_datetime'] = $this->start_datetime;
+        $payload['end_datetime']   = $this->end_datetime;
+    }
 
     if ($this->editingScheduleId) {
         $update->execute(auth()->id(), $this->editingScheduleId, $payload);
@@ -237,8 +243,10 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                                 <flux:input wire:model="end_time" label="End" type="time" class="flex-1" />
                             </div>
                         @else
-                            <flux:input wire:model="start_datetime" label="Start" type="datetime-local" />
-                            <flux:input wire:model="end_datetime" label="End" type="datetime-local" />
+                            @php $minStart = now()->addDay()->startOfDay()->format('Y-m-d\TH:i'); @endphp
+                            <flux:input wire:model="start_datetime" label="Start" type="datetime-local" min="{{ $minStart }}" />
+                            <flux:input wire:model="end_datetime" label="End" type="datetime-local" min="{{ $minStart }}" />
+                            @error('start_datetime') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                         @endif
 
                         <flux:textarea

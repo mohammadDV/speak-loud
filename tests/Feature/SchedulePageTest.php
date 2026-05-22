@@ -116,6 +116,81 @@ test('schedule page can edit a recurring slot', function () {
         ->and($schedule->description)->toBe('Updated rules: voice call only, beginner-friendly.');
 });
 
+test('schedule page can save a one-off slot starting tomorrow or later', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'schedule-onetime@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => 'scheduleonetime',
+        'display_name' => 'Schedule One Time',
+    ]);
+
+    $start = now()->addDay()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $end   = now()->addDay()->setTime(19, 0)->format('Y-m-d\TH:i');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('start_datetime', $start)
+        ->set('end_datetime', $end)
+        ->set('description', 'One-off video call. Camera on.')
+        ->set('max_participants', 1)
+        ->call('saveSlot')
+        ->assertSet('showModal', false)
+        ->assertHasNoErrors();
+
+    $schedule = $user->schedules()->with('oneTimeSlot')->first();
+
+    expect($schedule->type)->toBe('one_time')
+        ->and($schedule->oneTimeSlot)->not->toBeNull();
+});
+
+test('schedule page rejects one-off slot starting before tomorrow', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'schedule-onetime-past@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => 'scheduleonetimepast',
+        'display_name' => 'Schedule One Time Past',
+    ]);
+
+    $start = now()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $end   = now()->setTime(19, 0)->format('Y-m-d\TH:i');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('start_datetime', $start)
+        ->set('end_datetime', $end)
+        ->set('description', 'One-off video call. Camera on.')
+        ->call('saveSlot')
+        ->assertHasErrors(['start_datetime']);
+
+    expect($user->schedules()->count())->toBe(0);
+});
+
 test('schedule page can delete a slot', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
