@@ -19,6 +19,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Volt::route('/schedule', 'schedule.index')->name('schedule');
+    Volt::route('/schedules/{schedule}', 'schedule.show')->name('schedules.show');
     Volt::route('/messages', 'messages.index')->name('messages');
     Volt::route('/messages/{id}', 'messages.show')->name('messages.show');
     Volt::route('/profile', 'profile.overview')->name('profile');

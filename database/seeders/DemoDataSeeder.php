@@ -321,6 +321,7 @@ class DemoDataSeeder extends Seeder
         $userBId = max($claim->sender_id, $claim->receiver_id);
 
         $conversation = Conversation::create([
+            'type'            => 'direct',
             'user_a_id'       => $userAId,
             'user_b_id'       => $userBId,
             'last_message_at' => now(),

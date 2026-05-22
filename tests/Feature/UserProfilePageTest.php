@@ -101,6 +101,7 @@ test('profile page shows open chat when conversation exists', function () {
     ]);
 
     $conversation = Conversation::create([
+        'type'      => 'direct',
         'user_a_id' => min($host->id, $viewer->id),
         'user_b_id' => max($host->id, $viewer->id),
     ]);

@@ -41,4 +41,37 @@ class Schedule extends Model
     {
         return $this->hasMany(Claim::class);
     }
+
+    public function groupConversation(): HasOne
+    {
+        return $this->hasOne(Conversation::class)->where('type', 'schedule_group');
+    }
+
+    public function isHost(int $userId): bool
+    {
+        return (int) $this->user_id === $userId;
+    }
+
+    public function hasAcceptedMember(int $userId): bool
+    {
+        return $this->claims()
+            ->where('sender_id', $userId)
+            ->where('status', 'accepted')
+            ->exists();
+    }
+
+    public function userCanView(int $userId): bool
+    {
+        if ($this->isHost($userId) || $this->hasAcceptedMember($userId)) {
+            return true;
+        }
+
+        return $this->status === 'active';
+    }
+
+    public function userCanAccessGroupChat(int $userId): bool
+    {
+        return $this->isHost($userId) || $this->hasAcceptedMember($userId);
+    }
 }
+

@@ -31,6 +31,7 @@ describe('ConversationRepository', function () {
         $bob   = User::factory()->create();
 
         $stored = Conversation::create([
+            'type'      => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);
@@ -51,6 +52,7 @@ describe('ConversationRepository', function () {
         $bob   = User::factory()->create();
 
         $existing = Conversation::create([
+            'type'      => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);
@@ -80,6 +82,7 @@ describe('ConversationRepository', function () {
         $bob   = User::factory()->create();
 
         $conversation = $this->repository->create([
+            'type'      => 'direct',
             'user_a_id' => $bob->id,
             'user_b_id' => $alice->id,
         ]);
@@ -94,18 +97,21 @@ describe('ConversationRepository', function () {
         $partnerB = makeUserWithProfile('b');
 
         $older = Conversation::create([
+            'type'            => 'direct',
             'user_a_id'       => min($viewer->id, $partnerA->id),
             'user_b_id'       => max($viewer->id, $partnerA->id),
             'last_message_at' => now()->subDay(),
         ]);
 
         $newer = Conversation::create([
+            'type'            => 'direct',
             'user_a_id'       => min($viewer->id, $partnerB->id),
             'user_b_id'       => max($viewer->id, $partnerB->id),
             'last_message_at' => now(),
         ]);
 
         Conversation::create([
+            'type'      => 'direct',
             'user_a_id' => min($partnerA->id, $partnerB->id),
             'user_b_id' => max($partnerA->id, $partnerB->id),
         ]);
@@ -124,6 +130,7 @@ describe('ConversationRepository', function () {
         $bob   = User::factory()->create();
 
         $conversation = Conversation::create([
+            'type'      => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);

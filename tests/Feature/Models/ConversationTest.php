@@ -3,14 +3,13 @@
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
-use Illuminate\Database\QueryException;
-
 function conversationBetween(User $first, User $second, array $attributes = []): Conversation
 {
     $userAId = min($first->id, $second->id);
     $userBId = max($first->id, $second->id);
 
     return Conversation::create(array_merge([
+        'type'      => 'direct',
         'user_a_id' => $userAId,
         'user_b_id' => $userBId,
     ], $attributes));
@@ -34,14 +33,17 @@ describe('Conversation model', function () {
             ->and($conversation->getAttributes())->not->toHaveKey('updated_at');
     });
 
-    it('enforces one conversation per user pair', function () {
+    it('reuses the same direct conversation for a user pair via repository', function () {
         $alice = User::factory()->create();
         $bob   = User::factory()->create();
 
-        conversationBetween($alice, $bob);
+        $repo = app(\App\Repositories\Contracts\IConversationRepository::class);
 
-        expect(fn () => conversationBetween($bob, $alice))
-            ->toThrow(QueryException::class);
+        $first  = $repo->findOrCreateBetweenUsers($alice->id, $bob->id);
+        $second = $repo->findOrCreateBetweenUsers($bob->id, $alice->id);
+
+        expect($second->is($first))->toBeTrue()
+            ->and(Conversation::where('type', 'direct')->count())->toBe(1);
     });
 
     it('cascades delete when a participant is force-deleted', function () {

@@ -51,13 +51,14 @@
                         <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-2">{{ $schedule->description }}</p>
                     @endif
                     <p class="text-xs text-[#3D2B1F]/45 mt-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
+                    <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mt-2 text-sm text-[#FF8C42] hover:underline">View details</a>
                 </div>
             </div>
             <div class="shrink-0 sm:pt-1">
                 @if ($myClaim?->status === 'pending')
                     <flux:button type="button" variant="ghost" size="sm" disabled>Claim pending</flux:button>
                 @elseif ($myClaim?->status === 'accepted')
-                    <flux:button type="button" variant="ghost" size="sm" disabled>Accepted</flux:button>
+                    <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate variant="primary" size="sm">Open slot</flux:button>
                 @elseif ($isFull)
                     <flux:button type="button" variant="ghost" size="sm" disabled>Full</flux:button>
                 @else
@@ -94,10 +95,11 @@
 
                 <div class="mt-auto shrink-0 pt-3">
                     <p class="text-[11px] text-[#3D2B1F]/45 mb-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
+                    <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mb-2 text-xs text-[#FF8C42] hover:underline">View details</a>
                     @if ($myClaim?->status === 'pending')
                         <flux:button type="button" variant="ghost" size="sm" class="w-full" disabled>Claim pending</flux:button>
                     @elseif ($myClaim?->status === 'accepted')
-                        <flux:button type="button" variant="ghost" size="sm" class="w-full" disabled>Accepted</flux:button>
+                        <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate variant="primary" size="sm" class="w-full">Open slot</flux:button>
                     @elseif ($isFull)
                         <flux:button type="button" variant="ghost" size="sm" class="w-full" disabled>Full</flux:button>
                     @else

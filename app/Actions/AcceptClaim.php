@@ -16,6 +16,7 @@ class AcceptClaim
         private readonly IConversationRepository $conversations,
         private readonly IScheduleRepository $schedules,
         private readonly IMessageRepository $messages,
+        private readonly SyncScheduleGroupChat $syncGroupChat,
     ) {}
 
     public function execute(int $claimId, int $receiverId): Claim
@@ -40,6 +41,13 @@ class AcceptClaim
         }
 
         $claim = $this->claims->updateStatus($claimId, 'accepted');
+
+        if ($claim->schedule_id) {
+            $schedule = $this->schedules->findById($claim->schedule_id);
+            if ($schedule) {
+                $this->syncGroupChat->execute($schedule);
+            }
+        }
 
         $conversation = $this->conversations->findOrCreateBetweenUsers(
             $claim->sender_id,

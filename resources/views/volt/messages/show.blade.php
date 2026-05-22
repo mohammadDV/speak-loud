@@ -19,8 +19,14 @@ mount(function (int $id) {
         abort(404);
     }
 
-    if (! in_array(auth()->id(), [$conversation->user_a_id, $conversation->user_b_id], true)) {
+    if (! $conversation->userCanAccess(auth()->id())) {
         abort(403);
+    }
+
+    if ($conversation->isScheduleGroup()) {
+        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+
+        return;
     }
 
     $this->conversation = $conversation;
