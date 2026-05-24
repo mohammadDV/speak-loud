@@ -295,11 +295,7 @@ $levelLabels = [
                     @if ($user->interests->isNotEmpty())
                         <div class="mt-6">
                             <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Interests</h2>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach ($user->interests as $interest)
-                                    <span class="text-xs bg-[#FF8C42]/15 text-[#FF8C42] px-3 py-1 rounded-full">{{ $interest->name_en }}</span>
-                                @endforeach
-                            </div>
+                            <x-interest-tags :interests="$user->interests" />
                         </div>
                     @endif
                 @endunless

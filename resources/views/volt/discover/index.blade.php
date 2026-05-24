@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state, mount, computed, usesPagination};
 use App\Actions\SendClaim;
+use App\Models\Interest;
 use App\Models\Language;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
@@ -10,19 +11,22 @@ use App\Support\CountryCodes;
 usesPagination();
 
 state([
-    'search'           => '',
-    'language_id'      => '',
-    'level'            => '',
-    'country_code'     => '',
-    'type'             => '',
-    'languages'        => [],
-    'showClaimModal'   => false,
-    'claimScheduleId'  => null,
-    'claimMessage'     => '',
+    'search'                => '',
+    'language_id'           => '',
+    'level'                 => '',
+    'country_code'          => '',
+    'type'                  => '',
+    'selected_interest_ids' => [],
+    'languages'             => [],
+    'allInterests'          => [],
+    'showClaimModal'        => false,
+    'claimScheduleId'       => null,
+    'claimMessage'          => '',
 ]);
 
 mount(function () {
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
+    $this->allInterests = Interest::orderBy('name_en')->get();
 
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
         $this->claimScheduleId = session()->pull('pending_claim_schedule_id');
@@ -37,9 +41,32 @@ $openSchedules = computed(function () {
         'level'        => $this->level ?: null,
         'country_code' => $this->country_code ?: null,
         'type'         => $this->type ?: null,
+        'interest_ids' => $this->selected_interest_ids ?: null,
         'page'         => $this->getPage(),
     ], auth()->id());
 });
+
+$myInterestIds = computed(function () {
+    if (! auth()->check()) {
+        return [];
+    }
+
+    return auth()->user()
+        ->interests()
+        ->pluck('interests.id')
+        ->map(fn ($id) => (string) $id)
+        ->all();
+});
+
+$applyMyInterests = function () {
+    $this->selected_interest_ids = $this->myInterestIds;
+    $this->resetPage();
+};
+
+$clearInterestFilter = function () {
+    $this->selected_interest_ids = [];
+    $this->resetPage();
+};
 
 $claimTarget = computed(function () {
     if (! $this->claimScheduleId) {
@@ -47,7 +74,7 @@ $claimTarget = computed(function () {
     }
 
     return Schedule::query()
-        ->with(['user.profile', 'user.languages', 'language', 'recurringRule', 'oneTimeSlot'])
+        ->with(['user.profile', 'user.interests', 'user.languages', 'language', 'recurringRule', 'oneTimeSlot'])
         ->withCount([
             'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
         ])
@@ -63,6 +90,7 @@ $updatedLanguageId = $resetPageOnFilter;
 $updatedLevel = $resetPageOnFilter;
 $updatedCountryCode = $resetPageOnFilter;
 $updatedType = $resetPageOnFilter;
+$updatedSelectedInterestIds = $resetPageOnFilter;
 
 $openClaimModal = function (int $scheduleId) {
     if (! auth()->check()) {
@@ -153,6 +181,44 @@ $sendClaim = function (SendClaim $action) {
                         <flux:select.option value="advanced">C1 – Advanced</flux:select.option>
                         <flux:select.option value="fluent">C2 – Fluent</flux:select.option>
                     </flux:select>
+
+                    <fieldset>
+                        <legend class="text-sm font-medium text-[#3D2B1F]">Host interests</legend>
+                        <p class="text-xs text-[#3D2B1F]/50 mt-1 mb-2">Show slots from hosts who share at least one selected interest.</p>
+
+                        @auth
+                            @if ($this->myInterestIds !== [])
+                                <flux:button type="button" wire:click="applyMyInterests" variant="ghost" size="sm" class="mb-2 w-full">
+                                    Use my interests
+                                </flux:button>
+                            @else
+                                <p class="text-xs text-[#3D2B1F]/45 mb-2">
+                                    <a href="{{ route('profile.edit') }}" wire:navigate class="text-[#FF8C42] hover:underline">Add interests</a>
+                                    to your profile to use this shortcut.
+                                </p>
+                            @endif
+                        @endauth
+
+                        <div class="max-h-40 overflow-y-auto space-y-1.5 pr-1">
+                            @foreach ($allInterests as $interest)
+                                <label class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[#3D2B1F] hover:bg-[#FFF0E0] has-[:checked]:bg-[#FF8C42]/10">
+                                    <input
+                                        type="checkbox"
+                                        wire:model.live="selected_interest_ids"
+                                        value="{{ $interest->id }}"
+                                        class="rounded border-[#FF8C42]/50 text-[#FF8C42] focus:ring-[#FF8C42]"
+                                    />
+                                    {{ $interest->name_en }}
+                                </label>
+                            @endforeach
+                        </div>
+
+                        @if ($selected_interest_ids !== [])
+                            <button type="button" wire:click="clearInterestFilter" class="mt-2 text-xs text-[#FF8C42] hover:underline">
+                                Clear interests
+                            </button>
+                        @endif
+                    </fieldset>
                 </div>
             </flux:fieldset>
             </div>
@@ -163,16 +229,16 @@ $sendClaim = function (SendClaim $action) {
                 <h1 class="text-2xl font-bold text-[#3D2B1F]">Open slots</h1>
                 <p class="text-sm text-[#3D2B1F]/60 mt-1">
                     @auth
-                        Open slots you haven't applied to yet. Track existing claims under Claims.
+                        Find partners by language, level, and shared interests. Track claims under Claims.
                     @else
-                        Browse open practice slots from hosts. Sign in to send a claim.
+                        Browse open practice slots and filter by what hosts like to talk about.
                     @endauth
                     <span class="block mt-1 text-xs text-[#3D2B1F]/45">All times are shown in UTC.</span>
                 </p>
             </div>
 
             @if ($this->openSchedules->isEmpty())
-                <p class="text-[#3D2B1F]/50 text-center py-16">No open slots match your filters. Try another language or check back later.</p>
+                <p class="text-[#3D2B1F]/50 text-center py-16">No open slots match your filters. Try fewer interests, another language, or check back later.</p>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch">
                     @foreach ($this->openSchedules as $schedule)

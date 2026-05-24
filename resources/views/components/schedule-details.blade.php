@@ -74,6 +74,13 @@
             <dd>{{ $when }}</dd>
         </div>
 
+        @if ($schedule->user?->interests?->isNotEmpty())
+            <div>
+                <dt class="text-[#3D2B1F]/50 text-xs mb-1">Host interests</dt>
+                <dd><x-interest-tags :interests="$schedule->user->interests" :limit="6" size="xs" /></dd>
+            </div>
+        @endif
+
         <div class="flex flex-wrap gap-x-2">
             <dt class="text-[#3D2B1F]/50 shrink-0">Capacity</dt>
             <dd>

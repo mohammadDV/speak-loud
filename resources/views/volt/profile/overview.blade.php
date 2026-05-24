@@ -3,7 +3,7 @@
 use App\Support\CountryCodes;
 use function Livewire\Volt\{computed};
 
-$profile = computed(fn () => auth()->user()?->load(['profile', 'languages.language', 'tags']));
+$profile = computed(fn () => auth()->user()?->load(['profile', 'languages.language', 'interests']));
 
 ?>
 
@@ -81,16 +81,18 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
                         </div>
                     @endif
 
-                    @if ($user->tags->isNotEmpty())
-                        <div class="mt-6">
-                            <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Interests</h2>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach ($user->tags as $tag)
-                                    <span class="text-xs bg-[#FF8C42]/15 text-[#FF8C42] px-3 py-1 rounded-full">#{{ $tag->tag }}</span>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                    <div class="mt-6">
+                        <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Interests</h2>
+                        @if ($user->interests->isNotEmpty())
+                            <x-interest-tags :interests="$user->interests" />
+                        @else
+                            <p class="text-sm text-[#3D2B1F]/50">
+                                No interests yet.
+                                <a href="{{ route('profile.edit') }}" wire:navigate class="text-[#FF8C42] hover:underline">Add interests</a>
+                                so partners can find you on Discover.
+                            </p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </flux:card>

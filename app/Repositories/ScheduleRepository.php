@@ -49,6 +49,7 @@ class ScheduleRepository implements IScheduleRepository
     {
         $with = [
             'user.profile',
+            'user.interests',
             'language',
             'recurringRule',
             'oneTimeSlot',
@@ -118,6 +119,14 @@ class ScheduleRepository implements IScheduleRepository
             });
         }
 
+        if (! empty($filters['interest_ids'])) {
+            $interestIds = array_values(array_filter(array_map('intval', (array) $filters['interest_ids'])));
+
+            if ($interestIds !== []) {
+                $query->whereHas('user.interests', fn ($q) => $q->whereIn('interests.id', $interestIds));
+            }
+        }
+
         return $query
             ->latest('schedules.created_at')
             ->paginate(20, ['*'], 'page', $filters['page'] ?? 1);
@@ -127,6 +136,7 @@ class ScheduleRepository implements IScheduleRepository
     {
         $with = [
             'language',
+            'user.interests',
             'recurringRule',
             'oneTimeSlot',
         ];

@@ -7,17 +7,18 @@ use App\Models\Language;
 use App\Models\Interest;
 
 state([
-    'display_name'  => '',
-    'profile_slug'  => '',
-    'bio'           => '',
-    'country_code'  => '',
-    'is_private'    => false,
-    'languages'     => [],
-    'interests'     => [],
+    'display_name'          => '',
+    'profile_slug'          => '',
+    'bio'                   => '',
+    'country_code'          => '',
+    'is_private'            => false,
+    'selected_interest_ids' => [],
+    'languages'             => [],
+    'allInterests'          => [],
 ]);
 
 mount(function () {
-    $user = auth()->user()->load(['profile', 'tags']);
+    $user = auth()->user()->load(['profile', 'interests']);
     if ($user->profile) {
         $this->display_name = $user->profile->display_name;
         $this->profile_slug = $user->profile->profile_slug ?? $user->profile->username;
@@ -26,7 +27,11 @@ mount(function () {
         $this->is_private   = (bool) $user->profile->is_private;
     }
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
-    $this->interests = Interest::orderBy('name_en')->get();
+    $this->allInterests = Interest::orderBy('name_en')->get();
+    $this->selected_interest_ids = $user->interests
+        ->pluck('id')
+        ->map(fn ($id) => (string) $id)
+        ->all();
 });
 
 rules(function () {
@@ -37,7 +42,9 @@ rules(function () {
         'profile_slug' => ProfileSlug::validationRules($profileId),
         'bio'          => 'nullable|string|max:500',
         'country_code' => 'nullable|string|size:2|in:'.implode(',', array_keys(CountryCodes::LIST)),
-        'is_private'   => 'boolean',
+        'is_private'              => 'boolean',
+        'selected_interest_ids'   => 'nullable|array|max:10',
+        'selected_interest_ids.*' => 'integer|exists:interests,id',
     ];
 });
 
@@ -56,6 +63,10 @@ $save = function () {
         ]);
     }
 
+    $user->interests()->sync(
+        array_values(array_map('intval', $this->selected_interest_ids ?? []))
+    );
+
     session()->flash('saved', true);
 };
 
@@ -65,7 +76,7 @@ $save = function () {
     <div class="flex items-center justify-between gap-4 mb-8">
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">Edit profile</h1>
-            <p class="text-sm text-[#3D2B1F]/50 mt-1">Control your public profile and link.</p>
+            <p class="text-sm text-[#3D2B1F]/50 mt-1">Help others find you by language and shared interests.</p>
         </div>
         <a href="{{ route('profile') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Profile</a>
     </div>
@@ -117,6 +128,27 @@ $save = function () {
 
         <flux:textarea wire:model="bio" label="Bio" rows="4"
             placeholder="Engineer learning English. Movies, sci-fi, climbing." />
+
+        <fieldset>
+            <legend class="text-sm font-medium text-[#3D2B1F]">Your interests</legend>
+            <p class="text-xs text-[#3D2B1F]/50 mt-1 mb-3">
+                Pick up to 10 topics you enjoy talking about. Others can find your slots on Discover using these tags.
+            </p>
+            <div class="flex flex-wrap gap-2">
+                @foreach ($allInterests as $interest)
+                    <label class="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#FF8C42]/30 bg-[#FFF0E0] px-3 py-1.5 text-sm text-[#3D2B1F] has-[:checked]:border-[#FF8C42] has-[:checked]:bg-[#FF8C42]/15">
+                        <input
+                            type="checkbox"
+                            wire:model="selected_interest_ids"
+                            value="{{ $interest->id }}"
+                            class="rounded border-[#FF8C42]/50 text-[#FF8C42] focus:ring-[#FF8C42]"
+                        />
+                        {{ $interest->name_en }}
+                    </label>
+                @endforeach
+            </div>
+            @error('selected_interest_ids') <p class="mt-2 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+        </fieldset>
 
         <div class="flex gap-3 pt-2">
             <flux:button type="submit" variant="primary">Save profile</flux:button>

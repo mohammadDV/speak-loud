@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Claim;
+use App\Models\Interest;
 use App\Models\Language;
 use App\Models\Schedule;
 use App\Models\ScheduleRecurringRule;
@@ -113,6 +114,139 @@ test('discover page lists other users open schedules', function () {
         ->assertSee('Open slots')
         ->assertSee('Host Discover')
         ->assertSee(ScheduleDescription::EXAMPLES[0]);
+});
+
+test('discover page can filter slots by host interests', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $music = Interest::firstOrCreate(['slug' => 'music'], ['name_en' => 'Music']);
+    $travel = Interest::firstOrCreate(['slug' => 'travel'], ['name_en' => 'Travel']);
+
+    $musicHost = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-music@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    $travelHost = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-travel@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    $viewer = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'viewer-interest@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create(['user_id' => $musicHost->id, 'username' => 'hostmusic', 'display_name' => 'Host Music']);
+    UserProfile::create(['user_id' => $travelHost->id, 'username' => 'hosttravel', 'display_name' => 'Host Travel']);
+    UserProfile::create(['user_id' => $viewer->id, 'username' => 'viewerinterest', 'display_name' => 'Viewer Interest']);
+
+    $musicHost->interests()->sync([$music->id]);
+    $travelHost->interests()->sync([$travel->id]);
+
+    $musicSchedule = Schedule::create([
+        'user_id'          => $musicHost->id,
+        'description'      => 'Music lovers conversation practice.',
+        'type'             => 'recurring',
+        'language_id'      => $language->id,
+        'max_participants' => 2,
+        'status'           => 'active',
+    ]);
+
+    ScheduleRecurringRule::create([
+        'schedule_id' => $musicSchedule->id,
+        'day_of_week' => 'Fri',
+        'start_time'  => '18:00:00',
+        'end_time'    => '19:00:00',
+    ]);
+
+    $travelSchedule = Schedule::create([
+        'user_id'          => $travelHost->id,
+        'description'      => 'Travel stories and tips.',
+        'type'             => 'recurring',
+        'language_id'      => $language->id,
+        'max_participants' => 2,
+        'status'           => 'active',
+    ]);
+
+    ScheduleRecurringRule::create([
+        'schedule_id' => $travelSchedule->id,
+        'day_of_week' => 'Sat',
+        'start_time'  => '18:00:00',
+        'end_time'    => '19:00:00',
+    ]);
+
+    Volt::actingAs($viewer)->test('discover.index')
+        ->set('selected_interest_ids', [(string) $music->id])
+        ->assertSee('Host Music')
+        ->assertSee('Music lovers conversation practice.')
+        ->assertDontSee('Host Travel')
+        ->assertDontSee('Travel stories and tips.');
+});
+
+test('discover apply my interests sets filter from viewer profile', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $gaming = Interest::firstOrCreate(['slug' => 'gaming'], ['name_en' => 'Gaming']);
+
+    $host = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-gaming@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    $viewer = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'viewer-gaming@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create(['user_id' => $host->id, 'username' => 'hostgaming', 'display_name' => 'Host Gaming']);
+    UserProfile::create(['user_id' => $viewer->id, 'username' => 'viewergaming', 'display_name' => 'Viewer Gaming']);
+
+    $host->interests()->sync([$gaming->id]);
+    $viewer->interests()->sync([$gaming->id]);
+
+    $schedule = Schedule::create([
+        'user_id'          => $host->id,
+        'description'      => ScheduleDescription::EXAMPLES[0],
+        'type'             => 'recurring',
+        'language_id'      => $language->id,
+        'max_participants' => 2,
+        'status'           => 'active',
+    ]);
+
+    ScheduleRecurringRule::create([
+        'schedule_id' => $schedule->id,
+        'day_of_week' => 'Sun',
+        'start_time'  => '18:00:00',
+        'end_time'    => '19:00:00',
+    ]);
+
+    Volt::actingAs($viewer)->test('discover.index')
+        ->call('applyMyInterests')
+        ->assertSet('selected_interest_ids', [(string) $gaming->id])
+        ->assertSee('Host Gaming');
 });
 
 test('discover page can send a claim for a schedule', function () {

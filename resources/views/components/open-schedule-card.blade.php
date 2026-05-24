@@ -50,6 +50,9 @@
                     @if ($schedule->description)
                         <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-2">{{ $schedule->description }}</p>
                     @endif
+                    @if ($schedule->user?->interests?->isNotEmpty())
+                        <x-interest-tags :interests="$schedule->user->interests" :limit="4" size="xs" class="mt-2" />
+                    @endif
                     <p class="text-xs text-[#3D2B1F]/45 mt-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
                     <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mt-2 text-sm text-[#FF8C42] hover:underline">View details</a>
                 </div>
@@ -87,9 +90,12 @@
                     {{ $schedule->language->name_en }} · {{ $when }}@if ($hostCountry) · {{ $hostCountry }}@endif
                 </p>
 
-                <div class="flex-1 mt-2 min-h-[3.75rem]">
+                <div class="flex-1 mt-2 min-h-[3.75rem] space-y-2">
                     @if ($schedule->description)
                         <p class="text-xs text-[#3D2B1F]/65 line-clamp-3">{{ $schedule->description }}</p>
+                    @endif
+                    @if ($schedule->user?->interests?->isNotEmpty())
+                        <x-interest-tags :interests="$schedule->user->interests" :limit="3" size="xs" />
                     @endif
                 </div>
 
