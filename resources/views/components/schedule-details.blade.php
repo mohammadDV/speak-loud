@@ -56,6 +56,10 @@
         <span class="text-xs px-2 py-0.5 rounded-full shrink-0 {{ $typeClass }}">{{ $typeLabel }}</span>
     </div>
 
+    @if ($schedule->isHost(auth()->id()) && $schedule->title)
+        <p class="font-semibold text-[#3D2B1F]">{{ $schedule->title }}</p>
+    @endif
+
     <dl class="grid gap-2 text-[#3D2B1F]/80">
         <div class="flex flex-wrap gap-x-2">
             <dt class="text-[#3D2B1F]/50 shrink-0">Language</dt>

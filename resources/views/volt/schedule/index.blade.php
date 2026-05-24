@@ -13,6 +13,7 @@ state([
     'showModal'          => false,
     'editingScheduleId'  => null,
     'type'             => 'recurring',
+    'title'            => '',
     'description'      => '',
     'language_id'      => '',
     'selected_days'    => [],
@@ -46,6 +47,7 @@ $resetForm = function () {
     $this->start_time       = '18:00';
     $this->end_time         = '19:00';
     $this->max_participants = 1;
+    $this->title            = '';
     $this->description      = '';
     $this->start_datetime   = '';
     $this->end_datetime     = '';
@@ -67,6 +69,7 @@ $editSchedule = function (int $scheduleId) {
     $this->type              = $schedule->type;
     $this->language_id       = (string) $schedule->language_id;
     $this->max_participants  = $schedule->max_participants;
+    $this->title             = $schedule->title ?? '';
     $this->description       = $schedule->description ?? '';
 
     if ($schedule->type === 'recurring' && $schedule->recurringRule) {
@@ -100,6 +103,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     $rules = [
         'language_id'      => 'required|exists:languages,id',
         'type'             => 'required|in:recurring,one_time',
+        'title'            => 'required|string|min:1|max:200',
         'description'      => 'required|string|min:10|max:2000',
         'max_participants' => 'required|integer|min:1|max:10',
     ];
@@ -121,6 +125,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     $payload = [
         'type'             => $this->type,
         'language_id'      => $this->language_id,
+        'title'            => trim($this->title),
         'description'      => trim($this->description),
         'max_participants' => $this->max_participants,
     ];
@@ -157,7 +162,10 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
             <flux:card class="bg-[#FFF0E0] p-4">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="font-medium text-[#3D2B1F]">{{ $schedule->language->name_en }}</span>
+                        @if ($schedule->title)
+                            <p class="font-semibold text-[#3D2B1F]">{{ $schedule->title }}</p>
+                        @endif
+                        <span class="font-medium text-[#3D2B1F] {{ $schedule->title ? 'text-sm' : '' }}">{{ $schedule->language->name_en }}</span>
                         <span class="ml-2 text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">
                             {{ $schedule->type === 'recurring' ? 'Weekly' : 'One-off' }}
                         </span>
@@ -225,6 +233,14 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                                 <flux:select.option value="{{ $lang->id }}">{{ $lang->name_en }}</flux:select.option>
                             @endforeach
                         </flux:select>
+
+                        <flux:input
+                            wire:model="title"
+                            label="Title"
+                            maxlength="200"
+                            placeholder="e.g. Saturday evening chat"
+                            description="Only you can see this — it helps you tell your slots apart."
+                        />
 
                         @if ($type === 'recurring')
                             <fieldset>

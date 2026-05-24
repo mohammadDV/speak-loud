@@ -110,7 +110,7 @@ $sendMessage = function () {
             <h1 class="text-2xl font-bold text-[#3D2B1F] mt-2">
                 {{ $schedule->language->name_en }} practice slot
             </h1>
-            @if ($schedule->title)
+            @if ($schedule->isHost(auth()->id()) && $schedule->title)
                 <p class="text-[#3D2B1F]/60 mt-1">{{ $schedule->title }}</p>
             @endif
         </div>

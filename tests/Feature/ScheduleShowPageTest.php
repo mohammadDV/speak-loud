@@ -33,6 +33,7 @@ test('schedule show page displays details and members for host', function () {
 
     $schedule = Schedule::create([
         'user_id'          => $host->id,
+        'title'            => 'Host-only label',
         'description'      => 'Weekly practice with video on.',
         'type'             => 'recurring',
         'language_id'      => $language->id,
@@ -50,9 +51,66 @@ test('schedule show page displays details and members for host', function () {
 
     Volt::actingAs($host)->test('schedule.show', ['schedule' => $schedule->id])
         ->assertSee('English practice slot')
+        ->assertSee('Host-only label')
         ->assertSee('Host Show')
         ->assertSee('Members')
         ->assertSee('Group chat');
+});
+
+test('schedule show page hides private title from non-host viewers', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-title-hide@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    $member = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'member-title-hide@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create(['user_id' => $host->id, 'username' => 'hostth', 'display_name' => 'Host TH']);
+    UserProfile::create(['user_id' => $member->id, 'username' => 'memberth', 'display_name' => 'Member TH']);
+
+    $schedule = Schedule::create([
+        'user_id'          => $host->id,
+        'title'            => 'Secret host title',
+        'description'      => 'Visible session rules for everyone.',
+        'type'             => 'recurring',
+        'language_id'      => $language->id,
+        'max_participants' => 2,
+        'status'           => 'active',
+    ]);
+
+    $schedule->recurringRule()->create([
+        'day_of_week' => 'Tue',
+        'start_time'  => '18:00:00',
+        'end_time'    => '19:00:00',
+    ]);
+
+    Claim::create([
+        'sender_id'   => $member->id,
+        'receiver_id' => $host->id,
+        'schedule_id' => $schedule->id,
+        'type'        => 'schedule',
+        'status'      => 'accepted',
+    ]);
+
+    app(SyncScheduleGroupChat::class)->execute($schedule);
+
+    Volt::actingAs($member)->test('schedule.show', ['schedule' => $schedule->id])
+        ->assertSee('Visible session rules for everyone.')
+        ->assertDontSee('Secret host title');
 });
 
 test('accepted member can access group chat on schedule page', function () {
@@ -82,6 +140,7 @@ test('accepted member can access group chat on schedule page', function () {
 
     $schedule = Schedule::create([
         'user_id'          => $host->id,
+        'title'            => 'One-off host label',
         'description'      => 'One-off session rules here.',
         'type'             => 'one_time',
         'language_id'      => $language->id,

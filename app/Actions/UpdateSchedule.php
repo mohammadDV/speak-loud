@@ -25,6 +25,7 @@ class UpdateSchedule
 
         $this->schedules->update($scheduleId, [
             'language_id'      => $data['language_id'],
+            'title'            => trim($data['title']),
             'description'      => $data['description'],
             'max_participants' => $data['max_participants'] ?? 1,
         ]);

@@ -17,7 +17,7 @@ class CreateSchedule
     {
         $schedule = $this->schedules->create([
             'user_id'          => $userId,
-            'title'            => $data['title'] ?? null,
+            'title'            => trim($data['title']),
             'description'      => $data['description'],
             'type'             => $data['type'],
             'language_id'      => $data['language_id'],

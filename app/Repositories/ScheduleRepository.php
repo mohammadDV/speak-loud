@@ -114,7 +114,6 @@ class ScheduleRepository implements IScheduleRepository
             $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
                 $q->where('schedules.description', 'like', $search)
-                    ->orWhere('schedules.title', 'like', $search)
                     ->orWhereHas('user.profile', fn ($profile) => $profile->where('display_name', 'like', $search));
             });
         }
