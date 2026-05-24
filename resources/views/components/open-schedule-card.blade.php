@@ -6,6 +6,7 @@
 
 @php
     use App\Support\CountryCodes;
+    use App\Support\UtcTime;
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
@@ -14,14 +15,13 @@
     $myClaim = $schedule->claims->first();
     $isFull = $spotsLeft === 0;
 
+    $when = UtcTime::scheduleWhen($schedule) ?? '—';
+
     if ($schedule->recurringRule) {
-        $when = $schedule->recurringRule->day_of_week.' · '.substr((string) $schedule->recurringRule->start_time, 0, 5).'–'.substr((string) $schedule->recurringRule->end_time, 0, 5);
         $badge = 'Weekly';
     } elseif ($schedule->oneTimeSlot) {
-        $when = $schedule->oneTimeSlot->start_datetime->format('D, M j · H:i').' – '.$schedule->oneTimeSlot->end_datetime->format('H:i');
         $badge = 'One-off';
     } else {
-        $when = '—';
         $badge = $schedule->type === 'recurring' ? 'Weekly' : 'One-off';
     }
 @endphp

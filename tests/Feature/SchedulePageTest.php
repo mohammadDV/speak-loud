@@ -201,6 +201,118 @@ test('schedule page rejects one-off slot starting before tomorrow', function () 
     expect($user->schedules()->count())->toBe(0);
 });
 
+test('schedule page rejects one-off slot on a different day than start', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'schedule-onetime-day@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => 'scheduleoneday',
+        'display_name' => 'Schedule One Day',
+    ]);
+
+    $start = now('UTC')->addDay()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $end   = now('UTC')->addDays(2)->setTime(19, 0)->format('Y-m-d\TH:i');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Cross-day slot')
+        ->set('start_datetime', $start)
+        ->set('end_datetime', $end)
+        ->set('description', 'One-off video call. Camera on.')
+        ->call('saveSlot')
+        ->assertHasErrors(['end_datetime']);
+
+    expect($user->schedules()->count())->toBe(0);
+});
+
+test('schedule page rejects one-off slot shorter than 15 minutes', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'schedule-onetime-short@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => 'scheduleoneshort',
+        'display_name' => 'Schedule One Short',
+    ]);
+
+    $day = now('UTC')->addDay();
+    $start = $day->copy()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $end   = $day->copy()->setTime(18, 10)->format('Y-m-d\TH:i');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Short slot')
+        ->set('start_datetime', $start)
+        ->set('end_datetime', $end)
+        ->set('description', 'One-off video call. Camera on.')
+        ->call('saveSlot')
+        ->assertHasErrors(['end_datetime']);
+
+    expect($user->schedules()->count())->toBe(0);
+});
+
+test('schedule page accepts one-off slot that is exactly 15 minutes', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'schedule-onetime-15@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => 'scheduleone15',
+        'display_name' => 'Schedule One 15',
+    ]);
+
+    $day = now('UTC')->addDay();
+    $start = $day->copy()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $end   = $day->copy()->setTime(18, 15)->format('Y-m-d\TH:i');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Fifteen minute slot')
+        ->set('start_datetime', $start)
+        ->set('end_datetime', $end)
+        ->set('description', 'One-off video call. Camera on.')
+        ->call('saveSlot')
+        ->assertHasNoErrors();
+
+    $slot = $user->schedules()->with('oneTimeSlot')->first()->oneTimeSlot;
+
+    expect($slot->start_datetime->diffInMinutes($slot->end_datetime))->toEqual(15);
+});
+
 test('schedule page requires a title when saving a slot', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);

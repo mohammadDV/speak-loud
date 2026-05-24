@@ -8,6 +8,8 @@ use App\Models\Language;
 use App\Models\Schedule;
 use App\Support\ScheduleDayOfWeek;
 use App\Support\ScheduleDescription;
+use App\Support\UtcTime;
+use Carbon\Carbon;
 
 state([
     'showModal'          => false,
@@ -77,8 +79,8 @@ $editSchedule = function (int $scheduleId) {
         $this->start_time    = substr((string) $schedule->recurringRule->start_time, 0, 5);
         $this->end_time      = substr((string) $schedule->recurringRule->end_time, 0, 5);
     } elseif ($schedule->oneTimeSlot) {
-        $this->start_datetime = $schedule->oneTimeSlot->start_datetime->format('Y-m-d\TH:i');
-        $this->end_datetime   = $schedule->oneTimeSlot->end_datetime->format('Y-m-d\TH:i');
+        $this->start_datetime = UtcTime::formatForInput($schedule->oneTimeSlot->start_datetime);
+        $this->end_datetime   = UtcTime::formatForInput($schedule->oneTimeSlot->end_datetime);
     }
 
     $this->resetValidation();
@@ -114,13 +116,11 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         $rules['start_time']      = 'required';
         $rules['end_time']        = 'required';
     } else {
-        $rules['start_datetime'] = 'required|date|after_or_equal:tomorrow';
-        $rules['end_datetime']   = 'required|date|after:start_datetime';
+        $rules['start_datetime'] = 'required|date';
+        $rules['end_datetime']   = 'required|date';
     }
 
-    $this->validate($rules, [
-        'start_datetime.after_or_equal' => 'Start time must be tomorrow or later.',
-    ]);
+    $this->validate($rules);
 
     $payload = [
         'type'             => $this->type,
@@ -135,8 +135,36 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         $payload['start_time']  = $this->start_time;
         $payload['end_time']    = $this->end_time;
     } else {
-        $payload['start_datetime'] = $this->start_datetime;
-        $payload['end_datetime']   = $this->end_datetime;
+        $start = Carbon::parse($this->start_datetime, 'UTC');
+        $end   = Carbon::parse($this->end_datetime, 'UTC');
+        $minStart = now('UTC')->addDay()->startOfDay();
+
+        if ($start->lt($minStart)) {
+            $this->addError('start_datetime', 'Start time must be tomorrow or later (UTC).');
+
+            return;
+        }
+
+        if (! $start->isSameDay($end)) {
+            $this->addError('end_datetime', 'End must be on the same day as the start (UTC).');
+
+            return;
+        }
+
+        if ($end->lte($start)) {
+            $this->addError('end_datetime', 'End time must be after the start time (UTC).');
+
+            return;
+        }
+
+        if ($start->diffInMinutes($end) < 15) {
+            $this->addError('end_datetime', 'The slot must be at least 15 minutes long.');
+
+            return;
+        }
+
+        $payload['start_datetime'] = $start;
+        $payload['end_datetime']   = $end;
     }
 
     if ($this->editingScheduleId) {
@@ -153,7 +181,10 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
 
 <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-[#3D2B1F]">My Schedule</h1>
+        <div>
+            <h1 class="text-2xl font-bold text-[#3D2B1F]">My Schedule</h1>
+            <p class="text-sm text-[#3D2B1F]/50 mt-1">All times are in UTC.</p>
+        </div>
         <flux:button type="button" variant="primary" wire:click="openModal">+ New slot</flux:button>
     </div>
 
@@ -183,15 +214,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                         >Delete</flux:button>
                     </div>
                 </div>
-                @if ($schedule->recurringRule)
-                    <p class="text-sm text-[#3D2B1F]/60 mt-1">
-                        {{ $schedule->recurringRule->day_of_week }} · {{ $schedule->recurringRule->start_time }} – {{ $schedule->recurringRule->end_time }}
-                    </p>
-                @elseif ($schedule->oneTimeSlot)
-                    <p class="text-sm text-[#3D2B1F]/60 mt-1">
-                        {{ $schedule->oneTimeSlot->start_datetime->format('D, M j · H:i') }} – {{ $schedule->oneTimeSlot->end_datetime->format('H:i') }}
-                    </p>
-                @endif
+                <x-schedule-when :schedule="$schedule" class="text-sm text-[#3D2B1F]/60 mt-1 block" />
                 @if ($schedule->description)
                     <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-3">{{ $schedule->description }}</p>
                 @endif
@@ -208,7 +231,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
             <div class="relative w-full max-w-md rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold text-[#3D2B1F]">{{ $editingScheduleId ? 'Edit time slot' : 'New time slot' }}</h2>
-                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ $editingScheduleId ? 'Update your availability.' : "Set when you're free to chat." }}</p>
+                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ $editingScheduleId ? 'Update your availability.' : "Set when you're free to chat." }} All times are UTC.</p>
 
                     <form wire:submit="saveSlot" class="mt-6 space-y-5">
                         @if (! $editingScheduleId)
@@ -256,13 +279,13 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                                 @error('selected_days') <p class="mt-1 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                             </fieldset>
                             <div class="flex gap-3">
-                                <flux:input wire:model="start_time" label="Start" type="time" class="flex-1" />
-                                <flux:input wire:model="end_time" label="End" type="time" class="flex-1" />
+                                <flux:input wire:model="start_time" label="Start (UTC)" type="time" class="flex-1" />
+                                <flux:input wire:model="end_time" label="End (UTC)" type="time" class="flex-1" />
                             </div>
                         @else
-                            @php $minStart = now()->addDay()->startOfDay()->format('Y-m-d\TH:i'); @endphp
-                            <flux:input wire:model="start_datetime" label="Start" type="datetime-local" min="{{ $minStart }}" />
-                            <flux:input wire:model="end_datetime" label="End" type="datetime-local" min="{{ $minStart }}" />
+                            @php $minStart = now('UTC')->addDay()->startOfDay()->format('Y-m-d\TH:i'); @endphp
+                            <flux:input wire:model="start_datetime" label="Start (UTC)" type="datetime-local" min="{{ $minStart }}" description="Date and time in Coordinated Universal Time (UTC)." />
+                            <flux:input wire:model="end_datetime" label="End (UTC)" type="datetime-local" min="{{ $minStart }}" description="Same calendar day as start (UTC). Minimum 15 minutes long." />
                             @error('start_datetime') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                         @endif
 

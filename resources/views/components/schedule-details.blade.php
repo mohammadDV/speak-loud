@@ -2,6 +2,7 @@
 
 @php
     use App\Support\CountryCodes;
+    use App\Support\UtcTime;
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
@@ -23,20 +24,15 @@
         'fluent' => 'C2 – Fluent',
     ];
 
+    $when = UtcTime::scheduleWhenLong($schedule) ?? '—';
+
     if ($schedule->recurringRule) {
-        $days = str_replace(',', ', ', $schedule->recurringRule->day_of_week);
-        $start = substr((string) $schedule->recurringRule->start_time, 0, 5);
-        $end = substr((string) $schedule->recurringRule->end_time, 0, 5);
-        $when = "{$days} · {$start}–{$end}";
         $typeLabel = 'Weekly';
         $typeClass = 'bg-[#FF8C42]/20 text-[#FF8C42]';
     } elseif ($schedule->oneTimeSlot) {
-        $when = $schedule->oneTimeSlot->start_datetime->format('l, M j, Y · H:i')
-            .' – '.$schedule->oneTimeSlot->end_datetime->format('H:i');
         $typeLabel = 'One-off';
         $typeClass = 'bg-[#FFD166]/30 text-[#3D2B1F]';
     } else {
-        $when = '—';
         $typeLabel = $schedule->type === 'recurring' ? 'Weekly' : 'One-off';
         $typeClass = $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]';
     }

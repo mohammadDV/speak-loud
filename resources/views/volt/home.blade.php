@@ -148,10 +148,10 @@ mount(function () {
                         $cnt     = $slot->claims->count();
                         $g       = $gradients[$i % count($gradients)];
                         if ($slot->oneTimeSlot) {
-                            $time = \Carbon\Carbon::parse($slot->oneTimeSlot->start_datetime)->format('D H:i');
+                            $time = \App\Support\UtcTime::format($slot->oneTimeSlot->start_datetime, 'D H:i').' UTC';
                         } elseif ($slot->recurringRule) {
                             $day  = Str::title(strtok($slot->recurringRule->day_of_week ?? 'Mon', ','));
-                            $time = substr($day,0,3).' '.substr($slot->recurringRule->start_time??'',0,5);
+                            $time = substr($day,0,3).' '.substr($slot->recurringRule->start_time??'',0,5).' UTC';
                         } else { $time = '—'; }
                     @endphp
                     <div class="rounded-xl overflow-hidden border border-black/[0.06]">

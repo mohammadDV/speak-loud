@@ -73,7 +73,7 @@ class ScheduleRepository implements IScheduleRepository
             )
             ->where(function ($q) {
                 $q->where('schedules.type', 'recurring')
-                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('end_datetime', '>', now()));
+                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));
             });
 
         if ($viewerId !== null) {
@@ -150,7 +150,7 @@ class ScheduleRepository implements IScheduleRepository
             )
             ->where(function ($q) {
                 $q->where('type', 'recurring')
-                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('end_datetime', '>', now()));
+                    ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));
             })
             ->latest('created_at')
             ->get();

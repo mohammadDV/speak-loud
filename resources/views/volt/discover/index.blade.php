@@ -167,6 +167,7 @@ $sendClaim = function (SendClaim $action) {
                     @else
                         Browse open practice slots from hosts. Sign in to send a claim.
                     @endauth
+                    <span class="block mt-1 text-xs text-[#3D2B1F]/45">All times are shown in UTC.</span>
                 </p>
             </div>
 
