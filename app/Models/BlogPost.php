@@ -34,4 +34,20 @@ class BlogPost extends Model
     {
         return $this->belongsToMany(BlogTag::class, 'blog_post_tags', 'post_id', 'tag_id');
     }
+
+    public function coverUrl(): string
+    {
+        if ($this->cover_image_path) {
+            return str_starts_with($this->cover_image_path, 'http')
+                ? $this->cover_image_path
+                : asset($this->cover_image_path);
+        }
+
+        return asset('images/blog/default-cover.svg');
+    }
+
+    public function coverAlt(): string
+    {
+        return 'Cover image for '.$this->title;
+    }
 }

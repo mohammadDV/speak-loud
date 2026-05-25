@@ -1,8 +1,20 @@
 <?php
 
-use function Livewire\Volt\{state, rules};
+use App\Support\Seo;
+use function Livewire\Volt\{state, rules, mount, title};
 use App\Actions\RegisterUser;
 use Illuminate\Support\Facades\Auth;
+
+mount(function () {
+    Seo::share([
+        'seoTitle'       => 'Create account',
+        'seoDescription' => 'Join SpeakLoud for free. Create your profile, publish practice slots, and find language partners.',
+        'seoUrl'         => route('register'),
+        'seoRobots'      => 'noindex, nofollow',
+    ]);
+});
+
+title(fn () => Seo::pageTitle('Create account'));
 
 state([
     'username'     => '',

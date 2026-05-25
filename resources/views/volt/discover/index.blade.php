@@ -1,6 +1,7 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed, usesPagination};
+use App\Support\Seo;
+use function Livewire\Volt\{state, mount, computed, usesPagination, title};
 use App\Actions\SendClaim;
 use App\Models\Interest;
 use App\Models\Language;
@@ -25,6 +26,12 @@ state([
 ]);
 
 mount(function () {
+    Seo::share([
+        'seoTitle'       => 'Discover practice partners',
+        'seoDescription' => 'Browse open language practice slots by language, level, country, and shared interests. Claim a slot and start speaking.',
+        'seoUrl'         => route('discover'),
+    ]);
+
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
     $this->allInterests = Interest::orderBy('name_en')->get();
 
@@ -33,6 +40,8 @@ mount(function () {
         $this->showClaimModal  = true;
     }
 });
+
+title(fn () => Seo::pageTitle('Discover practice partners'));
 
 $openSchedules = computed(function () {
     return app(IScheduleRepository::class)->searchOpenSchedules([
