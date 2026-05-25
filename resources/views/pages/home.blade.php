@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SpeakLoud — Practice languages with real people</title>
+    <x-seo-head />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased">
@@ -166,6 +166,49 @@
     </div>
 </section>
 
+{{-- ─── Blog ───────────────────────────────────────────────── --}}
+@php
+    $recentPosts = app(\App\Repositories\Contracts\IBlogPostRepository::class)->recentPublished(3);
+@endphp
+
+@if ($recentPosts->isNotEmpty())
+<section class="border-t border-black/[0.06] py-16">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+            <div>
+                <span class="text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">From the blog</span>
+                <h2 class="text-[1.75rem] font-black text-[#3D2B1F] tracking-tight mt-2">Tips for better practice</h2>
+                <p class="text-sm text-[#3D2B1F]/50 mt-1 max-w-md">Guides on finding partners, running sessions, and getting the most from SpeakLoud.</p>
+            </div>
+            <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[#FF8C42] hover:underline shrink-0">
+                View all posts →
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            @foreach ($recentPosts as $post)
+                <a href="{{ route('blog.show', $post->slug) }}" class="group block rounded-xl border border-black/[0.06] bg-white overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,.08)] transition-shadow">
+                    <x-blog-cover :post="$post" class="rounded-none" />
+                    <div class="p-5">
+                        @if ($post->category)
+                            <span class="text-[10px] font-semibold uppercase tracking-wide text-[#FF8C42]">{{ $post->category->name }}</span>
+                        @endif
+                        <h3 class="font-semibold text-[#3D2B1F] mt-2 group-hover:text-[#FF8C42] transition-colors leading-snug">{{ $post->title }}</h3>
+                        @if ($post->excerpt)
+                            <p class="text-sm text-[#3D2B1F]/55 mt-2 line-clamp-3">{{ strip_tags($post->excerpt) }}</p>
+                        @endif
+                        <p class="text-xs text-[#3D2B1F]/40 mt-4">
+                            {{ $post->author?->profile?->display_name ?? 'SpeakLoud' }}
+                            · {{ $post->published_at?->format('M j, Y') }}
+                        </p>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ─── How it works ───────────────────────────────────────── --}}
 <section class="border-t border-black/[0.06] py-16">
     <div class="max-w-6xl mx-auto px-5 grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -189,6 +232,8 @@
     <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
         <span>© {{ date('Y') }} SpeakLoud</span>
         <div class="flex gap-5">
+            <a href="{{ route('blog.index') }}" class="hover:text-[#3D2B1F] transition-colors">Blog</a>
+            <a href="{{ route('faq.index') }}" class="hover:text-[#3D2B1F] transition-colors">FAQ</a>
             <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
             <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>
             <a href="{{ route('support') }}" class="hover:text-[#3D2B1F] transition-colors">Support</a>

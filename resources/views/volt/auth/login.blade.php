@@ -1,7 +1,19 @@
 <?php
 
-use function Livewire\Volt\{state, rules};
+use App\Support\Seo;
+use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Auth;
+
+mount(function () {
+    Seo::share([
+        'seoTitle'       => 'Sign in',
+        'seoDescription' => 'Sign in to your SpeakLoud account to manage schedules, claims, and messages.',
+        'seoUrl'         => route('login'),
+        'seoRobots'      => 'noindex, nofollow',
+    ]);
+});
+
+title(fn () => Seo::pageTitle('Sign in'));
 
 state([
     'email'    => '',

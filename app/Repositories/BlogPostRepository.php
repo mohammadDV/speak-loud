@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\BlogPost;
 use App\Repositories\Contracts\IBlogPostRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class BlogPostRepository implements IBlogPostRepository
 {
@@ -16,11 +17,22 @@ class BlogPostRepository implements IBlogPostRepository
     public function published(int $page = 1): LengthAwarePaginator
     {
         return BlogPost::query()
-            ->with(['author.profile'])
+            ->with(['author.profile', 'category'])
             ->where('published_at', '<=', now())
             ->whereNotNull('published_at')
             ->orderByDesc('published_at')
-            ->paginate(20, ['*'], 'page', $page);
+            ->paginate(6, ['*'], 'page', $page);
+    }
+
+    public function recentPublished(int $limit = 3): Collection
+    {
+        return BlogPost::query()
+            ->with(['author.profile', 'category'])
+            ->where('published_at', '<=', now())
+            ->whereNotNull('published_at')
+            ->orderByDesc('published_at')
+            ->limit($limit)
+            ->get();
     }
 
     public function create(array $data): BlogPost

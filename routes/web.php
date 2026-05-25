@@ -3,12 +3,21 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', fn() => view('pages.home'))->name('home');
+Route::get('/', function () {
+    \App\Support\Seo::share([
+        'seoTitle'       => 'Practice languages with real people',
+        'seoDescription' => 'SpeakLoud connects language learners with partners for scheduled practice. Publish slots, accept claims, and talk with real people.',
+        'seoUrl'         => route('home'),
+    ]);
+
+    return view('pages.home');
+})->name('home');
 Route::get('/about', fn() => view('pages.about'))->name('about');
 Route::get('/contact', fn() => view('pages.contact'))->name('contact');
 Route::get('/support', fn() => view('pages.support'))->name('support');
 Volt::route('/blog', 'blog.index')->name('blog.index');
 Volt::route('/blog/{slug}', 'blog.show')->name('blog.show');
+Volt::route('/faq', 'faq.index')->name('faq.index');
 Volt::route('/discover', 'discover.index')->name('discover');
 Volt::route('/u/{profileSlug}', 'users.show')->name('users.show');
 
