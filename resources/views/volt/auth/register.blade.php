@@ -17,10 +17,11 @@ mount(function () {
 title(fn () => Seo::pageTitle('Create account'));
 
 state([
-    'username'     => '',
-    'email'        => '',
-    'password'     => '',
+    'username'              => '',
+    'email'                 => '',
+    'password'              => '',
     'password_confirmation' => '',
+    'accepted_terms'        => false,
 ]);
 
 rules([
@@ -28,6 +29,9 @@ rules([
     'email'                 => 'required|email|unique:users,email',
     'password'              => 'required|min:8|confirmed',
     'password_confirmation' => 'required',
+    'accepted_terms'        => 'accepted',
+])->messages([
+    'accepted_terms.accepted' => 'You must read and accept the Terms of Service to create an account.',
 ]);
 
 $register = function (RegisterUser $action) {
@@ -59,6 +63,22 @@ $register = function (RegisterUser $action) {
                 <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
                 <flux:input wire:model="password" label="Password" type="password" placeholder="Min. 8 characters" />
                 <flux:input wire:model="password_confirmation" label="Confirm Password" type="password" placeholder="Repeat password" />
+
+                <label class="flex items-start gap-3 text-sm text-[#3D2B1F]/75 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        wire:model="accepted_terms"
+                        class="mt-1 rounded border-[#3D2B1F]/25 text-[#FF8C42] focus:ring-[#FF8C42]"
+                    />
+                    <span>
+                        I have read and agree to the
+                        <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-[#FF8C42] font-semibold hover:underline">Terms of Service</a>,
+                        including rules about payments, links, fraud, chat retention, and privacy.
+                    </span>
+                </label>
+                @error('accepted_terms')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
 
                 <flux:button type="submit" variant="primary" class="w-full">
                     Create account

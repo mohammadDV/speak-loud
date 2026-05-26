@@ -22,6 +22,8 @@ class UserFactory extends Factory
             'password'          => static::$password ??= 'password',
             'role'              => 'user',
             'status'            => 'active',
+            'terms_accepted_at' => now(),
+            'terms_version'     => config('legal.terms_version'),
             'remember_token'    => Str::random(10),
         ];
     }

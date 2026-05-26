@@ -237,6 +237,7 @@
             <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
             <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>
             <a href="{{ route('support') }}" class="hover:text-[#3D2B1F] transition-colors">Support</a>
+            <a href="{{ route('terms') }}" class="hover:text-[#3D2B1F] transition-colors">Terms</a>
         </div>
     </div>
 </footer>
