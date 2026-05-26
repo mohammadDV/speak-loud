@@ -20,6 +20,8 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'terms_accepted_at',
+        'terms_version',
     ];
 
     protected $hidden = [
@@ -34,6 +36,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'banned_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'terms_accepted_at' => 'datetime',
             'role' => 'string',
             'status' => 'string',
         ];

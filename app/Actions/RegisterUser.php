@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Repositories\Contracts\IUserRepository;
+use App\Support\Legal;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -15,9 +16,11 @@ class RegisterUser
     public function execute(array $data): User
     {
         $user = $this->users->create([
-            'uuid'     => Str::uuid(),
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
+            'uuid'              => Str::uuid(),
+            'email'             => $data['email'],
+            'password'          => Hash::make($data['password']),
+            'terms_accepted_at' => now(),
+            'terms_version'     => Legal::termsVersion(),
         ]);
 
         UserProfile::create([
