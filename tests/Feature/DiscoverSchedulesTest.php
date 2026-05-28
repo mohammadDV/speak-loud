@@ -53,7 +53,7 @@ test('guests can browse discover without logging in', function () {
         ->assertSee(ScheduleDescription::EXAMPLES[0]);
 
     Volt::test('discover.index')
-        ->assertSee('Sign in to send a claim')
+        ->assertSee('Sign in')
         ->call('openClaimModal', $schedule->id)
         ->assertRedirect(route('login'));
 

@@ -67,13 +67,22 @@ $sendMessage = function () {
             $partnerUser = $conversation->user_a_id === auth()->id()
                 ? $conversation->userB
                 : $conversation->userA;
+            $partnerAvatarUrl = $partnerUser?->profile?->profileImageUrl();
         @endphp
 
         <div class="flex items-center gap-3 px-4 py-3 border-b border-[#3D2B1F]/10 bg-[#FFF8F0]">
             <a href="{{ route('messages') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Messages</a>
-            <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold shrink-0">
-                {{ strtoupper(substr($partnerUser?->profile?->display_name ?? '?', 0, 1)) }}
-            </div>
+            @if ($partnerAvatarUrl)
+                <img
+                    src="{{ $partnerAvatarUrl }}"
+                    alt="Profile picture of {{ $partnerUser?->profile?->display_name ?? 'User' }}"
+                    class="w-10 h-10 rounded-full object-cover ring-2 ring-[#FFF8F0] shrink-0"
+                >
+            @else
+                <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold shrink-0">
+                    {{ strtoupper(substr($partnerUser?->profile?->display_name ?? '?', 0, 1)) }}
+                </div>
+            @endif
             <div class="min-w-0">
                 <p class="font-semibold text-[#3D2B1F] truncate">{{ $partnerUser?->profile?->display_name ?? 'User' }}</p>
             </div>

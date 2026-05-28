@@ -2,9 +2,12 @@
 
 use App\Support\CountryCodes;
 use App\Support\ProfileSlug;
-use function Livewire\Volt\{state, mount, rules};
+use function Livewire\Volt\{state, mount, rules, usesFileUploads};
 use App\Models\Language;
 use App\Models\Interest;
+use App\Services\Uploads\UserImageUploadService;
+
+usesFileUploads();
 
 state([
     'display_name'          => '',
@@ -15,6 +18,10 @@ state([
     'selected_interest_ids' => [],
     'languages'             => [],
     'allInterests'          => [],
+    'profile_image'         => null,
+    'background_image'      => null,
+    'current_profile_image_url' => null,
+    'current_background_image_url' => null,
 ]);
 
 mount(function () {
@@ -25,6 +32,8 @@ mount(function () {
         $this->bio          = $user->profile->bio ?? '';
         $this->country_code = $user->profile->country_code ?? '';
         $this->is_private   = (bool) $user->profile->is_private;
+        $this->current_profile_image_url = $user->profile->profileImageUrl();
+        $this->current_background_image_url = $user->profile->backgroundImageUrl();
     }
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
     $this->allInterests = Interest::orderBy('name_en')->get();
@@ -45,22 +54,47 @@ rules(function () {
         'is_private'              => 'boolean',
         'selected_interest_ids'   => 'nullable|array|max:10',
         'selected_interest_ids.*' => 'integer|exists:interests,id',
+        'profile_image'           => 'nullable|image|max:4096',
+        'background_image'        => 'nullable|image|max:6144',
     ];
 });
 
-$save = function () {
+$save = function (UserImageUploadService $uploader) {
     $this->validate();
 
     $user = auth()->user();
     if ($user->profile) {
-        $user->profile->update([
+        $profile = $user->profile;
+
+        $update = [
             'display_name' => $this->display_name,
             'profile_slug' => strtolower($this->profile_slug),
             'bio'          => $this->bio,
             'country_code' => $this->country_code ?: null,
             'nationality'  => null,
             'is_private'   => (bool) $this->is_private,
-        ]);
+        ];
+
+        if ($this->profile_image) {
+            $update['profile_image_path'] = $uploader->uploadProfileImage(
+                $this->profile_image,
+                $profile->profile_image_path
+            );
+        }
+
+        if ($this->background_image) {
+            $update['background_image_path'] = $uploader->uploadBackgroundImage(
+                $this->background_image,
+                $profile->background_image_path
+            );
+        }
+
+        $profile->update($update);
+
+        $this->current_profile_image_url = $profile->fresh()->profileImageUrl();
+        $this->current_background_image_url = $profile->fresh()->backgroundImageUrl();
+        $this->profile_image = null;
+        $this->background_image = null;
     }
 
     $user->interests()->sync(
@@ -86,6 +120,67 @@ $save = function () {
     @endif
 
     <form wire:submit="save" class="space-y-5">
+        <div class="rounded-xl border border-[#3D2B1F]/10 bg-[#FFF0E0] p-4">
+            <h2 class="text-sm font-semibold text-[#3D2B1F]">Profile images</h2>
+            <p class="text-xs text-[#3D2B1F]/55 mt-1">Upload a square avatar and a wide background header.</p>
+
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-[#3D2B1F]">Profile picture</label>
+                    <div class="mt-2 flex items-center gap-4">
+                        @php
+                            $previewProfile = null;
+                            try { $previewProfile = $profile_image?->temporaryUrl(); } catch (\Throwable $e) { $previewProfile = null; }
+                        @endphp
+
+                        @if ($previewProfile || $current_profile_image_url)
+                            <img
+                                src="{{ $previewProfile ?: $current_profile_image_url }}"
+                                alt="Profile picture preview"
+                                class="w-16 h-16 rounded-full object-cover ring-2 ring-[#FFF8F0]"
+                            >
+                        @else
+                            <div class="w-16 h-16 rounded-full bg-[#FF8C42] text-white flex items-center justify-center font-bold">S</div>
+                        @endif
+
+                        <input
+                            type="file"
+                            accept="image/*"
+                            wire:model="profile_image"
+                            class="block w-full text-sm text-[#3D2B1F]/70 file:mr-4 file:rounded-lg file:border-0 file:bg-[#FF8C42] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#e67a35]"
+                        >
+                    </div>
+                    @error('profile_image') <p class="mt-2 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-[#3D2B1F]">Background picture</label>
+                    @php
+                        $previewBackground = null;
+                        try { $previewBackground = $background_image?->temporaryUrl(); } catch (\Throwable $e) { $previewBackground = null; }
+                    @endphp
+                    <div class="mt-2">
+                        @if ($previewBackground || $current_background_image_url)
+                            <img
+                                src="{{ $previewBackground ?: $current_background_image_url }}"
+                                alt="Background picture preview"
+                                class="w-full h-28 rounded-xl object-cover"
+                            >
+                        @else
+                            <div class="w-full h-28 rounded-xl" style="background: linear-gradient(135deg, #FF8C42 0%, #FFD166 100%);"></div>
+                        @endif
+                    </div>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        wire:model="background_image"
+                        class="mt-3 block w-full text-sm text-[#3D2B1F]/70 file:mr-4 file:rounded-lg file:border-0 file:bg-[#FF8C42] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-[#e67a35]"
+                    >
+                    @error('background_image') <p class="mt-2 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+
         <flux:input wire:model="display_name" label="Display name" placeholder="Alex" />
 
         <div>

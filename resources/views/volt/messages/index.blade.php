@@ -69,20 +69,30 @@ $sendMessage = function () {
                     $label = ($conv->schedule?->language?->name_en ?? 'Schedule').' group';
                     $initial = 'G';
                     $href = route('schedules.show', $conv->schedule_id);
+                    $avatarUrl = null;
                 } else {
                     $partner = $conv->user_a_id === auth()->id() ? $conv->userB : $conv->userA;
                     $label = $partner->profile->display_name ?? 'User';
                     $initial = strtoupper(substr($label, 0, 1));
                     $href = null;
+                    $avatarUrl = $partner->profile?->profileImageUrl();
                 }
             @endphp
             @if ($href)
                 <a href="{{ $href }}" wire:navigate
                     class="block w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
-                            {{ $initial }}
-                        </div>
+                        @if ($avatarUrl)
+                            <img
+                                src="{{ $avatarUrl }}"
+                                alt="Profile picture of {{ $label }}"
+                                class="w-10 h-10 rounded-full object-cover ring-2 ring-[#FFF8F0]"
+                            >
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
+                                {{ $initial }}
+                            </div>
+                        @endif
                         <div class="min-w-0">
                             <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $label }}</p>
                             <p class="text-xs text-[#3D2B1F]/45">Group chat</p>
@@ -93,9 +103,17 @@ $sendMessage = function () {
                 <button wire:click="selectConversation({{ $conv->id }})"
                     class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
-                            {{ $initial }}
-                        </div>
+                        @if ($avatarUrl)
+                            <img
+                                src="{{ $avatarUrl }}"
+                                alt="Profile picture of {{ $label }}"
+                                class="w-10 h-10 rounded-full object-cover ring-2 ring-[#FFF8F0]"
+                            >
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
+                                {{ $initial }}
+                            </div>
+                        @endif
                         <div class="min-w-0">
                             <p class="font-medium text-[#3D2B1F] text-sm truncate">{{ $label }}</p>
                         </div>

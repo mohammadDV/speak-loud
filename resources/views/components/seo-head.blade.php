@@ -3,7 +3,7 @@
     'description' => null,
     'image' => null,
     'url' => null,
-    'type' => 'website',
+    'type' => null,
     'robots' => null,
 ])
 
