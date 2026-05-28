@@ -217,15 +217,34 @@ $levelLabels = [
             $conversation = $this->conversation;
             $directClaim = $this->directClaim;
             $isPrivate = (bool) $profile->is_private;
+            $backgroundUrl = $profile->backgroundImageUrl();
+            $avatarUrl = $profile->profileImageUrl();
         @endphp
 
         <flux:card class="overflow-hidden bg-[#FFF0E0] border-0 shadow-sm">
-            <div class="h-36 sm:h-44" style="background: linear-gradient(135deg, #FF8C42 0%, #FFD166 100%);"></div>
+            @if ($backgroundUrl)
+                <div
+                    class="h-36 sm:h-44 bg-center bg-cover"
+                    style="background-image: url('{{ $backgroundUrl }}');"
+                    role="img"
+                    aria-label="Profile background"
+                ></div>
+            @else
+                <div class="h-36 sm:h-44" style="background: linear-gradient(135deg, #FF8C42 0%, #FFD166 100%);"></div>
+            @endif
 
             <div class="px-5 sm:px-8 pb-8 -mt-14 sm:-mt-16">
-                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#FF8C42] border-4 border-[#FFF8F0] flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
-                    {{ strtoupper(substr($profile->display_name, 0, 1)) }}
-                </div>
+                @if ($avatarUrl)
+                    <img
+                        src="{{ $avatarUrl }}"
+                        alt="Profile picture of {{ $profile->display_name }}"
+                        class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#FFF8F0] shadow-md shrink-0"
+                    >
+                @else
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#FF8C42] border-4 border-[#FFF8F0] flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
+                        {{ strtoupper(substr($profile->display_name, 0, 1)) }}
+                    </div>
+                @endif
 
                 <div class="mt-5 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div>

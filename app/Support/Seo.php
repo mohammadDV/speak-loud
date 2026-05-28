@@ -15,7 +15,8 @@ class Seo
             return self::SITE_NAME;
         }
 
-        if (Str::contains($pageTitle, self::SITE_NAME)) {
+        // Don't double-append if the brand is already appended as a suffix.
+        if (Str::endsWith($pageTitle, ' | '.self::SITE_NAME) || Str::endsWith($pageTitle, ' — '.self::SITE_NAME)) {
             return $pageTitle;
         }
 

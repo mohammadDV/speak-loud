@@ -6,6 +6,7 @@
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
+    $avatarUrl = $profile?->profileImageUrl();
     $accepted = $schedule->accepted_claims_count
         ?? $schedule->claims?->where('status', 'accepted')->count()
         ?? 0;
@@ -40,9 +41,17 @@
 
 <div {{ $attributes->merge(['class' => 'rounded-lg bg-[#FFF0E0] p-4 space-y-3 text-sm text-[#3D2B1F]']) }}>
     <div class="flex items-start gap-3">
-        <div class="w-11 h-11 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-base">
-            {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
-        </div>
+        @if ($avatarUrl)
+            <img
+                src="{{ $avatarUrl }}"
+                alt="Profile picture of {{ $profile->display_name ?? 'Host' }}"
+                class="w-11 h-11 shrink-0 rounded-full object-cover ring-2 ring-[#FFF8F0]"
+            >
+        @else
+            <div class="w-11 h-11 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-base">
+                {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
+            </div>
+        @endif
         <div class="min-w-0 flex-1">
             <p class="font-semibold text-[#3D2B1F]">{{ $profile->display_name ?? 'Host' }}</p>
             @if ($hostCountry)
