@@ -73,7 +73,7 @@ $register = function (RegisterUser $action) {
                     <span>
                         I have read and agree to the
                         <a href="{{ route('terms') }}" target="_blank" rel="noopener noreferrer" class="text-[#FF8C42] font-semibold hover:underline">Terms of Service</a>,
-                        including rules about payments, links, fraud, chat retention, and privacy.
+                        including rules, and privacy policy.
                     </span>
                 </label>
                 @error('accepted_terms')
