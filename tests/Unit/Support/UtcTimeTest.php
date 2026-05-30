@@ -5,6 +5,9 @@ use App\Models\ScheduleOneTimeSlot;
 use App\Models\ScheduleRecurringRule;
 use App\Support\UtcTime;
 use Carbon\Carbon;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 test('scheduleWhen formats one-off datetimes in UTC', function () {
     $schedule = new Schedule(['type' => 'one_time']);

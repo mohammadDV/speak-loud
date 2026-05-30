@@ -1,15 +1,13 @@
 <?php
 
 use App\Support\Seo;
-use function Livewire\Volt\{state, mount, computed, usesPagination, title};
+use function Livewire\Volt\{state, mount, computed, title};
 use App\Actions\SendClaim;
 use App\Models\Interest;
 use App\Models\Language;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Support\CountryCodes;
-
-usesPagination();
 
 state([
     'search'                => '',
@@ -20,10 +18,55 @@ state([
     'selected_interest_ids' => [],
     'languages'             => [],
     'allInterests'          => [],
+    'schedulesPage'         => 1,
+    'loadedSchedules'       => [],
+    'hasMoreSchedules'      => false,
+    'scrollLoadEnabled'     => false,
     'showClaimModal'        => false,
     'claimScheduleId'       => null,
     'claimMessage'          => '',
 ]);
+
+$loadSchedules = function (bool $append = false) {
+    $paginator = app(IScheduleRepository::class)->searchOpenSchedules([
+        'search'       => $this->search,
+        'language_id'  => $this->language_id ?: null,
+        'level'        => $this->level ?: null,
+        'country_code' => $this->country_code ?: null,
+        'type'         => $this->type ?: null,
+        'interest_ids' => $this->selected_interest_ids ?: null,
+        'page'         => $this->schedulesPage,
+    ], auth()->id());
+
+    if ($append) {
+        $this->loadedSchedules = [...$this->loadedSchedules, ...$paginator->items()];
+    } else {
+        $this->loadedSchedules = $paginator->items();
+    }
+
+    $this->hasMoreSchedules = $paginator->hasMorePages();
+};
+
+$loadMoreSchedules = function () {
+    if (! $this->hasMoreSchedules) {
+        return;
+    }
+
+    $this->schedulesPage++;
+    $this->loadSchedules(append: true);
+};
+
+$enableScrollLoad = function () {
+    $this->scrollLoadEnabled = true;
+};
+
+$loadMoreSchedulesFromScroll = function () {
+    if (! $this->scrollLoadEnabled) {
+        return;
+    }
+
+    $this->loadMoreSchedules();
+};
 
 mount(function () {
     Seo::share([
@@ -34,6 +77,7 @@ mount(function () {
 
     $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
     $this->allInterests = Interest::orderBy('name_en')->get();
+    $this->loadSchedules();
 
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
         $this->claimScheduleId = session()->pull('pending_claim_schedule_id');
@@ -42,18 +86,6 @@ mount(function () {
 });
 
 title(fn () => Seo::pageTitle('Discover practice partners'));
-
-$openSchedules = computed(function () {
-    return app(IScheduleRepository::class)->searchOpenSchedules([
-        'search'       => $this->search,
-        'language_id'  => $this->language_id ?: null,
-        'level'        => $this->level ?: null,
-        'country_code' => $this->country_code ?: null,
-        'type'         => $this->type ?: null,
-        'interest_ids' => $this->selected_interest_ids ?: null,
-        'page'         => $this->getPage(),
-    ], auth()->id());
-});
 
 $myInterestIds = computed(function () {
     if (! auth()->check()) {
@@ -69,12 +101,16 @@ $myInterestIds = computed(function () {
 
 $applyMyInterests = function () {
     $this->selected_interest_ids = $this->myInterestIds;
-    $this->resetPage();
+    $this->schedulesPage = 1;
+    $this->scrollLoadEnabled = false;
+    $this->loadSchedules();
 };
 
 $clearInterestFilter = function () {
     $this->selected_interest_ids = [];
-    $this->resetPage();
+    $this->schedulesPage = 1;
+    $this->scrollLoadEnabled = false;
+    $this->loadSchedules();
 };
 
 $claimTarget = computed(function () {
@@ -91,7 +127,9 @@ $claimTarget = computed(function () {
 });
 
 $resetPageOnFilter = function () {
-    $this->resetPage();
+    $this->schedulesPage = 1;
+    $this->scrollLoadEnabled = false;
+    $this->loadSchedules();
 };
 
 $updatedSearch = $resetPageOnFilter;
@@ -149,7 +187,7 @@ $sendClaim = function (SendClaim $action) {
 
 ?>
 
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div class="max-w-7xl mx-auto px-4 py-8" @scroll.window.once="$wire.enableScrollLoad()">
     <div class="grid grid-cols-1 lg:grid-cols-[16rem_minmax(0,1fr)] gap-x-8 gap-y-6">
         <aside class="min-w-0">
             <div class="lg:sticky lg:top-[4.25rem] lg:z-10 lg:max-h-[calc(100vh-4.25rem-1rem)] lg:overflow-y-auto lg:overscroll-contain rounded-xl bg-[#FFF8F0]/95 lg:backdrop-blur-sm py-1 pr-1">
@@ -246,16 +284,37 @@ $sendClaim = function (SendClaim $action) {
                 </p>
             </div>
 
-            @if ($this->openSchedules->isEmpty())
+            @if ($loadedSchedules === [])
                 <p class="text-[#3D2B1F]/50 text-center py-16">No open slots match your filters. Try fewer interests, another language, or check back later.</p>
             @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch">
-                    @foreach ($this->openSchedules as $schedule)
-                        <x-open-schedule-card :schedule="$schedule" layout="grid" />
+                    @foreach ($loadedSchedules as $schedule)
+                        <x-open-schedule-card :schedule="$schedule" layout="grid" wire:key="discover-schedule-{{ $schedule->id }}" />
                     @endforeach
                 </div>
 
-                <div class="mt-8">{{ $this->openSchedules->links() }}</div>
+                @if ($hasMoreSchedules)
+                    <div
+                        wire:intersect="loadMoreSchedulesFromScroll"
+                        wire:intersect:margin.400px
+                        wire:key="discover-scroll-sentinel"
+                        class="h-px"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div class="mt-8 flex justify-center">
+                        <flux:button
+                            type="button"
+                            wire:click="loadMoreSchedules"
+                            wire:loading.attr="disabled"
+                            wire:target="loadMoreSchedules"
+                            variant="ghost"
+                        >
+                            <span wire:loading.remove wire:target="loadMoreSchedules">Load more</span>
+                            <span wire:loading wire:target="loadMoreSchedules">Loading…</span>
+                        </flux:button>
+                    </div>
+                @endif
             @endif
         </main>
     </div>

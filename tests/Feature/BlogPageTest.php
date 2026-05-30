@@ -26,7 +26,7 @@ test('blog and faq are separate pages', function () {
         ->assertDontSee('<h1 class="text-2xl font-bold text-[#3D2B1F]">Blog</h1>', false);
 });
 
-test('blog index paginates six posts per page', function () {
+test('blog index loads twelve posts initially', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
@@ -36,7 +36,7 @@ test('blog index paginates six posts per page', function () {
         'profile_slug' => 'paginateauthor',
     ]);
 
-    foreach (range(1, 8) as $n) {
+    foreach (range(1, 14) as $n) {
         BlogPost::create([
             'author_id'        => $author->id,
             'title'            => "Pagination post {$n}",
@@ -52,17 +52,12 @@ test('blog index paginates six posts per page', function () {
     $this->get(route('blog.index'))
         ->assertOk()
         ->assertSee('Pagination post 1')
-        ->assertSee('Pagination post 6')
-        ->assertDontSee('Pagination post 7');
-
-    $this->get(route('blog.index', ['page' => 2]))
-        ->assertOk()
-        ->assertSee('Pagination post 7')
-        ->assertSee('Pagination post 8')
-        ->assertDontSee('Pagination post 6');
+        ->assertSee('Pagination post 12')
+        ->assertDontSee('Pagination post 13')
+        ->assertSee('Load more');
 });
 
-test('blog index page two via livewire pagination', function () {
+test('blog index load more appends additional posts', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
@@ -72,7 +67,7 @@ test('blog index page two via livewire pagination', function () {
         'profile_slug' => 'livewireblog',
     ]);
 
-    foreach (range(1, 7) as $n) {
+    foreach (range(1, 13) as $n) {
         BlogPost::create([
             'author_id'        => $author->id,
             'title'            => "Livewire page post {$n}",
@@ -86,7 +81,11 @@ test('blog index page two via livewire pagination', function () {
     }
 
     Volt::test('blog.index')
-        ->call('gotoPage', 2)
-        ->assertSee('Livewire page post 7')
-        ->assertDontSee('Livewire page post 1');
+        ->assertSee('Livewire page post 1')
+        ->assertSee('Livewire page post 12')
+        ->assertDontSee('Livewire page post 13')
+        ->assertSee('Load more')
+        ->call('loadMorePosts')
+        ->assertSee('Livewire page post 13')
+        ->assertSet('hasMorePosts', false);
 });

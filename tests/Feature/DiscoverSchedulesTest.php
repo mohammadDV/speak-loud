@@ -565,3 +565,54 @@ test('discover page shows schedule again after claim is declined', function () {
         ->assertSee(ScheduleDescription::EXAMPLES[0])
         ->assertSee('Send claim');
 });
+
+test('discover page load more appends additional open schedules', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-loadmore@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $host->id,
+        'username'     => 'hostloadmore',
+        'display_name' => 'Host Load More',
+    ]);
+
+    foreach (range(1, 21) as $n) {
+        $schedule = Schedule::create([
+            'user_id'          => $host->id,
+            'description'      => "Discover load more slot {$n}",
+            'type'             => 'recurring',
+            'language_id'      => $language->id,
+            'max_participants' => 2,
+            'status'           => 'active',
+        ]);
+
+        $schedule->created_at = now()->subMinutes($n);
+        $schedule->updated_at = now()->subMinutes($n);
+        $schedule->saveQuietly();
+
+        ScheduleRecurringRule::create([
+            'schedule_id' => $schedule->id,
+            'day_of_week' => 'Wed',
+            'start_time'  => '18:00:00',
+            'end_time'    => '19:00:00',
+        ]);
+    }
+
+    Volt::test('discover.index')
+        ->assertSee('Discover load more slot 1')
+        ->assertSee('Discover load more slot 20')
+        ->assertDontSee('Discover load more slot 21')
+        ->assertSee('Load more')
+        ->call('loadMoreSchedules')
+        ->assertSee('Discover load more slot 21')
+        ->assertSet('hasMoreSchedules', false);
+});

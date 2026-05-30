@@ -1,10 +1,48 @@
 <?php
 
 use App\Support\Seo;
-use function Livewire\Volt\{mount, computed, usesPagination, title};
+use function Livewire\Volt\{state, mount, title};
 use App\Repositories\Contracts\IBlogPostRepository;
 
-usesPagination();
+state([
+    'postsPage'    => 1,
+    'loadedPosts'  => [],
+    'hasMorePosts' => false,
+    'scrollLoadEnabled' => false,
+]);
+
+$loadPosts = function (bool $append = false) {
+    $paginator = app(IBlogPostRepository::class)->published($this->postsPage);
+
+    if ($append) {
+        $this->loadedPosts = [...$this->loadedPosts, ...$paginator->items()];
+    } else {
+        $this->loadedPosts = $paginator->items();
+    }
+
+    $this->hasMorePosts = $paginator->hasMorePages();
+};
+
+$loadMorePosts = function () {
+    if (! $this->hasMorePosts) {
+        return;
+    }
+
+    $this->postsPage++;
+    $this->loadPosts(append: true);
+};
+
+$enableScrollLoad = function () {
+    $this->scrollLoadEnabled = true;
+};
+
+$loadMorePostsFromScroll = function () {
+    if (! $this->scrollLoadEnabled) {
+        return;
+    }
+
+    $this->loadMorePosts();
+};
 
 mount(function () {
     Seo::share([
@@ -12,17 +50,15 @@ mount(function () {
         'seoDescription' => 'Tips for language practice, community stories, and product updates from SpeakLoud.',
         'seoUrl'         => route('blog.index'),
     ]);
+
+    $this->loadPosts();
 });
 
 title(fn () => Seo::pageTitle('Blog'));
 
-$posts = computed(function () {
-    return app(IBlogPostRepository::class)->published($this->getPage());
-});
-
 ?>
 
-<div class="max-w-6xl mx-auto px-4 py-8">
+<div class="max-w-6xl mx-auto px-4 py-8" @scroll.window.once="$wire.enableScrollLoad()">
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">Blog</h1>
@@ -33,12 +69,12 @@ $posts = computed(function () {
         </a>
     </div>
 
-    @if ($this->posts->isEmpty())
+    @if ($loadedPosts === [])
         <p class="text-[#3D2B1F]/50 text-sm">No posts published yet.</p>
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            @foreach ($this->posts as $post)
-                <a href="{{ route('blog.show', $post->slug) }}" class="block overflow-hidden rounded-xl">
+            @foreach ($loadedPosts as $post)
+                <a href="{{ route('blog.show', $post->slug) }}" wire:key="blog-post-{{ $post->id }}" class="block overflow-hidden rounded-xl">
                     <flux:card class="bg-[#FFF0E0] hover:shadow-md transition-shadow p-0 overflow-hidden h-full">
                         <x-blog-cover :post="$post" class="rounded-none" />
                         <div class="p-5">
@@ -59,8 +95,27 @@ $posts = computed(function () {
             @endforeach
         </div>
 
-        @if ($this->posts->hasPages())
-            <div class="mt-8">{{ $this->posts->links() }}</div>
+        @if ($hasMorePosts)
+            <div
+                wire:intersect="loadMorePostsFromScroll"
+                wire:intersect:margin.400px
+                wire:key="blog-scroll-sentinel"
+                class="h-px"
+                aria-hidden="true"
+            ></div>
+
+            <div class="mt-8 flex justify-center">
+                <flux:button
+                    type="button"
+                    wire:click="loadMorePosts"
+                    wire:loading.attr="disabled"
+                    wire:target="loadMorePosts"
+                    variant="ghost"
+                >
+                    <span wire:loading.remove wire:target="loadMorePosts">Load more</span>
+                    <span wire:loading wire:target="loadMorePosts">Loading…</span>
+                </flux:button>
+            </div>
         @endif
     @endif
 </div>

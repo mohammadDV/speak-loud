@@ -21,7 +21,7 @@ class BlogPostRepository implements IBlogPostRepository
             ->where('published_at', '<=', now())
             ->whereNotNull('published_at')
             ->orderByDesc('published_at')
-            ->paginate(6, ['*'], 'page', $page);
+            ->paginate(12, ['*'], 'page', $page);
     }
 
     public function recentPublished(int $limit = 3): Collection
