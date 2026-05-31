@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Models\Schedule;
 use App\Support\ScheduleDayOfWeek;
 use App\Support\ScheduleDescription;
+use App\Support\ScheduleLimits;
 use App\Support\UtcTime;
 use Carbon\Carbon;
 
@@ -41,6 +42,10 @@ $languages = computed(function () {
         ->get();
 });
 
+$maxSlots = computed(fn () => ScheduleLimits::maxSlotsForUser());
+
+$canCreateSlot = computed(fn () => $this->schedules->count() < $this->maxSlots);
+
 $resetForm = function () {
     $this->editingScheduleId = null;
     $this->type             = 'recurring';
@@ -56,6 +61,10 @@ $resetForm = function () {
 };
 
 $openModal = function () {
+    if (! $this->canCreateSlot) {
+        return;
+    }
+
     $this->resetForm();
     $this->resetValidation();
     $this->showModal = true;
@@ -170,6 +179,12 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     if ($this->editingScheduleId) {
         $update->execute(auth()->id(), $this->editingScheduleId, $payload);
     } else {
+        if (! $this->canCreateSlot) {
+            $this->addError('title', ScheduleLimits::limitReachedMessage());
+
+            return;
+        }
+
         $create->execute(auth()->id(), $payload);
     }
 
@@ -183,9 +198,15 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     <div class="flex items-center justify-between mb-6">
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">My Schedule</h1>
-            <p class="text-sm text-[#3D2B1F]/50 mt-1">All times are in UTC.</p>
+            <p class="text-sm text-[#3D2B1F]/50 mt-1">
+                {{ $this->schedules->count() }} of {{ $this->maxSlots }} slots used · All times are in UTC.
+            </p>
         </div>
-        <flux:button type="button" variant="primary" wire:click="openModal">+ New slot</flux:button>
+        @if ($this->canCreateSlot)
+            <flux:button type="button" variant="primary" wire:click="openModal">+ New slot</flux:button>
+        @else
+            <flux:button type="button" variant="primary" disabled title="{{ ScheduleLimits::limitReachedMessage() }}">+ New slot</flux:button>
+        @endif
     </div>
 
     <div class="space-y-4">
@@ -223,6 +244,10 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
             <p class="text-center text-[#3D2B1F]/40 py-16">No slots yet. Create your first one!</p>
         @endforelse
     </div>
+
+    @if (! $this->canCreateSlot)
+        <p class="mt-4 text-sm text-[#3D2B1F]/55 text-center">{{ ScheduleLimits::limitReachedMessage() }}</p>
+    @endif
 
     @if ($showModal)
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">

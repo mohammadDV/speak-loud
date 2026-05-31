@@ -20,6 +20,11 @@ class ScheduleRepository implements IScheduleRepository
         return Schedule::where('user_id', $userId)->get();
     }
 
+    public function countByUser(int $userId): int
+    {
+        return Schedule::where('user_id', $userId)->count();
+    }
+
     public function create(array $data): Schedule
     {
         return Schedule::create($data);

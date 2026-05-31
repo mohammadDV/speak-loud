@@ -5,6 +5,8 @@ namespace App\Actions;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Support\ScheduleDayOfWeek;
+use App\Support\ScheduleLimits;
+use Illuminate\Validation\ValidationException;
 
 class CreateSchedule
 {
@@ -15,6 +17,12 @@ class CreateSchedule
 
     public function execute(int $userId, array $data): Schedule
     {
+        if ($this->schedules->countByUser($userId) >= ScheduleLimits::maxSlotsForUser()) {
+            throw ValidationException::withMessages([
+                'title' => ScheduleLimits::limitReachedMessage(),
+            ]);
+        }
+
         $schedule = $this->schedules->create([
             'user_id'          => $userId,
             'title'            => trim($data['title']),

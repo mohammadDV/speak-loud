@@ -6,6 +6,42 @@ use App\Models\UserProfile;
 use Illuminate\Support\Str;
 use Livewire\Volt\Volt;
 
+function createScheduleTestUser(string $email, string $username): User
+{
+    $user = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => $email,
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $user->id,
+        'username'     => $username,
+        'display_name' => ucfirst($username),
+    ]);
+
+    return $user;
+}
+
+function saveRecurringSlotViaSchedulePage(User $user, Language $language, string $title): void
+{
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'recurring')
+        ->set('language_id', (string) $language->id)
+        ->set('title', $title)
+        ->set('selected_days', ['Sat'])
+        ->set('start_time', '18:00')
+        ->set('end_time', '19:00')
+        ->set('description', 'Video call on Google Meet. 50/50 language split.')
+        ->set('max_participants', 1)
+        ->call('saveSlot')
+        ->assertHasNoErrors();
+}
+
 test('schedule page can open and close new slot modal', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
@@ -382,4 +418,73 @@ test('schedule page can delete a slot', function () {
         ->call('deleteSchedule', $schedule->id);
 
     expect($user->schedules()->count())->toBe(0);
+});
+
+test('schedule page allows up to the configured slot limit', function () {
+    config(['schedules.max_slots_per_user' => 3]);
+
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-limit@speakloud.test', 'schedulelimit');
+
+    foreach (['First slot', 'Second slot', 'Third slot'] as $title) {
+        saveRecurringSlotViaSchedulePage($user, $language, $title);
+    }
+
+    expect($user->schedules()->count())->toBe(3);
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->assertSee('3 of 3 slots used')
+        ->assertSee('You can have up to 3 slots. Delete an existing slot to create a new one.');
+});
+
+test('schedule page rejects creating a slot beyond the limit', function () {
+    config(['schedules.max_slots_per_user' => 3]);
+
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-limit-block@speakloud.test', 'schedulelimitblock');
+
+    foreach (['Slot A', 'Slot B', 'Slot C'] as $title) {
+        saveRecurringSlotViaSchedulePage($user, $language, $title);
+    }
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'recurring')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Fourth slot')
+        ->set('selected_days', ['Sun'])
+        ->set('start_time', '18:00')
+        ->set('end_time', '19:00')
+        ->set('description', 'Video call on Google Meet. 50/50 language split.')
+        ->call('saveSlot')
+        ->assertHasErrors(['title']);
+
+    expect($user->schedules()->count())->toBe(3);
+});
+
+test('schedule page allows a new slot after deleting one at the limit', function () {
+    config(['schedules.max_slots_per_user' => 3]);
+
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-limit-delete@speakloud.test', 'schedulelimitdelete');
+
+    foreach (['Slot A', 'Slot B', 'Slot C'] as $title) {
+        saveRecurringSlotViaSchedulePage($user, $language, $title);
+    }
+
+    $schedule = $user->schedules()->where('title', 'Slot A')->first();
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->call('deleteSchedule', $schedule->id);
+
+    saveRecurringSlotViaSchedulePage($user, $language, 'Replacement slot');
+
+    expect($user->schedules()->count())->toBe(3)
+        ->and($user->schedules()->where('title', 'Replacement slot')->exists())->toBeTrue();
 });

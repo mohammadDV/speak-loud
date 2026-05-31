@@ -12,6 +12,8 @@ interface IScheduleRepository
 
     public function findByUser(int $userId): Collection;
 
+    public function countByUser(int $userId): int;
+
     public function create(array $data): Schedule;
 
     public function update(int $id, array $data): Schedule;
