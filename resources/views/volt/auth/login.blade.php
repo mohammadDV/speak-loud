@@ -54,10 +54,22 @@ $login = function () {
             <p class="text-[#3D2B1F]/60 mt-1">Sign in to your account</p>
         </div>
 
+        @if (session('status') === 'password-reset')
+            <div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">
+                Your password has been reset. You can sign in with your new password.
+            </div>
+        @endif
+
         <flux:card class="bg-[#FFF0E0] p-8">
             <form wire:submit="login" class="space-y-5">
                 <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
                 <flux:input wire:model="password" label="Password" type="password" placeholder="••••••••" />
+
+                <div class="text-right">
+                    <a href="{{ route('password.request') }}" class="text-sm text-[#FF8C42] font-medium hover:underline">
+                        Forgot password?
+                    </a>
+                </div>
 
                 <flux:button type="submit" variant="primary" class="w-full">
                     Sign in

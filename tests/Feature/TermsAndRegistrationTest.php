@@ -35,7 +35,7 @@ test('registration stores terms acceptance when checkbox is checked', function (
         ->set('accepted_terms', true)
         ->call('register')
         ->assertHasNoErrors()
-        ->assertRedirect(route('profile.edit'));
+        ->assertRedirect(route('verification.notice'));
 
     $user = User::where('email', 'termsuser@example.com')->first();
 

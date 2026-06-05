@@ -45,7 +45,8 @@ $register = function (RegisterUser $action) {
 
     Auth::login($user);
     session()->regenerate();
-    $this->redirect(route('profile.edit'), navigate: true);
+    $user->sendEmailVerificationNotification();
+    $this->redirect(route('verification.notice'), navigate: true);
 };
 
 ?>

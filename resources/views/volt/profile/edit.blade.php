@@ -115,6 +115,10 @@ $save = function (UserImageUploadService $uploader) {
         <a href="{{ route('profile') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Profile</a>
     </div>
 
+    @if (session('verified'))
+        <div class="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">Email verified! Finish setting up your profile below.</div>
+    @endif
+
     @if (session('saved'))
         <div class="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">Profile saved!</div>
     @endif
