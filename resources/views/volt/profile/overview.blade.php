@@ -8,6 +8,15 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
+    @if (! auth()->user()->hasVerifiedEmail())
+        <div class="mb-6 p-4 bg-amber-50 text-amber-900 rounded-lg text-sm ring-1 ring-amber-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <span>Please verify your email to use schedules, claims, and messages.</span>
+            <a href="{{ route('verification.notice') }}" wire:navigate class="text-[#FF8C42] font-semibold hover:underline shrink-0">
+                Verify email
+            </a>
+        </div>
+    @endif
+
     @if ($this->profile?->profile)
         @php
             $user = $this->profile;
@@ -45,6 +54,9 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
                     <div class="flex flex-wrap gap-2 shrink-0 self-start sm:self-auto">
                         <flux:button href="{{ route('profile.edit') }}" variant="primary" size="sm">
                             Edit profile
+                        </flux:button>
+                        <flux:button href="{{ route('profile.security') }}" variant="ghost" size="sm">
+                            Security
                         </flux:button>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
