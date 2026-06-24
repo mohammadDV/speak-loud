@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\LogsModelChanges;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Message extends Model
 {
-    use SoftDeletes;
+    use LogsModelChanges, SoftDeletes;
 
     const UPDATED_AT = null;
 
@@ -18,8 +19,8 @@ class Message extends Model
     ];
 
     protected $casts = [
-        'is_read'  => 'boolean',
-        'read_at'  => 'datetime',
+        'is_read' => 'boolean',
+        'read_at' => 'datetime',
     ];
 
     public function conversation(): BelongsTo

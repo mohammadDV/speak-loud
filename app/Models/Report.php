@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\LogsModelChanges;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Report extends Model
 {
+    use LogsModelChanges;
+
     const UPDATED_AT = null;
 
     protected $fillable = [

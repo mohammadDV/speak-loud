@@ -6,5 +6,8 @@
       "Bash(rm -rf node_modules package-lock.json)",
       "Bash(npm install *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
 }
