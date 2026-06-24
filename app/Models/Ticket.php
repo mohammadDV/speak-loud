@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Support\LogsModelChanges;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ticket extends Model
 {
+    use LogsModelChanges;
+
     protected $fillable = [
         'user_id', 'category_id', 'subject', 'status',
         'priority', 'assigned_to', 'resolved_at',
