@@ -14,7 +14,8 @@ class TicketsTable
     {
         return $table
             ->columns([
-                TextColumn::make('user.id')
+                TextColumn::make('user.email')
+                    ->label('User')
                     ->searchable(),
                 TextColumn::make('category.name')
                     ->searchable(),
@@ -24,8 +25,9 @@ class TicketsTable
                     ->badge(),
                 TextColumn::make('priority')
                     ->badge(),
-                TextColumn::make('assigned_to')
-                    ->numeric()
+                TextColumn::make('assignee.email')
+                    ->label('Assigned to')
+                    ->placeholder('Unassigned')
                     ->sortable(),
                 TextColumn::make('resolved_at')
                     ->dateTime()

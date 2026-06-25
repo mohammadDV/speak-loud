@@ -50,5 +50,7 @@ Route::middleware('auth')->group(function () {
         Volt::route('/messages', 'messages.index')->name('messages');
         Volt::route('/messages/{id}', 'messages.show')->name('messages.show');
         Volt::route('/claims', 'claims.index')->name('claims');
+        Volt::route('/tickets', 'tickets.index')->name('tickets.index');
+        Volt::route('/tickets/{ticket}', 'tickets.show')->name('tickets.show');
     });
 });
