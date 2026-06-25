@@ -107,12 +107,13 @@ $save = function (UserImageUploadService $uploader) {
 ?>
 
 <div class="max-w-xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between gap-4 mb-8">
+    <div class="mb-8 space-y-6">
+        <x-profile-nav />
+
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">Edit profile</h1>
             <p class="text-sm text-[#3D2B1F]/50 mt-1">Help others find you by language and shared interests.</p>
         </div>
-        <a href="{{ route('profile') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Profile</a>
     </div>
 
     @if (session('verified'))

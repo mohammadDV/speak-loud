@@ -27,6 +27,11 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
         return $this->role === 'admin' && $this->status === 'active';
     }
 
+    public function isStaff(): bool
+    {
+        return in_array($this->role, ['admin', 'moderator'], true);
+    }
+
     public function getFilamentName(): string
     {
         return $this->profile?->display_name ?? $this->email ?? 'User';

@@ -9,10 +9,12 @@ use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
 use App\Repositories\Contracts\IScheduleRepository;
+use App\Repositories\Contracts\ITicketRepository;
 use App\Repositories\Contracts\IUserRepository;
 use App\Repositories\ConversationRepository;
 use App\Repositories\MessageRepository;
 use App\Repositories\ScheduleRepository;
+use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Support\Seo;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IConversationRepository::class, ConversationRepository::class);
         $this->app->bind(IMessageRepository::class, MessageRepository::class);
         $this->app->bind(IBlogPostRepository::class, BlogPostRepository::class);
+        $this->app->bind(ITicketRepository::class, TicketRepository::class);
     }
 
     public function boot(): void

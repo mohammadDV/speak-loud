@@ -47,8 +47,8 @@
                 <a href="{{ route('profile') }}"
                     @class([
                         'w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold transition-all',
-                        'bg-[#FF8C42] text-white ring-2 ring-[#FF8C42]/30' => request()->routeIs('profile*'),
-                        'bg-[#FF8C42] text-white hover:ring-2 hover:ring-[#FF8C42]/20' => ! request()->routeIs('profile*'),
+                        'bg-[#FF8C42] text-white ring-2 ring-[#FF8C42]/30' => request()->routeIs('profile*', 'tickets.*'),
+                        'bg-[#FF8C42] text-white hover:ring-2 hover:ring-[#FF8C42]/20' => ! request()->routeIs('profile*', 'tickets.*'),
                     ])>
                     {{ strtoupper(substr(auth()->user()->email, 0, 1)) }}
                 </a>

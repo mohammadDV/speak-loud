@@ -14,7 +14,8 @@ class TicketForm
         return $schema
             ->components([
                 Select::make('user_id')
-                    ->relationship('user', 'id')
+                    ->relationship('user', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('category_id')
                     ->relationship('category', 'name'),
@@ -34,8 +35,9 @@ class TicketForm
                     ->options(['low' => 'Low', 'normal' => 'Normal', 'high' => 'High', 'urgent' => 'Urgent'])
                     ->default('normal')
                     ->required(),
-                TextInput::make('assigned_to')
-                    ->numeric(),
+                Select::make('assigned_to')
+                    ->relationship('assignee', 'email')
+                    ->searchable(),
                 DateTimePicker::make('resolved_at'),
             ]);
     }

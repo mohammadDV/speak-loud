@@ -8,6 +8,17 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <x-profile-nav>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <flux:button type="submit" variant="ghost" size="sm">
+                    Log out
+                </flux:button>
+            </form>
+        </x-profile-nav>
+    </div>
+
     @if (! auth()->user()->hasVerifiedEmail())
         <div class="mb-6 p-4 bg-amber-50 text-amber-900 rounded-lg text-sm ring-1 ring-amber-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <span>Please verify your email to use schedules, claims, and messages.</span>
@@ -39,7 +50,7 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
             @endif
 
             <div class="px-5 sm:px-8 pb-8 -mt-14 sm:-mt-16">
-                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div class="flex flex-col sm:flex-row sm:items-end gap-4">
                     @if ($avatarUrl)
                         <img
                             src="{{ $avatarUrl }}"
@@ -51,20 +62,6 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
                             {{ strtoupper(substr($profile->display_name, 0, 1)) }}
                         </div>
                     @endif
-                    <div class="flex flex-wrap gap-2 shrink-0 self-start sm:self-auto">
-                        <flux:button href="{{ route('profile.edit') }}" variant="primary" size="sm">
-                            Edit profile
-                        </flux:button>
-                        <flux:button href="{{ route('profile.security') }}" variant="ghost" size="sm">
-                            Security
-                        </flux:button>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <flux:button type="submit" variant="ghost" size="sm">
-                                Log out
-                            </flux:button>
-                        </form>
-                    </div>
                 </div>
 
                 <div class="mt-5">
