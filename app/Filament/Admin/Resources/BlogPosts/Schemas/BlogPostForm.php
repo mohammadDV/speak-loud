@@ -30,7 +30,8 @@ class BlogPostForm
                     ->required()
                     ->columnSpanFull(),
                 FileUpload::make('cover_image_path')
-                    ->image(),
+                    ->image()
+                    ->directory('blog/cover-images'),
                 Select::make('status')
                     ->options(['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived'])
                     ->default('draft')

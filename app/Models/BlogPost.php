@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class BlogPost extends Model
 {
@@ -39,9 +40,14 @@ class BlogPost extends Model
     public function coverUrl(): string
     {
         if ($this->cover_image_path) {
-            return str_starts_with($this->cover_image_path, 'http')
-                ? $this->cover_image_path
-                : asset($this->cover_image_path);
+            if (str_starts_with($this->cover_image_path, 'http')) {
+                return $this->cover_image_path;
+            }
+
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+            $disk = Storage::disk('s3');
+
+            return $disk->url($this->cover_image_path);
         }
 
         return asset('images/blog/default-cover.svg');

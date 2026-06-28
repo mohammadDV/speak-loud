@@ -17,7 +17,12 @@ use App\Repositories\ScheduleRepository;
 use App\Repositories\TicketRepository;
 use App\Repositories\UserRepository;
 use App\Support\Seo;
+use App\Services\Uploads\S3UploadService;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Support\ServiceProvider;
+use League\Flysystem\UnableToCheckFileExistence;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +40,35 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Seo::share();
+
+        FileUpload::configureUsing(function (FileUpload $component): void {
+            $component
+                ->disk('s3')
+                ->visibility('public')
+                ->saveUploadedFileUsing(function (FileUpload $component, TemporaryUploadedFile $file) {
+                    try {
+                        if (! $file->exists()) {
+                            return null;
+                        }
+                    } catch (UnableToCheckFileExistence) {
+                        return null;
+                    }
+
+                    /** @var S3UploadService $uploader */
+                    $uploader = app(S3UploadService::class);
+
+                    return $uploader->storeTemporaryFile(
+                        $file,
+                        $component->getDirectory(),
+                        $component->getUploadedFileNameForStorage($file),
+                    );
+                });
+        });
+
+        ImageColumn::configureUsing(function (ImageColumn $column): void {
+            $column
+                ->disk('s3')
+                ->visibility('public');
+        });
     }
 }
