@@ -69,7 +69,13 @@ class ClaimRepository implements IClaimRepository
     {
         $claims = Claim::query()
             ->where('receiver_id', $userId)
-            ->with(['sender.profile', 'schedule.language'])
+            ->with([
+                'sender.profile',
+                'schedule.language',
+                'schedule' => fn ($query) => $query->withCount([
+                    'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+                ]),
+            ])
             ->latest()
             ->get();
 

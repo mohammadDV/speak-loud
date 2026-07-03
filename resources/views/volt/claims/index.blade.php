@@ -65,6 +65,12 @@ $withdraw = function (int $claimId) {
 <div class="max-w-3xl mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold text-[#3D2B1F] mb-6">Claims</h1>
 
+    @error('claim')
+        <div class="mb-4 rounded-lg border border-[#D94F3D]/30 bg-[#D94F3D]/10 px-4 py-3 text-sm text-[#D94F3D]">
+            {{ $message }}
+        </div>
+    @enderror
+
     <div class="flex gap-1 p-1 bg-[#FFF0E0] rounded-lg w-fit" role="tablist">
         <button type="button" wire:click="$set('tab', 'incoming')" role="tab"
             @class([
@@ -103,12 +109,23 @@ $withdraw = function (int $claimId) {
                             </span>
                         </div>
                         @if ($claim->status === 'pending')
-                            <div class="flex gap-2 shrink-0">
+                            @php
+                                $scheduleFull = $claim->schedule
+                                    && ($claim->schedule->accepted_claims_count ?? 0) >= $claim->schedule->max_participants;
+                            @endphp
+                            <div class="flex flex-col items-end gap-2 shrink-0">
+                                @if ($scheduleFull)
+                                    <p class="text-xs text-[#D94F3D] text-right max-w-[14rem]">
+                                        Slot full ({{ $claim->schedule->accepted_claims_count }}/{{ $claim->schedule->max_participants }}). Increase max claims or decline.
+                                    </p>
+                                @endif
+                                <div class="flex gap-2">
                                 <flux:button
                                     wire:click="accept({{ $claim->id }})"
                                     wire:confirm="Accept this claim? You can coordinate in your existing chat with this person."
                                     variant="primary"
                                     size="sm"
+                                    :disabled="$scheduleFull"
                                 >Accept</flux:button>
                                 <flux:button
                                     type="button"
@@ -116,6 +133,7 @@ $withdraw = function (int $claimId) {
                                     variant="ghost"
                                     size="sm"
                                 >Decline</flux:button>
+                                </div>
                             </div>
                         @elseif ($claim->status === 'accepted' && $claim->schedule_id)
                             <flux:button href="{{ route('schedules.show', $claim->schedule_id) }}" wire:navigate variant="primary" size="sm">

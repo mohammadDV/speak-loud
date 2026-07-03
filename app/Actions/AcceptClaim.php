@@ -7,6 +7,7 @@ use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
 use App\Repositories\Contracts\IScheduleRepository;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class AcceptClaim
@@ -36,7 +37,14 @@ class AcceptClaim
             $schedule = $this->schedules->findById($claim->schedule_id);
 
             if ($accepted >= $schedule->max_participants) {
-                throw new RuntimeException('This schedule is already at capacity.');
+                throw ValidationException::withMessages([
+                    'claim' => sprintf(
+                        'You have already accepted %d of %d %s for this slot. Increase max claims in My Schedule, or decline this claim.',
+                        $accepted,
+                        $schedule->max_participants,
+                        $schedule->max_participants === 1 ? 'claim' : 'claims',
+                    ),
+                ]);
             }
         }
 
