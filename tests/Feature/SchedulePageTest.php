@@ -466,7 +466,74 @@ test('schedule page rejects creating a slot beyond the limit', function () {
     expect($user->schedules()->count())->toBe(3);
 });
 
-test('schedule page allows a new slot after deleting one at the limit', function () {
+test('schedule page rejects lowering max claims below accepted count', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = createScheduleTestUser('schedule-max-claims@speakloud.test', 'schedulemaxclaims');
+
+    $senderOne = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'sender-max-one@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    $senderTwo = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'sender-max-two@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create(['user_id' => $senderOne->id, 'username' => 'smax1', 'display_name' => 'Sender Max One']);
+    UserProfile::create(['user_id' => $senderTwo->id, 'username' => 'smax2', 'display_name' => 'Sender Max Two']);
+
+    Volt::actingAs($host)->test('schedule.index')
+        ->set('showModal', true)
+        ->set('type', 'recurring')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Busy slot')
+        ->set('selected_days', ['Sat'])
+        ->set('start_time', '18:00')
+        ->set('end_time', '19:00')
+        ->set('description', 'Video call on Google Meet. 50/50 language split.')
+        ->set('max_participants', 3)
+        ->call('saveSlot')
+        ->assertHasNoErrors();
+
+    $schedule = $host->schedules()->first();
+
+    \App\Models\Claim::create([
+        'sender_id'   => $senderOne->id,
+        'receiver_id' => $host->id,
+        'schedule_id' => $schedule->id,
+        'type'        => 'schedule',
+        'status'      => 'accepted',
+    ]);
+
+    \App\Models\Claim::create([
+        'sender_id'   => $senderTwo->id,
+        'receiver_id' => $host->id,
+        'schedule_id' => $schedule->id,
+        'type'        => 'schedule',
+        'status'      => 'accepted',
+    ]);
+
+    Volt::actingAs($host)->test('schedule.index')
+        ->call('editSchedule', $schedule->id)
+        ->assertSet('min_max_participants', 2)
+        ->set('max_participants', 1)
+        ->call('saveSlot')
+        ->assertHasErrors(['max_participants']);
+
+    expect($schedule->fresh()->max_participants)->toBe(3);
+});
+
     config(['schedules.max_slots_per_user' => 3]);
 
     $language = Language::where('code', 'en')->first()

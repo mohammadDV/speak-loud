@@ -22,7 +22,8 @@ state([
     'selected_days'    => [],
     'start_time'       => '18:00',
     'end_time'         => '19:00',
-    'max_participants' => 1,
+    'max_participants'     => 1,
+    'min_max_participants' => 1,
     'start_datetime'   => '',
     'end_datetime'     => '',
 ]);
@@ -53,7 +54,8 @@ $resetForm = function () {
     $this->selected_days    = [];
     $this->start_time       = '18:00';
     $this->end_time         = '19:00';
-    $this->max_participants = 1;
+    $this->max_participants     = 1;
+    $this->min_max_participants = 1;
     $this->title            = '';
     $this->description      = '';
     $this->start_datetime   = '';
@@ -79,7 +81,10 @@ $editSchedule = function (int $scheduleId) {
     $this->editingScheduleId = $schedule->id;
     $this->type              = $schedule->type;
     $this->language_id       = (string) $schedule->language_id;
-    $this->max_participants  = $schedule->max_participants;
+    $acceptedClaims = $schedule->claims()->where('status', 'accepted')->count();
+
+    $this->max_participants     = $schedule->max_participants;
+    $this->min_max_participants = max(1, $acceptedClaims);
     $this->title             = $schedule->title ?? '';
     $this->description       = $schedule->description ?? '';
 
@@ -322,7 +327,15 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                             description="Tell partners how the session works (format, language split, tools, expectations)."
                         />
 
-                        <flux:input wire:model="max_participants" label="Max claims" type="number" min="1" max="10" />
+                        <flux:input
+                            wire:model="max_participants"
+                            label="Max claims"
+                            type="number"
+                            min="{{ $editingScheduleId ? $min_max_participants : 1 }}"
+                            max="10"
+                            description="{{ ($editingScheduleId && $min_max_participants > 1) ? 'At least '.$min_max_participants.' because that many claims are already accepted.' : '' }}"
+                        />
+                        @error('max_participants') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
 
                         <div class="flex justify-end gap-3 pt-2">
                             <flux:button type="button" wire:click="closeModal" variant="ghost">Cancel</flux:button>

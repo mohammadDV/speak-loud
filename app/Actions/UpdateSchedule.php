@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Support\ScheduleDayOfWeek;
+use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
 class UpdateSchedule
@@ -23,11 +24,25 @@ class UpdateSchedule
             throw new RuntimeException('Cannot change schedule type.');
         }
 
+        $maxParticipants = $data['max_participants'] ?? 1;
+        $acceptedClaims  = $this->schedules->countAcceptedClaims($scheduleId);
+
+        if ($maxParticipants < $acceptedClaims) {
+            throw ValidationException::withMessages([
+                'max_participants' => sprintf(
+                    '%d %s already been accepted on this slot. Max claims cannot be lower than %d.',
+                    $acceptedClaims,
+                    $acceptedClaims === 1 ? 'person has' : 'people have',
+                    $acceptedClaims,
+                ),
+            ]);
+        }
+
         $this->schedules->update($scheduleId, [
             'language_id'      => $data['language_id'],
             'title'            => trim($data['title']),
             'description'      => $data['description'],
-            'max_participants' => $data['max_participants'] ?? 1,
+            'max_participants' => $maxParticipants,
         ]);
 
         if ($schedule->type === 'recurring') {
