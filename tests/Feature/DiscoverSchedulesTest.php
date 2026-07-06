@@ -319,6 +319,93 @@ test('discover page can send a claim for a schedule', function () {
     expect($viewer->sentClaims()->where('schedule_id', $schedule->id)->where('status', 'pending')->exists())->toBeTrue();
 });
 
+test('discover page still allows claim when another user has a pending claim and spots remain', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'host-multi@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $host->id,
+        'username'     => 'hostmulti',
+        'display_name' => 'Host Multi',
+    ]);
+
+    $existingClaimant = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'claimant-multi@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $existingClaimant->id,
+        'username'     => 'claimantmulti',
+        'display_name' => 'Claimant Multi',
+    ]);
+
+    $viewer = User::create([
+        'uuid'              => (string) Str::uuid(),
+        'email'             => 'viewer-multi@speakloud.test',
+        'password'          => '123456789',
+        'role'              => 'user',
+        'status'            => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id'      => $viewer->id,
+        'username'     => 'viewermulti',
+        'display_name' => 'Viewer Multi',
+    ]);
+
+    $schedule = Schedule::create([
+        'user_id'          => $host->id,
+        'description'      => ScheduleDescription::EXAMPLES[0],
+        'type'             => 'recurring',
+        'language_id'      => $language->id,
+        'max_participants' => 3,
+        'status'           => 'active',
+    ]);
+
+    ScheduleRecurringRule::create([
+        'schedule_id' => $schedule->id,
+        'day_of_week' => 'Thu',
+        'start_time'  => '18:00:00',
+        'end_time'    => '19:00:00',
+    ]);
+
+    Claim::create([
+        'sender_id'   => $existingClaimant->id,
+        'receiver_id' => $host->id,
+        'schedule_id' => $schedule->id,
+        'type'        => 'schedule',
+        'status'      => 'pending',
+    ]);
+
+    Volt::actingAs($viewer)->test('discover.index')
+        ->assertSee('Host Multi')
+        ->assertSee('3 spots left')
+        ->assertSee('Send claim')
+        ->assertDontSee('Claim pending');
+
+    auth()->logout();
+
+    Volt::test('discover.index')
+        ->assertSee('Host Multi')
+        ->assertSee('Sign in')
+        ->assertDontSee('Claim pending');
+});
+
 test('discover page hides schedules with no remaining spots', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);

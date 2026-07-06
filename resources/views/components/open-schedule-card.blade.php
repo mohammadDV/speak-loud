@@ -14,7 +14,10 @@
     $backgroundUrl = $profile?->backgroundImageUrl();
     $accepted = $schedule->accepted_claims_count ?? $schedule->claims->where('status', 'accepted')->count();
     $spotsLeft = max(0, $schedule->max_participants - $accepted);
-    $myClaim = $schedule->claims->first();
+    $viewerId = auth()->id();
+    $myClaim = $viewerId
+        ? $schedule->claims->first(fn ($claim) => (int) $claim->sender_id === $viewerId)
+        : null;
     $isFull = $spotsLeft === 0;
 
     $when = UtcTime::scheduleWhen($schedule) ?? '—';

@@ -534,6 +534,7 @@ test('schedule page rejects lowering max claims below accepted count', function 
     expect($schedule->fresh()->max_participants)->toBe(3);
 });
 
+test('schedule page allows creating a slot after deleting one at the limit', function () {
     config(['schedules.max_slots_per_user' => 3]);
 
     $language = Language::where('code', 'en')->first()
