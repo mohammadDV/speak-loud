@@ -27,11 +27,11 @@ test('password can be reset with valid token', function () {
 
     Volt::test('auth.reset-password', ['token' => $token])
         ->set('email', 'reset@example.com')
-        ->set('password', 'newpassword123')
-        ->set('password_confirmation', 'newpassword123')
+        ->set('password', 'Newpassword1!')
+        ->set('password_confirmation', 'Newpassword1!')
         ->call('resetPassword')
         ->assertHasNoErrors()
         ->assertRedirect(route('login'));
 
-    expect(Hash::check('newpassword123', $user->fresh()->password))->toBeTrue();
+    expect(Hash::check('Newpassword1!', $user->fresh()->password))->toBeTrue();
 });

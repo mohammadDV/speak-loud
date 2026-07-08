@@ -17,8 +17,8 @@ test('registration requires accepting terms', function () {
     Volt::test('auth.register')
         ->set('username', 'newuser')
         ->set('email', 'newuser@example.com')
-        ->set('password', 'password123')
-        ->set('password_confirmation', 'password123')
+        ->set('password', 'Password1!')
+        ->set('password_confirmation', 'Password1!')
         ->set('accepted_terms', false)
         ->call('register')
         ->assertHasErrors(['accepted_terms']);
@@ -26,12 +26,25 @@ test('registration requires accepting terms', function () {
     expect(User::where('email', 'newuser@example.com')->exists())->toBeFalse();
 });
 
+test('registration rejects weak passwords', function () {
+    Volt::test('auth.register')
+        ->set('username', 'weakpass')
+        ->set('email', 'weakpass@example.com')
+        ->set('password', 'password123')
+        ->set('password_confirmation', 'password123')
+        ->set('accepted_terms', true)
+        ->call('register')
+        ->assertHasErrors(['password']);
+
+    expect(User::where('email', 'weakpass@example.com')->exists())->toBeFalse();
+});
+
 test('registration stores terms acceptance when checkbox is checked', function () {
     Volt::test('auth.register')
         ->set('username', 'termsuser')
         ->set('email', 'termsuser@example.com')
-        ->set('password', 'password123')
-        ->set('password_confirmation', 'password123')
+        ->set('password', 'Password1!')
+        ->set('password_confirmation', 'Password1!')
         ->set('accepted_terms', true)
         ->call('register')
         ->assertHasNoErrors()

@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\PasswordRules;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use App\Actions\RegisterUser;
@@ -27,7 +28,7 @@ state([
 rules([
     'username'              => 'required|string|min:3|max:50|unique:user_profiles,username',
     'email'                 => 'required|email|unique:users,email',
-    'password'              => 'required|min:8|confirmed',
+    'password'              => PasswordRules::validationRules(),
     'password_confirmation' => 'required',
     'accepted_terms'        => 'accepted',
 ])->messages([
@@ -62,7 +63,10 @@ $register = function (RegisterUser $action) {
             <form wire:submit="register" class="space-y-5">
                 <flux:input wire:model="username" label="Username" placeholder="speakloud.app/ alex" />
                 <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
-                <flux:input wire:model="password" label="Password" type="password" placeholder="Min. 8 characters" />
+                <div class="space-y-2">
+                    <flux:input wire:model="password" label="Password" type="password" placeholder="Create a strong password" />
+                    <x-password-requirements />
+                </div>
                 <flux:input wire:model="password_confirmation" label="Confirm Password" type="password" placeholder="Repeat password" />
 
                 <label class="flex items-start gap-3 text-sm text-[#3D2B1F]/75 cursor-pointer">

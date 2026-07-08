@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\ChangePassword;
+use App\Support\PasswordRules;
 use function Livewire\Volt\{state, rules, mount};
 
 mount(function () {
@@ -18,7 +19,7 @@ state([
 
 rules([
     'current_password'      => 'required|current_password',
-    'password'              => 'required|min:8|confirmed',
+    'password'              => PasswordRules::validationRules(),
     'password_confirmation' => 'required',
 ]);
 
@@ -58,7 +59,10 @@ $updatePassword = function (ChangePassword $action) {
     <flux:card class="bg-[#FFF0E0] p-6">
         <form wire:submit="updatePassword" class="space-y-5">
             <flux:input wire:model="current_password" label="Current password" type="password" placeholder="••••••••" />
-            <flux:input wire:model="password" label="New password" type="password" placeholder="Min. 8 characters" />
+            <div class="space-y-2">
+                <flux:input wire:model="password" label="New password" type="password" placeholder="Create a strong password" />
+                <x-password-requirements />
+            </div>
             <flux:input wire:model="password_confirmation" label="Confirm new password" type="password" placeholder="Repeat password" />
 
             <flux:button type="submit" variant="primary">Update password</flux:button>

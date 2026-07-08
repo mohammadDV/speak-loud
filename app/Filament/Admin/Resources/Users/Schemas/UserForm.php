@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Users\Schemas;
 
+use App\Support\PasswordRules;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -24,7 +25,12 @@ class UserForm
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->revealable()
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->rules(fn (string $operation): array => $operation === 'create'
+                        ? PasswordRules::validationRules(confirmed: false)
+                        : ['nullable', PasswordRules::rule()])
+                    ->helperText(PasswordRules::instructions()),
                 Select::make('role')
                     ->options(['user' => 'User', 'admin' => 'Admin', 'moderator' => 'Moderator'])
                     ->default('user')
