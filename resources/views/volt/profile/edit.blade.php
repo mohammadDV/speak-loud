@@ -2,6 +2,7 @@
 
 use App\Support\CountryCodes;
 use App\Support\ProfileSlug;
+use App\Support\UserLanguageLevels;
 use function Livewire\Volt\{state, mount, rules, usesFileUploads};
 use App\Models\Language;
 use App\Models\Interest;
@@ -16,7 +17,8 @@ state([
     'country_code'          => '',
     'is_private'            => false,
     'selected_interest_ids' => [],
-    'languages'             => [],
+    'userLanguages'         => [],
+    'allLanguages'          => [],
     'allInterests'          => [],
     'profile_image'         => null,
     'background_image'      => null,
@@ -25,7 +27,7 @@ state([
 ]);
 
 mount(function () {
-    $user = auth()->user()->load(['profile', 'interests']);
+    $user = auth()->user()->load(['profile', 'interests', 'languages']);
     if ($user->profile) {
         $this->display_name = $user->profile->display_name;
         $this->profile_slug = $user->profile->profile_slug ?? $user->profile->username;
@@ -35,11 +37,19 @@ mount(function () {
         $this->current_profile_image_url = $user->profile->profileImageUrl();
         $this->current_background_image_url = $user->profile->backgroundImageUrl();
     }
-    $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
+    $this->allLanguages = Language::where('is_active', true)->orderBy('name_en')->get();
     $this->allInterests = Interest::orderBy('name_en')->get();
     $this->selected_interest_ids = $user->interests
         ->pluck('id')
         ->map(fn ($id) => (string) $id)
+        ->all();
+    $this->userLanguages = $user->languages
+        ->map(fn ($entry) => [
+            'language_id' => (string) $entry->language_id,
+            'type'        => $entry->type,
+            'level'       => $entry->level ?? '',
+        ])
+        ->values()
         ->all();
 });
 
@@ -54,13 +64,45 @@ rules(function () {
         'is_private'              => 'boolean',
         'selected_interest_ids'   => 'nullable|array|max:10',
         'selected_interest_ids.*' => 'integer|exists:interests,id',
+        'userLanguages'           => 'nullable|array|max:10',
+        'userLanguages.*.language_id' => 'required|integer|exists:languages,id',
+        'userLanguages.*.type'        => 'required|in:'.implode(',', UserLanguageLevels::TYPES),
+        'userLanguages.*.level'       => 'required|in:'.implode(',', UserLanguageLevels::LEVELS),
         'profile_image'           => 'nullable|image|max:4096',
         'background_image'        => 'nullable|image|max:6144',
     ];
 });
 
+$addLanguageRow = function () {
+    if (count($this->userLanguages) >= 10) {
+        return;
+    }
+
+    $this->userLanguages[] = [
+        'language_id' => '',
+        'type'        => 'learning',
+        'level'       => '',
+    ];
+};
+
+$removeLanguageRow = function (int $index) {
+    unset($this->userLanguages[$index]);
+    $this->userLanguages = array_values($this->userLanguages);
+};
+
 $save = function (UserImageUploadService $uploader) {
     $this->validate();
+
+    $seen = [];
+    foreach ($this->userLanguages ?? [] as $index => $entry) {
+        $key = ($entry['language_id'] ?? '').':'.($entry['type'] ?? '');
+        if (isset($seen[$key])) {
+            $this->addError('userLanguages', 'Each language can only appear once per type (native or learning).');
+
+            return;
+        }
+        $seen[$key] = $index;
+    }
 
     $user = auth()->user();
     if ($user->profile) {
@@ -100,6 +142,15 @@ $save = function (UserImageUploadService $uploader) {
     $user->interests()->sync(
         array_values(array_map('intval', $this->selected_interest_ids ?? []))
     );
+
+    $user->languages()->delete();
+    foreach ($this->userLanguages ?? [] as $entry) {
+        $user->languages()->create([
+            'language_id' => (int) $entry['language_id'],
+            'type'        => $entry['type'],
+            'level'       => $entry['level'],
+        ]);
+    }
 
     session()->flash('saved', true);
 };
@@ -228,6 +279,59 @@ $save = function (UserImageUploadService $uploader) {
 
         <flux:textarea wire:model="bio" label="Bio" rows="4"
             placeholder="Engineer learning English. Movies, sci-fi, climbing." />
+
+        <fieldset>
+            <legend class="text-sm font-medium text-[#3D2B1F]">Your languages</legend>
+            <p class="text-xs text-[#3D2B1F]/50 mt-1 mb-3">
+                Add languages you speak natively or are learning. Your level for each language appears on your practice slots and helps partners find you on Discover.
+            </p>
+
+            <div class="space-y-3">
+                @foreach ($userLanguages as $index => $entry)
+                    <div wire:key="user-language-{{ $index }}" class="rounded-lg border border-[#3D2B1F]/10 bg-[#FFF0E0] p-3 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-medium text-[#3D2B1F]/60">Language {{ $index + 1 }}</span>
+                            <flux:button type="button" wire:click="removeLanguageRow({{ $index }})" variant="ghost" size="sm">
+                                Remove
+                            </flux:button>
+                        </div>
+
+                        <flux:select wire:model="userLanguages.{{ $index }}.language_id" label="Language">
+                            <flux:select.option value="">Select language</flux:select.option>
+                            @foreach ($allLanguages as $language)
+                                <flux:select.option value="{{ $language->id }}">{{ $language->name_en }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <flux:select wire:model="userLanguages.{{ $index }}.type" label="Type">
+                                <flux:select.option value="native">Native</flux:select.option>
+                                <flux:select.option value="learning">Learning</flux:select.option>
+                            </flux:select>
+
+                            <flux:select wire:model="userLanguages.{{ $index }}.level" label="Level">
+                                <flux:select.option value="">Select level</flux:select.option>
+                                @foreach (UserLanguageLevels::labels() as $value => $label)
+                                    <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                        </div>
+
+                        @error('userLanguages.'.$index.'.language_id') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                        @error('userLanguages.'.$index.'.type') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                        @error('userLanguages.'.$index.'.level') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                    </div>
+                @endforeach
+            </div>
+
+            @if (count($userLanguages) < 10)
+                <flux:button type="button" wire:click="addLanguageRow" variant="ghost" size="sm" class="mt-3">
+                    + Add language
+                </flux:button>
+            @endif
+
+            @error('userLanguages') <p class="mt-2 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+        </fieldset>
 
         <fieldset>
             <legend class="text-sm font-medium text-[#3D2B1F]">Your interests</legend>

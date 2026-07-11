@@ -1,6 +1,7 @@
 <?php
 
 use App\Support\CountryCodes;
+use App\Support\UserLanguageLevels;
 use function Livewire\Volt\{computed};
 
 $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.language', 'interests']));
@@ -102,10 +103,20 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
                                 @foreach ($user->languages as $userLanguage)
                                     <span class="text-xs bg-[#FFF8F0] text-[#3D2B1F] px-3 py-1.5 rounded-lg ring-1 ring-[#FF8C42]/20">
                                         {{ $userLanguage->language->name_en }}
-                                        <span class="text-[#3D2B1F]/45">· {{ str_replace('_', ' ', $userLanguage->level) }}</span>
+                                        <span class="text-[#3D2B1F]/45">· {{ UserLanguageLevels::labels()[$userLanguage->level] ?? str_replace('_', ' ', $userLanguage->level) }}</span>
+                                        <span class="text-[#3D2B1F]/35">· {{ UserLanguageLevels::typeLabel($userLanguage->type) }}</span>
                                     </span>
                                 @endforeach
                             </div>
+                        </div>
+                    @else
+                        <div class="mt-8">
+                            <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Languages</h2>
+                            <p class="text-sm text-[#3D2B1F]/50">
+                                No languages yet.
+                                <a href="{{ route('profile.edit') }}" wire:navigate class="text-[#FF8C42] hover:underline">Add languages</a>
+                                so partners can see your level on Discover.
+                            </p>
                         </div>
                     @endif
 
