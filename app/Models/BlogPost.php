@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use App\Support\LogsModelChanges;
+use App\Support\StorageUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\Storage;
 
 class BlogPost extends Model
 {
@@ -40,18 +39,8 @@ class BlogPost extends Model
 
     public function coverUrl(): string
     {
-        if ($this->cover_image_path) {
-            if (str_starts_with($this->cover_image_path, 'http')) {
-                return $this->cover_image_path;
-            }
-
-            /** @var FilesystemAdapter $disk */
-            $disk = Storage::disk('s3');
-
-            return $disk->url($this->cover_image_path);
-        }
-
-        return asset('images/blog/default-cover.svg');
+        return StorageUrl::resolve($this->cover_image_path)
+            ?? asset('images/blog/default-cover.svg');
     }
 
     public function coverAlt(): string

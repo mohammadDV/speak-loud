@@ -89,6 +89,11 @@ jobs:
       DB_DATABASE: testing
       DB_USERNAME: root
       DB_PASSWORD: password
+      AWS_ACCESS_KEY_ID: testing
+      AWS_SECRET_ACCESS_KEY: testing
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_BUCKET: testing
+      AWS_USE_PATH_STYLE_ENDPOINT: false
     steps:
       - uses: actions/checkout@v4
 
