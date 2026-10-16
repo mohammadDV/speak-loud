@@ -25,7 +25,7 @@ class UpdateSchedule
         }
 
         $maxParticipants = $data['max_participants'] ?? 1;
-        $acceptedClaims  = $this->schedules->countAcceptedClaims($scheduleId);
+        $acceptedClaims = $this->schedules->countAcceptedClaims($scheduleId);
 
         if ($maxParticipants < $acceptedClaims) {
             throw ValidationException::withMessages([
@@ -39,9 +39,9 @@ class UpdateSchedule
         }
 
         $this->schedules->update($scheduleId, [
-            'language_id'      => $data['language_id'],
-            'title'            => trim($data['title']),
-            'description'      => $data['description'],
+            'language_id' => $data['language_id'],
+            'title' => trim($data['title']),
+            'description' => $data['description'],
             'max_participants' => $maxParticipants,
         ]);
 
@@ -50,8 +50,8 @@ class UpdateSchedule
                 ['schedule_id' => $scheduleId],
                 [
                     'day_of_week' => ScheduleDayOfWeek::normalize($data['day_of_week'] ?? ''),
-                    'start_time'  => $data['start_time'],
-                    'end_time'    => $data['end_time'],
+                    'start_time' => $data['start_time'],
+                    'end_time' => $data['end_time'],
                 ]
             );
         } else {
@@ -59,7 +59,7 @@ class UpdateSchedule
                 ['schedule_id' => $scheduleId],
                 [
                     'start_datetime' => $data['start_datetime'],
-                    'end_datetime'   => $data['end_datetime'],
+                    'end_datetime' => $data['end_datetime'],
                 ]
             );
         }

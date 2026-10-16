@@ -14,22 +14,22 @@ test('home page shows recent published blog posts', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
-        'user_id'      => $author->id,
-        'username'     => 'blogauthor',
+        'user_id' => $author->id,
+        'username' => 'blogauthor',
         'display_name' => 'Blog Author',
         'profile_slug' => 'blogauthor',
     ]);
 
     BlogPost::create([
-        'author_id'        => $author->id,
-        'category_id'      => $category->id,
-        'title'            => 'Home page blog spotlight',
-        'slug'             => 'home-page-blog-spotlight',
-        'excerpt'          => 'This post should appear on the landing page.',
-        'body'             => '<p>Full article body.</p>',
+        'author_id' => $author->id,
+        'category_id' => $category->id,
+        'title' => 'Home page blog spotlight',
+        'slug' => 'home-page-blog-spotlight',
+        'excerpt' => 'This post should appear on the landing page.',
+        'body' => '<p>Full article body.</p>',
         'cover_image_path' => 'images/blog/partners.svg',
-        'status'           => 'published',
-        'published_at'     => now()->subDay(),
+        'status' => 'published',
+        'published_at' => now()->subDay(),
     ]);
 
     $this->get(route('home'))

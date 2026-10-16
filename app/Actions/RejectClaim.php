@@ -49,8 +49,8 @@ class RejectClaim
         if ($claim->message) {
             $this->messages->create([
                 'conversation_id' => $conversationId,
-                'sender_id'       => $claim->sender_id,
-                'body'            => $claim->message,
+                'sender_id' => $claim->sender_id,
+                'body' => $claim->message,
             ]);
             $lastAt = now();
         }
@@ -58,8 +58,8 @@ class RejectClaim
         if ($rejectionMessage && trim($rejectionMessage) !== '') {
             $this->messages->create([
                 'conversation_id' => $conversationId,
-                'sender_id'       => $claim->receiver_id,
-                'body'            => trim($rejectionMessage),
+                'sender_id' => $claim->receiver_id,
+                'body' => trim($rejectionMessage),
             ]);
             $lastAt = now();
         }

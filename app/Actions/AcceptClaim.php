@@ -65,8 +65,8 @@ class AcceptClaim
         if ($claim->message) {
             $this->messages->create([
                 'conversation_id' => $conversation->id,
-                'sender_id'       => $claim->sender_id,
-                'body'            => $claim->message,
+                'sender_id' => $claim->sender_id,
+                'body' => $claim->message,
             ]);
             $conversation->update(['last_message_at' => now()]);
         }

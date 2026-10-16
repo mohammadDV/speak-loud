@@ -7,6 +7,7 @@ use App\Models\TicketCategory;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Models\UserProfile;
+use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Volt;
 
 test('guests cannot access support tickets', function () {
@@ -17,8 +18,8 @@ test('user can create a ticket and see it in the list', function () {
     $user = actingAsUser();
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'ticketuser',
+        'user_id' => $user->id,
+        'username' => 'ticketuser',
         'display_name' => 'Ticket User',
     ]);
 
@@ -64,7 +65,7 @@ test('user cannot create another ticket while waiting for admin response', funct
         null,
         'Second ticket',
         'Another issue.',
-    ))->toThrow(\Illuminate\Validation\ValidationException::class);
+    ))->toThrow(ValidationException::class);
 });
 
 test('user cannot reply until admin has responded', function () {
@@ -81,7 +82,7 @@ test('user cannot reply until admin has responded', function () {
         $ticket->fresh(),
         $user,
         'Any update?',
-    ))->toThrow(\Illuminate\Validation\ValidationException::class);
+    ))->toThrow(ValidationException::class);
 
     $this->actingAs($user)
         ->get(route('tickets.show', $ticket))
@@ -95,9 +96,9 @@ test('user cannot view another users ticket', function () {
     $other = actingAsUser();
 
     $ticket = Ticket::create([
-        'user_id'  => $owner->id,
-        'subject'  => 'Private ticket',
-        'status'   => 'open',
+        'user_id' => $owner->id,
+        'subject' => 'Private ticket',
+        'status' => 'open',
         'priority' => 'normal',
     ]);
 
@@ -109,8 +110,8 @@ test('admin reply is visible to the ticket owner', function () {
     $admin = User::factory()->admin()->create();
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'supportseeker',
+        'user_id' => $user->id,
+        'username' => 'supportseeker',
         'display_name' => 'Support Seeker',
     ]);
 
@@ -150,18 +151,18 @@ test('user reply reopens a waiting ticket', function () {
     $admin = User::factory()->admin()->create();
 
     $ticket = Ticket::create([
-        'user_id'     => $user->id,
-        'subject'     => 'Need more help',
-        'status'      => 'waiting_user',
-        'priority'    => 'normal',
+        'user_id' => $user->id,
+        'subject' => 'Need more help',
+        'status' => 'waiting_user',
+        'priority' => 'normal',
         'assigned_to' => $admin->id,
     ]);
 
     TicketMessage::create([
-        'ticket_id'  => $ticket->id,
-        'sender_id'  => $admin->id,
-        'body'       => 'Can you share a screenshot?',
-        'is_internal'=> false,
+        'ticket_id' => $ticket->id,
+        'sender_id' => $admin->id,
+        'body' => 'Can you share a screenshot?',
+        'is_internal' => false,
     ]);
 
     app(ReplyToTicket::class)->execute(
@@ -176,7 +177,7 @@ test('user reply reopens a waiting ticket', function () {
         $ticket->fresh(),
         $user,
         'One more thing...',
-    ))->toThrow(\Illuminate\Validation\ValidationException::class);
+    ))->toThrow(ValidationException::class);
 });
 
 test('user can create a ticket from the support page form', function () {

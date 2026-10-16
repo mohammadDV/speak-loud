@@ -14,22 +14,22 @@ test('home page includes seo meta tags and blog cover image alt', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
-        'user_id'      => $author->id,
-        'username'     => 'seoauthor',
+        'user_id' => $author->id,
+        'username' => 'seoauthor',
         'display_name' => 'SEO Author',
         'profile_slug' => 'seoauthor',
     ]);
 
     BlogPost::create([
-        'author_id'        => $author->id,
-        'category_id'      => $category->id,
-        'title'            => 'SEO spotlight post',
-        'slug'             => 'seo-spotlight-post',
-        'excerpt'          => 'Meta description source text for testing.',
-        'body'             => '<p>Body</p>',
+        'author_id' => $author->id,
+        'category_id' => $category->id,
+        'title' => 'SEO spotlight post',
+        'slug' => 'seo-spotlight-post',
+        'excerpt' => 'Meta description source text for testing.',
+        'body' => '<p>Body</p>',
         'cover_image_path' => 'images/blog/partners.svg',
-        'status'           => 'published',
-        'published_at'     => now(),
+        'status' => 'published',
+        'published_at' => now(),
     ]);
 
     $this->get(route('home'))
@@ -45,21 +45,21 @@ test('blog post page includes article meta and cover image', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
-        'user_id'      => $author->id,
-        'username'     => 'postauthor',
+        'user_id' => $author->id,
+        'username' => 'postauthor',
         'display_name' => 'Post Author',
         'profile_slug' => 'postauthor',
     ]);
 
     $post = BlogPost::create([
-        'author_id'        => $author->id,
-        'title'            => 'Article for SEO',
-        'slug'             => 'article-for-seo',
-        'excerpt'          => 'Short excerpt used in meta description.',
-        'body'             => '<p>Content</p>',
+        'author_id' => $author->id,
+        'title' => 'Article for SEO',
+        'slug' => 'article-for-seo',
+        'excerpt' => 'Short excerpt used in meta description.',
+        'body' => '<p>Content</p>',
         'cover_image_path' => 'images/blog/welcome.svg',
-        'status'           => 'published',
-        'published_at'     => now(),
+        'status' => 'published',
+        'published_at' => now(),
     ]);
 
     $this->get(route('blog.show', $post->slug))

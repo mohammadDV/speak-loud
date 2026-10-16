@@ -54,10 +54,10 @@ class Ticket extends Model
     {
         return match ($this->status) {
             'open', 'in_progress' => 'Waiting for support',
-            'waiting_user'        => 'Awaiting your reply',
-            'resolved'            => 'Resolved',
-            'closed'              => 'Closed',
-            default               => ucfirst(str_replace('_', ' ', $this->status)),
+            'waiting_user' => 'Awaiting your reply',
+            'resolved' => 'Resolved',
+            'closed' => 'Closed',
+            default => ucfirst(str_replace('_', ' ', $this->status)),
         };
     }
 
@@ -65,10 +65,10 @@ class Ticket extends Model
     {
         return match ($this->status) {
             'open', 'in_progress' => 'bg-[#FFD166]/40 text-[#3D2B1F]',
-            'waiting_user'        => 'bg-[#FF8C42]/20 text-[#FF8C42]',
-            'resolved'            => 'bg-green-100 text-green-700',
-            'closed'              => 'bg-[#3D2B1F]/10 text-[#3D2B1F]/60',
-            default               => 'bg-[#FFF0E0] text-[#3D2B1F]',
+            'waiting_user' => 'bg-[#FF8C42]/20 text-[#FF8C42]',
+            'resolved' => 'bg-green-100 text-green-700',
+            'closed' => 'bg-[#3D2B1F]/10 text-[#3D2B1F]/60',
+            default => 'bg-[#FFF0E0] text-[#3D2B1F]',
         };
     }
 
@@ -76,7 +76,7 @@ class Ticket extends Model
     {
         return match ($this->status) {
             'closed' => 'This ticket is closed. Open a new ticket if you need more help.',
-            default  => 'Our team is reviewing your message. You can reply once they respond.',
+            default => 'Our team is reviewing your message. You can reply once they respond.',
         };
     }
 }

@@ -59,6 +59,7 @@ class UserRepository implements IUserRepository
     {
         $user = User::findOrFail($id);
         $user->update($data);
+
         return $user->fresh();
     }
 
@@ -77,7 +78,7 @@ class UserRepository implements IUserRepository
             ->whereNotIn('users.id', $blockedIds)
             ->select('users.*', 'user_profiles.display_name', 'user_profiles.bio', 'user_profiles.country_code', 'user_profiles.profile_image_path');
 
-        if (!empty($filters['language_id'])) {
+        if (! empty($filters['language_id'])) {
             $query->whereExists(function ($sub) use ($filters) {
                 $sub->select(DB::raw(1))
                     ->from('user_languages')
@@ -86,7 +87,7 @@ class UserRepository implements IUserRepository
             });
         }
 
-        if (!empty($filters['level'])) {
+        if (! empty($filters['level'])) {
             $query->whereExists(function ($sub) use ($filters) {
                 $sub->select(DB::raw(1))
                     ->from('user_languages')
@@ -95,11 +96,11 @@ class UserRepository implements IUserRepository
             });
         }
 
-        if (!empty($filters['country_code'])) {
+        if (! empty($filters['country_code'])) {
             $query->where('user_profiles.country_code', $filters['country_code']);
         }
 
-        if (!empty($filters['tags']) && is_array($filters['tags'])) {
+        if (! empty($filters['tags']) && is_array($filters['tags'])) {
             foreach ($filters['tags'] as $tag) {
                 $query->whereExists(function ($sub) use ($tag) {
                     $sub->select(DB::raw(1))
@@ -110,11 +111,11 @@ class UserRepository implements IUserRepository
             }
         }
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
                 $q->where('user_profiles.display_name', 'like', $search)
-                  ->orWhere('user_profiles.bio', 'like', $search);
+                    ->orWhere('user_profiles.bio', 'like', $search);
             });
         }
 

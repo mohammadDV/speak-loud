@@ -36,23 +36,23 @@ class Seo
     public static function share(array $overrides = []): void
     {
         view()->share(array_merge([
-            'seoTitle'       => null,
+            'seoTitle' => null,
             'seoDescription' => self::defaultDescription(),
-            'seoImage'       => self::defaultImage(),
-            'seoUrl'         => url()->current(),
-            'seoType'        => 'website',
-            'seoRobots'      => null,
+            'seoImage' => self::defaultImage(),
+            'seoUrl' => url()->current(),
+            'seoType' => 'website',
+            'seoRobots' => null,
         ], $overrides));
     }
 
     public static function forPost(BlogPost $post): void
     {
         self::share([
-            'seoTitle'       => $post->title,
+            'seoTitle' => $post->title,
             'seoDescription' => self::descriptionFromText($post->excerpt ?: strip_tags($post->body)),
-            'seoImage'       => $post->coverUrl(),
-            'seoUrl'         => route('blog.show', $post->slug),
-            'seoType'        => 'article',
+            'seoImage' => $post->coverUrl(),
+            'seoUrl' => route('blog.show', $post->slug),
+            'seoType' => 'article',
         ]);
     }
 
@@ -66,5 +66,4 @@ class Seo
 
         return Str::limit($text, $limit);
     }
-
 }

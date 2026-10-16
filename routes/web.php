@@ -1,22 +1,24 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Support\Seo;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
-    \App\Support\Seo::share([
-        'seoTitle'       => 'Practice languages with real people',
+    Seo::share([
+        'seoTitle' => 'Practice languages with real people',
         'seoDescription' => 'SpeakLoud connects language learners with partners for scheduled practice. Publish slots, accept claims, and talk with real people.',
-        'seoUrl'         => route('home'),
+        'seoUrl' => route('home'),
     ]);
 
     return view('pages.home');
 })->name('home');
-Route::get('/about', fn() => view('pages.about'))->name('about');
-Route::get('/contact', fn() => view('pages.contact'))->name('contact');
-Route::get('/support', fn() => view('pages.support'))->name('support');
-Route::get('/terms', fn() => view('pages.terms'))->name('terms');
+Route::get('/about', fn () => view('pages.about'))->name('about');
+Route::get('/contact', fn () => view('pages.contact'))->name('contact');
+Route::get('/support', fn () => view('pages.support'))->name('support');
+Route::get('/terms', fn () => view('pages.terms'))->name('terms');
 Volt::route('/blog', 'blog.index')->name('blog.index');
 Volt::route('/blog/{slug}', 'blog.show')->name('blog.show');
 Volt::route('/faq', 'faq.index')->name('faq.index');
@@ -42,7 +44,7 @@ Route::middleware('auth')->group(function () {
     Volt::route('/profile', 'profile.overview')->name('profile');
     Volt::route('/profile/edit', 'profile.edit')->name('profile.edit');
     Volt::route('/profile/security', 'profile.security')->name('profile.security');
-    Route::post('/logout', [\App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('verified')->group(function () {
         Volt::route('/schedule', 'schedule.index')->name('schedule');

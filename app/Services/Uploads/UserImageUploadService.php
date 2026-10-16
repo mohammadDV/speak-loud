@@ -36,4 +36,3 @@ class UserImageUploadService
         $this->s3Uploads->deleteIfExists($path);
     }
 }
-

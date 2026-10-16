@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Claim;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -45,7 +46,7 @@ class ScheduleRepository implements IScheduleRepository
 
     public function countAcceptedClaims(int $scheduleId): int
     {
-        return \App\Models\Claim::where('schedule_id', $scheduleId)
+        return Claim::where('schedule_id', $scheduleId)
             ->where('status', 'accepted')
             ->count();
     }

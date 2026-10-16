@@ -23,4 +23,3 @@ test('user image upload service uploads to s3 and deletes previous path', functi
         ->and(Storage::disk('s3')->exists($newPath))->toBeTrue()
         ->and(Storage::disk('s3')->exists($oldPath))->toBeFalse();
 });
-

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Claim;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\UserProfile;
@@ -9,17 +10,17 @@ use Livewire\Volt\Volt;
 function createScheduleTestUser(string $email, string $username): User
 {
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => $email,
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => $email,
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => $username,
+        'user_id' => $user->id,
+        'username' => $username,
         'display_name' => ucfirst($username),
     ]);
 
@@ -47,17 +48,17 @@ test('schedule page can open and close new slot modal', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-test@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-test@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduletest',
+        'user_id' => $user->id,
+        'username' => 'scheduletest',
         'display_name' => 'Schedule Test',
     ]);
 
@@ -75,17 +76,17 @@ test('schedule page can save a recurring slot', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-save@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-save@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'schedulesave',
+        'user_id' => $user->id,
+        'username' => 'schedulesave',
         'display_name' => 'Schedule Save',
     ]);
 
@@ -114,17 +115,17 @@ test('schedule page can edit a recurring slot', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-edit@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-edit@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleedit',
+        'user_id' => $user->id,
+        'username' => 'scheduleedit',
         'display_name' => 'Schedule Edit',
     ]);
 
@@ -164,22 +165,22 @@ test('schedule page can save a one-off slot starting tomorrow or later', functio
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-onetime@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-onetime@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleonetime',
+        'user_id' => $user->id,
+        'username' => 'scheduleonetime',
         'display_name' => 'Schedule One Time',
     ]);
 
     $start = now()->addDay()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end   = now()->addDay()->setTime(19, 0)->format('Y-m-d\TH:i');
+    $end = now()->addDay()->setTime(19, 0)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
@@ -206,22 +207,22 @@ test('schedule page rejects one-off slot starting before tomorrow', function () 
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-onetime-past@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-onetime-past@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleonetimepast',
+        'user_id' => $user->id,
+        'username' => 'scheduleonetimepast',
         'display_name' => 'Schedule One Time Past',
     ]);
 
     $start = now()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end   = now()->setTime(19, 0)->format('Y-m-d\TH:i');
+    $end = now()->setTime(19, 0)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
@@ -242,22 +243,22 @@ test('schedule page rejects one-off slot on a different day than start', functio
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-onetime-day@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-onetime-day@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleoneday',
+        'user_id' => $user->id,
+        'username' => 'scheduleoneday',
         'display_name' => 'Schedule One Day',
     ]);
 
     $start = now('UTC')->addDay()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end   = now('UTC')->addDays(2)->setTime(19, 0)->format('Y-m-d\TH:i');
+    $end = now('UTC')->addDays(2)->setTime(19, 0)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
@@ -278,23 +279,23 @@ test('schedule page rejects one-off slot shorter than 15 minutes', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-onetime-short@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-onetime-short@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleoneshort',
+        'user_id' => $user->id,
+        'username' => 'scheduleoneshort',
         'display_name' => 'Schedule One Short',
     ]);
 
     $day = now('UTC')->addDay();
     $start = $day->copy()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end   = $day->copy()->setTime(18, 10)->format('Y-m-d\TH:i');
+    $end = $day->copy()->setTime(18, 10)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
@@ -315,23 +316,23 @@ test('schedule page accepts one-off slot that is exactly 15 minutes', function (
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-onetime-15@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-onetime-15@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduleone15',
+        'user_id' => $user->id,
+        'username' => 'scheduleone15',
         'display_name' => 'Schedule One 15',
     ]);
 
     $day = now('UTC')->addDay();
     $start = $day->copy()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end   = $day->copy()->setTime(18, 15)->format('Y-m-d\TH:i');
+    $end = $day->copy()->setTime(18, 15)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
@@ -354,17 +355,17 @@ test('schedule page requires a title when saving a slot', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-title@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-title@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduletitle',
+        'user_id' => $user->id,
+        'username' => 'scheduletitle',
         'display_name' => 'Schedule Title',
     ]);
 
@@ -387,17 +388,17 @@ test('schedule page can delete a slot', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'schedule-delete@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'schedule-delete@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'scheduledelete',
+        'user_id' => $user->id,
+        'username' => 'scheduledelete',
         'display_name' => 'Schedule Delete',
     ]);
 
@@ -473,20 +474,20 @@ test('schedule page rejects lowering max claims below accepted count', function 
     $host = createScheduleTestUser('schedule-max-claims@speakloud.test', 'schedulemaxclaims');
 
     $senderOne = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'sender-max-one@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'sender-max-one@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     $senderTwo = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'sender-max-two@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'sender-max-two@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
@@ -508,20 +509,20 @@ test('schedule page rejects lowering max claims below accepted count', function 
 
     $schedule = $host->schedules()->first();
 
-    \App\Models\Claim::create([
-        'sender_id'   => $senderOne->id,
+    Claim::create([
+        'sender_id' => $senderOne->id,
         'receiver_id' => $host->id,
         'schedule_id' => $schedule->id,
-        'type'        => 'schedule',
-        'status'      => 'accepted',
+        'type' => 'schedule',
+        'status' => 'accepted',
     ]);
 
-    \App\Models\Claim::create([
-        'sender_id'   => $senderTwo->id,
+    Claim::create([
+        'sender_id' => $senderTwo->id,
         'receiver_id' => $host->id,
         'schedule_id' => $schedule->id,
-        'type'        => 'schedule',
-        'status'      => 'accepted',
+        'type' => 'schedule',
+        'status' => 'accepted',
     ]);
 
     Volt::actingAs($host)->test('schedule.index')

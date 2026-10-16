@@ -45,7 +45,7 @@ class ClaimRepository implements IClaimRepository
         $claim = Claim::findOrFail($id);
 
         $claim->update([
-            'status'       => $status,
+            'status' => $status,
             'responded_at' => now(),
         ]);
 
@@ -57,8 +57,8 @@ class ClaimRepository implements IClaimRepository
         $claim = Claim::findOrFail($id);
 
         $claim->update([
-            'status'       => 'pending',
-            'message'      => $message,
+            'status' => 'pending',
+            'message' => $message,
             'responded_at' => null,
         ]);
 

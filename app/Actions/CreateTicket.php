@@ -30,11 +30,11 @@ class CreateTicket
         }
 
         return $this->tickets->create([
-            'user_id'     => $user->id,
+            'user_id' => $user->id,
             'category_id' => $categoryId,
-            'subject'     => $subject,
-            'status'      => 'open',
-            'priority'    => 'normal',
+            'subject' => $subject,
+            'status' => 'open',
+            'priority' => 'normal',
         ], $body);
     }
 }

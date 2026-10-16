@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('interests', function (Blueprint $table) {
-            $table->unsignedSmallInteger('id')->autoIncrement()->primary();
+            $table->unsignedSmallInteger('id')->autoIncrement();
             $table->string('slug', 100)->unique();
             $table->string('name_en', 100);
         });

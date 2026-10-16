@@ -3,13 +3,15 @@
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use App\Repositories\Contracts\IConversationRepository;
+
 function conversationBetween(User $first, User $second, array $attributes = []): Conversation
 {
     $userAId = min($first->id, $second->id);
     $userBId = max($first->id, $second->id);
 
     return Conversation::create(array_merge([
-        'type'      => 'direct',
+        'type' => 'direct',
         'user_a_id' => $userAId,
         'user_b_id' => $userBId,
     ], $attributes));
@@ -18,7 +20,7 @@ function conversationBetween(User $first, User $second, array $attributes = []):
 describe('Conversation model', function () {
     it('persists user pair and optional last_message_at', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
         $lastAt = now()->startOfSecond();
 
         $conversation = conversationBetween($alice, $bob, [
@@ -35,11 +37,11 @@ describe('Conversation model', function () {
 
     it('reuses the same direct conversation for a user pair via repository', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
-        $repo = app(\App\Repositories\Contracts\IConversationRepository::class);
+        $repo = app(IConversationRepository::class);
 
-        $first  = $repo->findOrCreateBetweenUsers($alice->id, $bob->id);
+        $first = $repo->findOrCreateBetweenUsers($alice->id, $bob->id);
         $second = $repo->findOrCreateBetweenUsers($bob->id, $alice->id);
 
         expect($second->is($first))->toBeTrue()
@@ -48,7 +50,7 @@ describe('Conversation model', function () {
 
     it('cascades delete when a participant is force-deleted', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = conversationBetween($alice, $bob);
         $conversationId = $conversation->id;
@@ -75,22 +77,22 @@ describe('Conversation relationships', function () {
 
     it('has many messages ordered by repository usage', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = conversationBetween($alice, $bob);
 
         $first = Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $alice->id,
-            'body'            => 'Hello',
-            'type'            => 'text',
+            'sender_id' => $alice->id,
+            'body' => 'Hello',
+            'type' => 'text',
         ]);
 
         $second = Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $bob->id,
-            'body'            => 'Hi back',
-            'type'            => 'text',
+            'sender_id' => $bob->id,
+            'body' => 'Hi back',
+            'type' => 'text',
         ]);
 
         $conversation->load('messages');
@@ -101,15 +103,15 @@ describe('Conversation relationships', function () {
 
     it('cascades delete to messages when conversation is removed', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = conversationBetween($alice, $bob);
 
         $message = Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $alice->id,
-            'body'            => 'Gone soon',
-            'type'            => 'text',
+            'sender_id' => $alice->id,
+            'body' => 'Gone soon',
+            'type' => 'text',
         ]);
 
         $conversation->delete();
@@ -121,15 +123,15 @@ describe('Conversation relationships', function () {
 describe('Message inverse relationship', function () {
     it('belongs to a conversation and sender', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = conversationBetween($alice, $bob);
 
         $message = Message::create([
             'conversation_id' => $conversation->id,
-            'sender_id'       => $alice->id,
-            'body'            => 'Test',
-            'type'            => 'text',
+            'sender_id' => $alice->id,
+            'body' => 'Test',
+            'type' => 'text',
         ]);
 
         $message->load(['conversation', 'sender']);
@@ -142,7 +144,7 @@ describe('Message inverse relationship', function () {
 describe('User conversation relationships', function () {
     it('exposes conversationsAsA and conversationsAsB', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
         $carol = User::factory()->create();
 
         $withBob = conversationBetween($alice, $bob);

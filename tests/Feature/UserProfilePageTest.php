@@ -16,43 +16,43 @@ test('public user profile page shows profile details and open schedules', functi
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $host = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'host-profile@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-profile@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $host->id,
-        'username'     => 'hostprofile',
+        'user_id' => $host->id,
+        'username' => 'hostprofile',
         'profile_slug' => 'hostprofile',
         'display_name' => 'Host Profile',
-        'bio'          => 'Friendly conversation partner.',
+        'bio' => 'Friendly conversation partner.',
         'country_code' => 'DE',
     ]);
 
     $host->languages()->create([
         'language_id' => $language->id,
-        'type'        => 'native',
-        'level'       => 'fluent',
+        'type' => 'native',
+        'level' => 'fluent',
     ]);
 
     $schedule = Schedule::create([
-        'user_id'          => $host->id,
-        'description'      => ScheduleDescription::EXAMPLES[0],
-        'type'             => 'recurring',
-        'language_id'      => $language->id,
+        'user_id' => $host->id,
+        'description' => ScheduleDescription::EXAMPLES[0],
+        'type' => 'recurring',
+        'language_id' => $language->id,
         'max_participants' => 2,
-        'status'           => 'active',
+        'status' => 'active',
     ]);
 
     ScheduleRecurringRule::create([
         'schedule_id' => $schedule->id,
         'day_of_week' => 'Sat',
-        'start_time'  => '18:00:00',
-        'end_time'    => '19:00:00',
+        'start_time' => '18:00:00',
+        'end_time' => '19:00:00',
     ]);
 
     $this->get(route('users.show', 'hostprofile'))
@@ -69,39 +69,39 @@ test('profile page shows open chat when conversation exists', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $host = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'host-chat@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-chat@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $host->id,
-        'username'     => 'hostchat',
+        'user_id' => $host->id,
+        'username' => 'hostchat',
         'profile_slug' => 'hostchat',
         'display_name' => 'Host Chat',
         'country_code' => 'US',
     ]);
 
     $viewer = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'viewer-chat@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'viewer-chat@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $viewer->id,
-        'username'     => 'viewerchat',
+        'user_id' => $viewer->id,
+        'username' => 'viewerchat',
         'display_name' => 'Viewer Chat',
     ]);
 
     $conversation = Conversation::create([
-        'type'      => 'direct',
+        'type' => 'direct',
         'user_a_id' => min($host->id, $viewer->id),
         'user_b_id' => max($host->id, $viewer->id),
     ]);
@@ -113,33 +113,33 @@ test('profile page shows open chat when conversation exists', function () {
 
 test('profile page can send a direct claim when no conversation exists', function () {
     $host = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'host-direct@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-direct@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $host->id,
-        'username'     => 'hostdirect',
+        'user_id' => $host->id,
+        'username' => 'hostdirect',
         'profile_slug' => 'hostdirect',
         'display_name' => 'Host Direct',
     ]);
 
     $viewer = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'viewer-direct@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'viewer-direct@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $viewer->id,
-        'username'     => 'viewerdirect',
+        'user_id' => $viewer->id,
+        'username' => 'viewerdirect',
         'display_name' => 'Viewer Direct',
     ]);
 
@@ -159,17 +159,17 @@ test('profile page can send a direct claim when no conversation exists', functio
 
 test('guest is redirected to login when trying to claim from profile', function () {
     $host = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'host-guest-claim@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-guest-claim@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $host->id,
-        'username'     => 'hostguestclaim',
+        'user_id' => $host->id,
+        'username' => 'hostguestclaim',
         'profile_slug' => 'hostguestclaim',
         'display_name' => 'Host Guest Claim',
     ]);
@@ -179,29 +179,29 @@ test('guest is redirected to login when trying to claim from profile', function 
         ->assertRedirect(route('login'));
 
     expect(session('pending_direct_claim'))->toMatchArray([
-        'receiver_id'  => $host->id,
+        'receiver_id' => $host->id,
         'profile_slug' => 'hostguestclaim',
     ]);
 });
 
 test('private profile only shows display name to visitors', function () {
     $host = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'host-private@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-private@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $host->id,
-        'username'     => 'hostprivate',
+        'user_id' => $host->id,
+        'username' => 'hostprivate',
         'profile_slug' => '12345678',
         'display_name' => 'Private Host',
-        'bio'          => 'Secret bio',
+        'bio' => 'Secret bio',
         'country_code' => 'DE',
-        'is_private'   => true,
+        'is_private' => true,
     ]);
 
     $this->get(route('users.show', '12345678'))
@@ -215,20 +215,20 @@ test('private profile only shows display name to visitors', function () {
 
 test('user can toggle private profile on edit page', function () {
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'private-toggle@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'private-toggle@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'privatetoggle',
+        'user_id' => $user->id,
+        'username' => 'privatetoggle',
         'profile_slug' => 'privatetoggle',
         'display_name' => 'Toggle User',
-        'is_private'   => false,
+        'is_private' => false,
     ]);
 
     Volt::actingAs($user)->test('profile.edit')
@@ -242,17 +242,17 @@ test('user can toggle private profile on edit page', function () {
 
 test('user can change profile slug when unique', function () {
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'slug-edit@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'slug-edit@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'user9',
+        'user_id' => $user->id,
+        'username' => 'user9',
         'profile_slug' => 'user9',
         'display_name' => 'Slug Editor',
     ]);
@@ -265,17 +265,17 @@ test('user can change profile slug when unique', function () {
     expect($user->profile->fresh()->profile_slug)->toBe('12345678');
 
     $viewer = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'slug-viewer@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'slug-viewer@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $viewer->id,
-        'username'     => 'slugviewer',
+        'user_id' => $viewer->id,
+        'username' => 'slugviewer',
         'profile_slug' => 'slugviewer',
         'display_name' => 'Slug Viewer',
     ]);

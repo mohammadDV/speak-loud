@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 
 class UserProfile extends Model
@@ -31,8 +32,8 @@ class UserProfile extends Model
     {
         return [
             'is_available' => 'boolean',
-            'is_private'   => 'boolean',
-            'birthdate'    => 'date',
+            'is_private' => 'boolean',
+            'birthdate' => 'date',
         ];
     }
 
@@ -51,7 +52,7 @@ class UserProfile extends Model
             return $this->profile_image_path;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('s3');
 
         return $disk->url($this->profile_image_path);
@@ -67,7 +68,7 @@ class UserProfile extends Model
             return $this->background_image_path;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('s3');
 
         return $disk->url($this->background_image_path);

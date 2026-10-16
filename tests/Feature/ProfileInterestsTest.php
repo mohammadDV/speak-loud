@@ -12,17 +12,17 @@ test('user can save interests on profile edit', function () {
     Interest::firstOrCreate(['slug' => 'tech'], ['name_en' => 'Tech']);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'interests-save@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'interests-save@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'interestsave',
+        'user_id' => $user->id,
+        'username' => 'interestsave',
         'display_name' => 'Interest Save',
         'profile_slug' => 'interestsave',
     ]);
@@ -43,17 +43,17 @@ test('profile overview shows saved interests', function () {
     $gaming = Interest::firstOrCreate(['slug' => 'gaming'], ['name_en' => 'Gaming']);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'interests-overview@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'interests-overview@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'interestoverview',
+        'user_id' => $user->id,
+        'username' => 'interestoverview',
         'display_name' => 'Interest Overview',
         'profile_slug' => 'interestoverview',
     ]);

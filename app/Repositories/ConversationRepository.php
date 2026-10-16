@@ -30,7 +30,7 @@ class ConversationRepository implements IConversationRepository
     {
         return $this->findBetweenUsers($userId1, $userId2)
             ?? $this->create([
-                'type'      => 'direct',
+                'type' => 'direct',
                 ...$this->normalizePair($userId1, $userId2),
             ]);
     }
@@ -42,7 +42,7 @@ class ConversationRepository implements IConversationRepository
             ->where('schedule_id', $schedule->id)
             ->first()
             ?? Conversation::create([
-                'type'        => 'schedule_group',
+                'type' => 'schedule_group',
                 'schedule_id' => $schedule->id,
             ]);
     }
@@ -63,7 +63,7 @@ class ConversationRepository implements IConversationRepository
         foreach ($memberIds as $userId) {
             ConversationParticipant::firstOrCreate([
                 'conversation_id' => $conversation->id,
-                'user_id'         => $userId,
+                'user_id' => $userId,
             ]);
         }
 

@@ -16,15 +16,15 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid'              => Str::uuid()->toString(),
-            'email'             => fake()->unique()->safeEmail(),
+            'uuid' => Str::uuid()->toString(),
+            'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password'          => static::$password ??= 'password',
-            'role'              => 'user',
-            'status'            => 'active',
+            'password' => static::$password ??= 'password',
+            'role' => 'user',
+            'status' => 'active',
             'terms_accepted_at' => now(),
-            'terms_version'     => config('legal.terms_version'),
-            'remember_token'    => Str::random(10),
+            'terms_version' => config('legal.terms_version'),
+            'remember_token' => Str::random(10),
         ];
     }
 

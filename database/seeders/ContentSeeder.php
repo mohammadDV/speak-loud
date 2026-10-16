@@ -52,9 +52,9 @@ class ContentSeeder extends Seeder
                 ['question' => $question],
                 [
                     'category_id' => $categories[$categorySlug] ?? null,
-                    'answer'      => $answer,
-                    'is_active'   => true,
-                    'sort_order'  => $index + 1,
+                    'answer' => $answer,
+                    'is_active' => true,
+                    'sort_order' => $index + 1,
                 ]
             );
         }
@@ -110,14 +110,14 @@ class ContentSeeder extends Seeder
             $blogPost = BlogPost::firstOrCreate(
                 ['slug' => $slug],
                 [
-                    'author_id'        => $author->id,
-                    'category_id'      => $categories[$post['category']] ?? null,
-                    'title'            => $post['title'],
-                    'excerpt'          => $post['excerpt'],
-                    'body'             => $post['body'],
+                    'author_id' => $author->id,
+                    'category_id' => $categories[$post['category']] ?? null,
+                    'title' => $post['title'],
+                    'excerpt' => $post['excerpt'],
+                    'body' => $post['body'],
                     'cover_image_path' => $cover,
-                    'status'           => 'published',
-                    'published_at'     => now()->subDays(30 - $index),
+                    'status' => 'published',
+                    'published_at' => now()->subDays(30 - $index),
                 ]
             );
 
@@ -165,9 +165,9 @@ class ContentSeeder extends Seeder
     {
         $coversBySlug = [
             'five-ways-to-find-the-right-practice-partner' => 'images/blog/partners.svg',
-            'making-the-most-of-your-first-session'        => 'images/blog/first-session.svg',
-            'why-recurring-slots-work-better-than-one-offs'  => 'images/blog/recurring.svg',
-            'how-shared-interests-make-practice-easier'    => 'images/blog/interests.svg',
+            'making-the-most-of-your-first-session' => 'images/blog/first-session.svg',
+            'why-recurring-slots-work-better-than-one-offs' => 'images/blog/recurring.svg',
+            'how-shared-interests-make-practice-easier' => 'images/blog/interests.svg',
             'welcome-to-speakloud-schedules-and-group-chat' => 'images/blog/welcome.svg',
             'setting-session-rules-that-partners-actually-read' => 'images/blog/session-rules.svg',
         ];

@@ -17,8 +17,8 @@ function makeUserWithProfile(string $suffix): User
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => "user{$suffix}",
+        'user_id' => $user->id,
+        'username' => "user{$suffix}",
         'display_name' => "User {$suffix}",
     ]);
 
@@ -28,10 +28,10 @@ function makeUserWithProfile(string $suffix): User
 describe('ConversationRepository', function () {
     it('finds a conversation regardless of argument order', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $stored = Conversation::create([
-            'type'      => 'direct',
+            'type' => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);
@@ -42,17 +42,17 @@ describe('ConversationRepository', function () {
 
     it('returns null when no conversation exists between users', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         expect($this->repository->findBetweenUsers($alice->id, $bob->id))->toBeNull();
     });
 
     it('findOrCreateBetweenUsers reuses an existing conversation', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $existing = Conversation::create([
-            'type'      => 'direct',
+            'type' => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);
@@ -65,7 +65,7 @@ describe('ConversationRepository', function () {
 
     it('findOrCreateBetweenUsers stores normalized user ids', function () {
         $higher = User::factory()->create();
-        $lower  = User::factory()->create();
+        $lower = User::factory()->create();
 
         if ($lower->id > $higher->id) {
             [$lower, $higher] = [$higher, $lower];
@@ -79,10 +79,10 @@ describe('ConversationRepository', function () {
 
     it('create normalizes user ids when passed in reverse order', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = $this->repository->create([
-            'type'      => 'direct',
+            'type' => 'direct',
             'user_a_id' => $bob->id,
             'user_b_id' => $alice->id,
         ]);
@@ -97,21 +97,21 @@ describe('ConversationRepository', function () {
         $partnerB = makeUserWithProfile('b');
 
         $older = Conversation::create([
-            'type'            => 'direct',
-            'user_a_id'       => min($viewer->id, $partnerA->id),
-            'user_b_id'       => max($viewer->id, $partnerA->id),
+            'type' => 'direct',
+            'user_a_id' => min($viewer->id, $partnerA->id),
+            'user_b_id' => max($viewer->id, $partnerA->id),
             'last_message_at' => now()->subDay(),
         ]);
 
         $newer = Conversation::create([
-            'type'            => 'direct',
-            'user_a_id'       => min($viewer->id, $partnerB->id),
-            'user_b_id'       => max($viewer->id, $partnerB->id),
+            'type' => 'direct',
+            'user_a_id' => min($viewer->id, $partnerB->id),
+            'user_b_id' => max($viewer->id, $partnerB->id),
             'last_message_at' => now(),
         ]);
 
         Conversation::create([
-            'type'      => 'direct',
+            'type' => 'direct',
             'user_a_id' => min($partnerA->id, $partnerB->id),
             'user_b_id' => max($partnerA->id, $partnerB->id),
         ]);
@@ -127,10 +127,10 @@ describe('ConversationRepository', function () {
 
     it('findById returns the conversation record', function () {
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
 
         $conversation = Conversation::create([
-            'type'      => 'direct',
+            'type' => 'direct',
             'user_a_id' => min($alice->id, $bob->id),
             'user_b_id' => max($alice->id, $bob->id),
         ]);
@@ -142,25 +142,25 @@ describe('ConversationRepository', function () {
 
 describe('ConversationRepository with messages', function () {
     it('keeps a single thread when multiple claims share the same pair', function () {
-        $host   = User::factory()->create();
-        $guest  = User::factory()->create();
+        $host = User::factory()->create();
+        $guest = User::factory()->create();
 
         $first = $this->repository->findOrCreateBetweenUsers($guest->id, $host->id);
 
         Message::create([
             'conversation_id' => $first->id,
-            'sender_id'       => $guest->id,
-            'body'            => 'First claim note',
-            'type'            => 'text',
+            'sender_id' => $guest->id,
+            'body' => 'First claim note',
+            'type' => 'text',
         ]);
 
         $second = $this->repository->findOrCreateBetweenUsers($host->id, $guest->id);
 
         Message::create([
             'conversation_id' => $second->id,
-            'sender_id'       => $host->id,
-            'body'            => 'Second claim note',
-            'type'            => 'text',
+            'sender_id' => $host->id,
+            'body' => 'Second claim note',
+            'type' => 'text',
         ]);
 
         expect($second->is($first))->toBeTrue()

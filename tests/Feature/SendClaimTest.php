@@ -32,50 +32,50 @@ test('send claim blocks a fourth claim within one hour', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $sender = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'sender-limit@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'sender-limit@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $sender->id,
-        'username'     => 'senderlimit',
+        'user_id' => $sender->id,
+        'username' => 'senderlimit',
         'display_name' => 'Sender Limit',
     ]);
 
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
-            'uuid'              => (string) Str::uuid(),
-            'email'             => "host-limit-{$index}@speakloud.test",
-            'password'          => '123456789',
-            'role'              => 'user',
-            'status'            => 'active',
+            'uuid' => (string) Str::uuid(),
+            'email' => "host-limit-{$index}@speakloud.test",
+            'password' => '123456789',
+            'role' => 'user',
+            'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         UserProfile::create([
-            'user_id'      => $host->id,
-            'username'     => "hostlimit{$index}",
+            'user_id' => $host->id,
+            'username' => "hostlimit{$index}",
             'display_name' => "Host Limit {$index}",
         ]);
 
         $schedule = Schedule::create([
-            'user_id'          => $host->id,
-            'description'      => ScheduleDescription::EXAMPLES[0],
-            'type'             => 'recurring',
-            'language_id'      => $language->id,
+            'user_id' => $host->id,
+            'description' => ScheduleDescription::EXAMPLES[0],
+            'type' => 'recurring',
+            'language_id' => $language->id,
             'max_participants' => 1,
-            'status'           => 'active',
+            'status' => 'active',
         ]);
 
         ScheduleRecurringRule::create([
             'schedule_id' => $schedule->id,
             'day_of_week' => 'Mon',
-            'start_time'  => '18:00:00',
-            'end_time'    => '19:00:00',
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
         ]);
 
         return $schedule;
@@ -85,18 +85,18 @@ test('send claim blocks a fourth claim within one hour', function () {
 
     foreach ($hosts->take(3) as $schedule) {
         $action->execute([
-            'sender_id'   => $sender->id,
+            'sender_id' => $sender->id,
             'receiver_id' => $schedule->user_id,
             'schedule_id' => $schedule->id,
-            'message'     => 'Would love to join!',
+            'message' => 'Would love to join!',
         ]);
     }
 
     expect(fn () => $action->execute([
-        'sender_id'   => $sender->id,
+        'sender_id' => $sender->id,
         'receiver_id' => $hosts[3]->user_id,
         'schedule_id' => $hosts[3]->id,
-        'message'     => 'One more please!',
+        'message' => 'One more please!',
     ]))->toThrow(function (ValidationException $e) {
         expect($e->errors()['claimMessage'][0])->toContain('You can send up to 3 claims per hour.');
     });
@@ -109,50 +109,50 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $viewer = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'viewer-limit@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'viewer-limit@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $viewer->id,
-        'username'     => 'viewerlimit',
+        'user_id' => $viewer->id,
+        'username' => 'viewerlimit',
         'display_name' => 'Viewer Limit',
     ]);
 
     $schedules = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
-            'uuid'              => (string) Str::uuid(),
-            'email'             => "host-discover-limit-{$index}@speakloud.test",
-            'password'          => '123456789',
-            'role'              => 'user',
-            'status'            => 'active',
+            'uuid' => (string) Str::uuid(),
+            'email' => "host-discover-limit-{$index}@speakloud.test",
+            'password' => '123456789',
+            'role' => 'user',
+            'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         UserProfile::create([
-            'user_id'      => $host->id,
-            'username'     => "hostdiscover{$index}",
+            'user_id' => $host->id,
+            'username' => "hostdiscover{$index}",
             'display_name' => "Host Discover {$index}",
         ]);
 
         $schedule = Schedule::create([
-            'user_id'          => $host->id,
-            'description'      => ScheduleDescription::EXAMPLES[0],
-            'type'             => 'recurring',
-            'language_id'      => $language->id,
+            'user_id' => $host->id,
+            'description' => ScheduleDescription::EXAMPLES[0],
+            'type' => 'recurring',
+            'language_id' => $language->id,
             'max_participants' => 1,
-            'status'           => 'active',
+            'status' => 'active',
         ]);
 
         ScheduleRecurringRule::create([
             'schedule_id' => $schedule->id,
             'day_of_week' => 'Mon',
-            'start_time'  => '18:00:00',
-            'end_time'    => '19:00:00',
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
         ]);
 
         return $schedule;
@@ -176,7 +176,7 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
 
 test('send claim allows another claim after the hourly window expires', function () {
     config([
-        'claims.max_per_hour'              => 3,
+        'claims.max_per_hour' => 3,
         'claims.rate_limit_window_seconds' => 3600,
     ]);
 
@@ -184,50 +184,50 @@ test('send claim allows another claim after the hourly window expires', function
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $sender = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'sender-reset@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'sender-reset@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $sender->id,
-        'username'     => 'senderreset',
+        'user_id' => $sender->id,
+        'username' => 'senderreset',
         'display_name' => 'Sender Reset',
     ]);
 
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
-            'uuid'              => (string) Str::uuid(),
-            'email'             => "host-reset-{$index}@speakloud.test",
-            'password'          => '123456789',
-            'role'              => 'user',
-            'status'            => 'active',
+            'uuid' => (string) Str::uuid(),
+            'email' => "host-reset-{$index}@speakloud.test",
+            'password' => '123456789',
+            'role' => 'user',
+            'status' => 'active',
             'email_verified_at' => now(),
         ]);
 
         UserProfile::create([
-            'user_id'      => $host->id,
-            'username'     => "hostreset{$index}",
+            'user_id' => $host->id,
+            'username' => "hostreset{$index}",
             'display_name' => "Host Reset {$index}",
         ]);
 
         $schedule = Schedule::create([
-            'user_id'          => $host->id,
-            'description'      => ScheduleDescription::EXAMPLES[0],
-            'type'             => 'recurring',
-            'language_id'      => $language->id,
+            'user_id' => $host->id,
+            'description' => ScheduleDescription::EXAMPLES[0],
+            'type' => 'recurring',
+            'language_id' => $language->id,
             'max_participants' => 1,
-            'status'           => 'active',
+            'status' => 'active',
         ]);
 
         ScheduleRecurringRule::create([
             'schedule_id' => $schedule->id,
             'day_of_week' => 'Mon',
-            'start_time'  => '18:00:00',
-            'end_time'    => '19:00:00',
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
         ]);
 
         return $schedule;
@@ -237,7 +237,7 @@ test('send claim allows another claim after the hourly window expires', function
 
     foreach ($hosts->take(3) as $schedule) {
         $action->execute([
-            'sender_id'   => $sender->id,
+            'sender_id' => $sender->id,
             'receiver_id' => $schedule->user_id,
             'schedule_id' => $schedule->id,
         ]);
@@ -246,7 +246,7 @@ test('send claim allows another claim after the hourly window expires', function
     RateLimiter::clear(ClaimLimits::rateLimiterKey($sender->id));
 
     $claim = $action->execute([
-        'sender_id'   => $sender->id,
+        'sender_id' => $sender->id,
         'receiver_id' => $hosts[3]->user_id,
         'schedule_id' => $hosts[3]->id,
     ]);

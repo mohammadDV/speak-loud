@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Claim;
-use App\Support\ScheduleDescription;
 use App\Models\Conversation;
 use App\Models\Interest;
 use App\Models\Language;
@@ -21,6 +20,7 @@ use App\Models\UserLanguage;
 use App\Models\UserNotificationPreference;
 use App\Models\UserProfile;
 use App\Models\UserTag;
+use App\Support\ScheduleDescription;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -81,10 +81,10 @@ class DemoDataSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@speakloud.test'],
             [
-                'uuid'              => Str::uuid()->toString(),
-                'password'          => self::PASSWORD,
-                'role'              => 'admin',
-                'status'            => 'active',
+                'uuid' => Str::uuid()->toString(),
+                'password' => self::PASSWORD,
+                'role' => 'admin',
+                'status' => 'active',
                 'email_verified_at' => now(),
             ]
         );
@@ -92,11 +92,11 @@ class DemoDataSeeder extends Seeder
         UserProfile::firstOrCreate(
             ['user_id' => $admin->id],
             [
-                'username'     => 'admin',
+                'username' => 'admin',
                 'profile_slug' => 'admin',
                 'display_name' => 'SpeakLoud Admin',
-                'bio'          => 'Platform administrator account for local development.',
-                'nationality'  => 'Global',
+                'bio' => 'Platform administrator account for local development.',
+                'nationality' => 'Global',
                 'country_code' => 'US',
                 'is_available' => true,
             ]
@@ -110,12 +110,12 @@ class DemoDataSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['email' => $email],
                 [
-                    'uuid'              => Str::uuid()->toString(),
-                    'password'          => self::PASSWORD,
-                    'role'              => 'user',
-                    'status'            => 'active',
+                    'uuid' => Str::uuid()->toString(),
+                    'password' => self::PASSWORD,
+                    'role' => 'user',
+                    'status' => 'active',
                     'email_verified_at' => now()->subDays(rand(1, 90)),
-                    'last_login_at'     => now()->subDays(rand(0, 14)),
+                    'last_login_at' => now()->subDays(rand(0, 14)),
                 ]
             );
 
@@ -125,13 +125,13 @@ class DemoDataSeeder extends Seeder
             UserProfile::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'username'     => $username,
+                    'username' => $username,
                     'profile_slug' => $username,
                     'display_name' => $firstName.' '.fake()->lastName(),
-                    'bio'          => fake()->optional(0.85)->paragraph(),
-                    'gender'       => fake()->randomElement($this->genders),
-                    'birthdate'    => fake()->optional(0.7)->dateTimeBetween('-55 years', '-18 years')?->format('Y-m-d'),
-                    'nationality'  => fake()->country(),
+                    'bio' => fake()->optional(0.85)->paragraph(),
+                    'gender' => fake()->randomElement($this->genders),
+                    'birthdate' => fake()->optional(0.7)->dateTimeBetween('-55 years', '-18 years')?->format('Y-m-d'),
+                    'nationality' => fake()->country(),
                     'country_code' => fake()->randomElement($this->countryCodes),
                     'is_available' => fake()->boolean(85),
                 ]
@@ -184,9 +184,9 @@ class DemoDataSeeder extends Seeder
                 foreach (['email', 'push'] as $channel) {
                     UserNotificationPreference::firstOrCreate(
                         [
-                            'user_id'           => $user->id,
+                            'user_id' => $user->id,
                             'notification_type' => $type,
-                            'channel'           => $channel,
+                            'channel' => $channel,
                         ],
                         ['is_enabled' => fake()->boolean(80)]
                     );
@@ -206,22 +206,22 @@ class DemoDataSeeder extends Seeder
 
             if (fake()->boolean(55)) {
                 $schedule = Schedule::create([
-                    'user_id'          => $host->id,
-                    'title'            => fake()->randomElement(['Weekly chat', 'Saturday practice', 'Morning session']),
-                    'description'      => fake()->randomElement(ScheduleDescription::EXAMPLES),
-                    'type'             => 'recurring',
-                    'language_id'      => $language->id,
+                    'user_id' => $host->id,
+                    'title' => fake()->randomElement(['Weekly chat', 'Saturday practice', 'Morning session']),
+                    'description' => fake()->randomElement(ScheduleDescription::EXAMPLES),
+                    'type' => 'recurring',
+                    'language_id' => $language->id,
                     'max_participants' => fake()->numberBetween(1, 3),
-                    'status'           => 'active',
+                    'status' => 'active',
                 ]);
 
                 ScheduleRecurringRule::create([
-                    'schedule_id'  => $schedule->id,
-                    'day_of_week'  => implode(',', fake()->randomElements($this->weekdays, rand(1, 3))),
-                    'start_time'   => sprintf('%02d:00:00', rand(8, 20)),
-                    'end_time'     => sprintf('%02d:00:00', rand(9, 21)),
-                    'valid_from'   => now()->subMonth()->toDateString(),
-                    'valid_until'  => now()->addMonths(3)->toDateString(),
+                    'schedule_id' => $schedule->id,
+                    'day_of_week' => implode(',', fake()->randomElements($this->weekdays, rand(1, 3))),
+                    'start_time' => sprintf('%02d:00:00', rand(8, 20)),
+                    'end_time' => sprintf('%02d:00:00', rand(9, 21)),
+                    'valid_from' => now()->subMonth()->toDateString(),
+                    'valid_until' => now()->addMonths(3)->toDateString(),
                 ]);
 
                 $schedules->push($schedule);
@@ -230,19 +230,19 @@ class DemoDataSeeder extends Seeder
             if (fake()->boolean(50)) {
                 $start = now()->addDays(rand(1, 21))->setTime(rand(9, 19), 0);
                 $schedule = Schedule::create([
-                    'user_id'          => $host->id,
-                    'title'            => fake()->randomElement(['One-off session', 'Trial call', 'Open slot']),
-                    'description'      => fake()->randomElement(ScheduleDescription::EXAMPLES),
-                    'type'             => 'one_time',
-                    'language_id'      => $language->id,
+                    'user_id' => $host->id,
+                    'title' => fake()->randomElement(['One-off session', 'Trial call', 'Open slot']),
+                    'description' => fake()->randomElement(ScheduleDescription::EXAMPLES),
+                    'type' => 'one_time',
+                    'language_id' => $language->id,
                     'max_participants' => 1,
-                    'status'           => 'active',
+                    'status' => 'active',
                 ]);
 
                 ScheduleOneTimeSlot::create([
-                    'schedule_id'    => $schedule->id,
+                    'schedule_id' => $schedule->id,
                     'start_datetime' => $start,
-                    'end_datetime'   => $start->copy()->addHour(),
+                    'end_datetime' => $start->copy()->addHour(),
                 ]);
 
                 $schedules->push($schedule);
@@ -276,14 +276,14 @@ class DemoDataSeeder extends Seeder
             }
 
             $claim = Claim::create([
-                'sender_id'    => $sender->id,
-                'receiver_id'  => $schedule->user_id,
-                'schedule_id'  => $schedule->id,
-                'type'         => 'schedule',
-                'status'       => $status,
-                'message'      => fake()->optional(0.7)->sentence(),
+                'sender_id' => $sender->id,
+                'receiver_id' => $schedule->user_id,
+                'schedule_id' => $schedule->id,
+                'type' => 'schedule',
+                'status' => $status,
+                'message' => fake()->optional(0.7)->sentence(),
                 'responded_at' => in_array($status, ['accepted', 'rejected'], true) ? now()->subDays(rand(0, 5)) : null,
-                'expires_at'   => now()->addDays(7),
+                'expires_at' => now()->addDays(7),
             ]);
 
             if (in_array($status, ['accepted', 'rejected'], true)) {
@@ -303,14 +303,14 @@ class DemoDataSeeder extends Seeder
             $receiver = $users->where('id', '!=', $sender->id)->random();
 
             Claim::create([
-                'sender_id'    => $sender->id,
-                'receiver_id'  => $receiver->id,
-                'schedule_id'  => null,
-                'type'         => 'direct',
-                'status'       => fake()->randomElement(['pending', 'accepted', 'rejected']),
-                'message'      => fake()->sentence(),
+                'sender_id' => $sender->id,
+                'receiver_id' => $receiver->id,
+                'schedule_id' => null,
+                'type' => 'direct',
+                'status' => fake()->randomElement(['pending', 'accepted', 'rejected']),
+                'message' => fake()->sentence(),
                 'responded_at' => fake()->optional()->dateTimeBetween('-3 days', 'now'),
-                'expires_at'   => now()->addDays(5),
+                'expires_at' => now()->addDays(5),
             ]);
         }
     }
@@ -321,9 +321,9 @@ class DemoDataSeeder extends Seeder
         $userBId = max($claim->sender_id, $claim->receiver_id);
 
         $conversation = Conversation::create([
-            'type'            => 'direct',
-            'user_a_id'       => $userAId,
-            'user_b_id'       => $userBId,
+            'type' => 'direct',
+            'user_a_id' => $userAId,
+            'user_b_id' => $userBId,
             'last_message_at' => now(),
         ]);
         $conversation->created_at = now()->subDays(rand(1, 10));
@@ -339,11 +339,11 @@ class DemoDataSeeder extends Seeder
 
             $message = new Message([
                 'conversation_id' => $conversation->id,
-                'sender_id'       => $senderId,
-                'body'            => fake()->sentence(),
-                'type'            => 'text',
-                'is_read'         => $i < $messageCount - 1,
-                'read_at'         => $i < $messageCount - 1 ? $lastAt : null,
+                'sender_id' => $senderId,
+                'body' => fake()->sentence(),
+                'type' => 'text',
+                'is_read' => $i < $messageCount - 1,
+                'read_at' => $i < $messageCount - 1 ? $lastAt : null,
             ]);
             $message->created_at = $lastAt;
             $message->save();
@@ -361,29 +361,29 @@ class DemoDataSeeder extends Seeder
 
         foreach ($users->shuffle()->take(12) as $user) {
             $ticket = Ticket::create([
-                'user_id'     => $user->id,
+                'user_id' => $user->id,
                 'category_id' => $categories->random(),
-                'subject'     => fake()->sentence(4),
-                'status'      => fake()->randomElement(['open', 'in_progress', 'waiting_user', 'resolved']),
-                'priority'    => fake()->randomElement(['low', 'normal', 'high']),
+                'subject' => fake()->sentence(4),
+                'status' => fake()->randomElement(['open', 'in_progress', 'waiting_user', 'resolved']),
+                'priority' => fake()->randomElement(['low', 'normal', 'high']),
                 'assigned_to' => fake()->boolean(40) ? $adminId : null,
             ]);
 
             TicketMessage::create([
-                'ticket_id'  => $ticket->id,
-                'sender_id'  => $user->id,
-                'body'       => fake()->paragraph(),
-                'is_internal'=> false,
+                'ticket_id' => $ticket->id,
+                'sender_id' => $user->id,
+                'body' => fake()->paragraph(),
+                'is_internal' => false,
                 'created_at' => now()->subDays(rand(1, 5)),
             ]);
 
             if ($ticket->assigned_to) {
                 TicketMessage::create([
-                    'ticket_id'   => $ticket->id,
-                    'sender_id'   => $ticket->assigned_to,
-                    'body'        => 'Thanks for reaching out — we are looking into this.',
+                    'ticket_id' => $ticket->id,
+                    'sender_id' => $ticket->assigned_to,
+                    'body' => 'Thanks for reaching out — we are looking into this.',
                     'is_internal' => false,
-                    'created_at'  => now()->subDays(rand(0, 2)),
+                    'created_at' => now()->subDays(rand(0, 2)),
                 ]);
             }
         }
@@ -406,9 +406,9 @@ class DemoDataSeeder extends Seeder
             Report::create([
                 'reporter_id' => $reporter->id,
                 'reported_id' => $reported->id,
-                'reason'      => fake()->randomElement(['spam', 'harassment', 'inappropriate_content', 'fake_profile', 'other']),
+                'reason' => fake()->randomElement(['spam', 'harassment', 'inappropriate_content', 'fake_profile', 'other']),
                 'description' => fake()->optional()->sentence(),
-                'status'      => fake()->randomElement(['pending', 'reviewed', 'dismissed']),
+                'status' => fake()->randomElement(['pending', 'reviewed', 'dismissed']),
                 'reviewed_by' => fake()->boolean(30) ? $admin->id : null,
                 'reviewed_at' => fake()->boolean(30) ? now()->subDays(rand(1, 7)) : null,
             ]);

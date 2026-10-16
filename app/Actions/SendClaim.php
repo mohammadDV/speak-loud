@@ -14,7 +14,7 @@ class SendClaim
 
     public function execute(array $data): Claim
     {
-        $senderId   = $data['sender_id'];
+        $senderId = $data['sender_id'];
         $limiterKey = ClaimLimits::rateLimiterKey($senderId);
 
         if (RateLimiter::tooManyAttempts($limiterKey, ClaimLimits::maxPerHour())) {
@@ -56,11 +56,11 @@ class SendClaim
         }
 
         $claim = $this->claims->create([
-            'sender_id'   => $data['sender_id'],
+            'sender_id' => $data['sender_id'],
             'receiver_id' => $data['receiver_id'],
             'schedule_id' => $data['schedule_id'] ?? null,
-            'type'        => isset($data['schedule_id']) ? 'schedule' : 'direct',
-            'message'     => $data['message'] ?? null,
+            'type' => isset($data['schedule_id']) ? 'schedule' : 'direct',
+            'message' => $data['message'] ?? null,
         ]);
 
         RateLimiter::hit($limiterKey, ClaimLimits::windowSeconds());

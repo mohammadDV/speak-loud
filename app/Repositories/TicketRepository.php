@@ -53,9 +53,9 @@ class TicketRepository implements ITicketRepository
             $ticket = Ticket::create($data);
 
             TicketMessage::create([
-                'ticket_id'   => $ticket->id,
-                'sender_id'   => $ticket->user_id,
-                'body'        => trim($initialMessage),
+                'ticket_id' => $ticket->id,
+                'sender_id' => $ticket->user_id,
+                'body' => trim($initialMessage),
                 'is_internal' => false,
             ]);
 
@@ -66,9 +66,9 @@ class TicketRepository implements ITicketRepository
     public function addMessage(Ticket $ticket, int $senderId, string $body, bool $isInternal = false): TicketMessage
     {
         return TicketMessage::create([
-            'ticket_id'   => $ticket->id,
-            'sender_id'   => $senderId,
-            'body'        => trim($body),
+            'ticket_id' => $ticket->id,
+            'sender_id' => $senderId,
+            'body' => trim($body),
             'is_internal' => $isInternal,
         ]);
     }

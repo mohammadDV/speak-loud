@@ -8,9 +8,9 @@ use Livewire\Volt\Volt;
 
 test('blog and faq are separate pages', function () {
     Faq::create([
-        'question'   => 'What is SpeakLoud?',
-        'answer'     => 'A community for language practice.',
-        'is_active'  => true,
+        'question' => 'What is SpeakLoud?',
+        'answer' => 'A community for language practice.',
+        'is_active' => true,
         'sort_order' => 1,
     ]);
 
@@ -30,22 +30,22 @@ test('blog index loads twelve posts initially', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
-        'user_id'      => $author->id,
-        'username'     => 'paginateauthor',
+        'user_id' => $author->id,
+        'username' => 'paginateauthor',
         'display_name' => 'Paginate Author',
         'profile_slug' => 'paginateauthor',
     ]);
 
     foreach (range(1, 14) as $n) {
         BlogPost::create([
-            'author_id'        => $author->id,
-            'title'            => "Pagination post {$n}",
-            'slug'             => "pagination-post-{$n}",
-            'excerpt'          => "Excerpt for post {$n}.",
-            'body'             => '<p>Body</p>',
+            'author_id' => $author->id,
+            'title' => "Pagination post {$n}",
+            'slug' => "pagination-post-{$n}",
+            'excerpt' => "Excerpt for post {$n}.",
+            'body' => '<p>Body</p>',
             'cover_image_path' => 'images/blog/partners.svg',
-            'status'           => 'published',
-            'published_at'     => now()->subDays($n),
+            'status' => 'published',
+            'published_at' => now()->subDays($n),
         ]);
     }
 
@@ -61,22 +61,22 @@ test('blog index load more appends additional posts', function () {
     $author = User::factory()->create();
 
     UserProfile::create([
-        'user_id'      => $author->id,
-        'username'     => 'livewireblog',
+        'user_id' => $author->id,
+        'username' => 'livewireblog',
         'display_name' => 'Livewire Blog',
         'profile_slug' => 'livewireblog',
     ]);
 
     foreach (range(1, 13) as $n) {
         BlogPost::create([
-            'author_id'        => $author->id,
-            'title'            => "Livewire page post {$n}",
-            'slug'             => "livewire-page-post-{$n}",
-            'excerpt'          => 'Excerpt',
-            'body'             => '<p>Body</p>',
+            'author_id' => $author->id,
+            'title' => "Livewire page post {$n}",
+            'slug' => "livewire-page-post-{$n}",
+            'excerpt' => 'Excerpt',
+            'body' => '<p>Body</p>',
             'cover_image_path' => 'images/blog/welcome.svg',
-            'status'           => 'published',
-            'published_at'     => now()->subHours($n),
+            'status' => 'published',
+            'published_at' => now()->subHours($n),
         ]);
     }
 

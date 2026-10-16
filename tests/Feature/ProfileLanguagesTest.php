@@ -13,17 +13,17 @@ test('user can save languages on profile edit', function () {
         ?? Language::create(['code' => 'es', 'name_en' => 'Spanish', 'name_native' => 'Español', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'languages-save@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'languages-save@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'langsave',
+        'user_id' => $user->id,
+        'username' => 'langsave',
         'display_name' => 'Language Save',
         'profile_slug' => 'langsave',
     ]);
@@ -48,17 +48,17 @@ test('profile edit rejects duplicate language and type combinations', function (
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'languages-dup@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'languages-dup@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'langdup',
+        'user_id' => $user->id,
+        'username' => 'langdup',
         'display_name' => 'Language Dup',
         'profile_slug' => 'langdup',
     ]);
@@ -77,25 +77,25 @@ test('profile overview shows saved languages', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $user = User::create([
-        'uuid'              => (string) Str::uuid(),
-        'email'             => 'languages-overview@speakloud.test',
-        'password'          => '123456789',
-        'role'              => 'user',
-        'status'            => 'active',
+        'uuid' => (string) Str::uuid(),
+        'email' => 'languages-overview@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
         'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
-        'user_id'      => $user->id,
-        'username'     => 'langoverview',
+        'user_id' => $user->id,
+        'username' => 'langoverview',
         'display_name' => 'Language Overview',
         'profile_slug' => 'langoverview',
     ]);
 
     $user->languages()->create([
         'language_id' => $english->id,
-        'type'        => 'native',
-        'level'       => 'fluent',
+        'type' => 'native',
+        'level' => 'fluent',
     ]);
 
     Volt::actingAs($user)->test('profile.overview')

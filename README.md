@@ -102,6 +102,17 @@ Seeders: `LanguageSeeder`, `InterestSeeder`, `ContentSeeder`, `DemoDataSeeder` (
 ./vendor/bin/sail shell
 ```
 
+### CI-local quality checks
+
+Same checks as GitHub Actions (`.github/workflows/ci.yml`):
+
+```bash
+composer lint          # Pint (style, dry-run)
+composer stan          # PHPStan / Larastan (level 5 + baseline)
+composer test          # Pest
+composer audit         # Dependency security advisories (built-in Composer command)
+```
+
 Frontend hot reload runs on the host:
 
 ```bash
@@ -183,10 +194,11 @@ CLI:
 
 ## Testing
 
-Feature tests use `RefreshDatabase` (see `tests/Pest.php`). Target **≥ 80%** coverage in CI.
+Feature tests use `RefreshDatabase` (see `tests/Pest.php`). GitHub Actions runs lint, PHPStan, Pest (MySQL 8 service), and `composer audit` on every push/PR. Coverage target remains **≥ 80%** locally (`--coverage --min=80`); it is not enforced in CI yet.
 
 ```bash
 ./vendor/bin/sail pest
+# or: composer test
 ```
 
 ## Environment notes

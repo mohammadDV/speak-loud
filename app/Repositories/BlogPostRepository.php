@@ -44,6 +44,7 @@ class BlogPostRepository implements IBlogPostRepository
     {
         $post = BlogPost::findOrFail($id);
         $post->update($data);
+
         return $post->fresh();
     }
 }
