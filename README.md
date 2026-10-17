@@ -6,7 +6,7 @@
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Laravel 13, PHP 8.3+ |
+| Framework | Laravel 13, PHP 8.5+ |
 | UI | Livewire 4, Volt (single-file components), Flux UI, Tailwind CSS v4 |
 | Database | MySQL 8 |
 | Cache / queues | Redis |
@@ -35,7 +35,7 @@ docker run --rm \
   -u "$(id -u):$(id -g)" \
   -v "$(pwd):/var/www/html" \
   -w /var/www/html \
-  laravelsail/php83-composer:latest \
+  laravelsail/php85-composer:latest \
   composer install --ignore-platform-reqs
 
 # 3. Start containers (app, MySQL, Redis)

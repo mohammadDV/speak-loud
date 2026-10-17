@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: mbstring, pdo_mysql
           coverage: none
 
@@ -28,9 +28,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: composer-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php8.5-${{ hashFiles('composer.lock') }}
           restore-keys: |
-            composer-${{ runner.os }}-php8.4-
+            composer-${{ runner.os }}-php8.5-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -47,7 +47,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: mbstring, pdo_mysql
           coverage: none
 
@@ -55,9 +55,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: composer-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php8.5-${{ hashFiles('composer.lock') }}
           restore-keys: |
-            composer-${{ runner.os }}-php8.4-
+            composer-${{ runner.os }}-php8.5-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -100,7 +100,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: mbstring, pdo_mysql
           coverage: none
 
@@ -108,9 +108,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: composer-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php8.5-${{ hashFiles('composer.lock') }}
           restore-keys: |
-            composer-${{ runner.os }}-php8.4-
+            composer-${{ runner.os }}-php8.5-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -144,16 +144,16 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           coverage: none
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
           path: vendor
-          key: composer-${{ runner.os }}-php8.4-${{ hashFiles('composer.lock') }}
+          key: composer-${{ runner.os }}-php8.5-${{ hashFiles('composer.lock') }}
           restore-keys: |
-            composer-${{ runner.os }}-php8.4-
+            composer-${{ runner.os }}-php8.5-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
