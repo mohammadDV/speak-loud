@@ -3,6 +3,8 @@
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 mount(function () {
     Seo::share([
@@ -28,11 +30,23 @@ rules([
 $login = function () {
     $this->validate();
 
-    if (!Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
-        $this->addError('email', 'These credentials do not match our records.');
+    $throttleKey = Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+
+    if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->addError('email', 'Too many login attempts. Please try again in '.$seconds.' seconds.');
+
         return;
     }
 
+    if (! Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
+        RateLimiter::hit($throttleKey, 60);
+        $this->addError('email', 'These credentials do not match our records.');
+
+        return;
+    }
+
+    RateLimiter::clear($throttleKey);
     session()->regenerate();
 
     if ($pendingDirect = session('pending_direct_claim')) {

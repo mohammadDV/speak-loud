@@ -41,7 +41,13 @@ $sendMessage = function () {
 
     $conversation = Conversation::find($this->activeConversation);
 
-    if (! $conversation) {
+    if (! $conversation || ! $conversation->userCanAccess(auth()->id())) {
+        abort(403);
+    }
+
+    if ($conversation->isScheduleGroup()) {
+        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+
         return;
     }
 

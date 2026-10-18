@@ -34,8 +34,8 @@ mount(function (int $id) {
 });
 
 $loadMessages = function () {
-    if (! $this->conversation) {
-        return;
+    if (! $this->conversation || ! $this->conversation->userCanAccess(auth()->id())) {
+        abort(403);
     }
 
     $messages = app(IMessageRepository::class);
@@ -46,6 +46,10 @@ $loadMessages = function () {
 $sendMessage = function () {
     if (! trim($this->newMessage) || ! $this->conversation) {
         return;
+    }
+
+    if (! $this->conversation->userCanAccess(auth()->id())) {
+        abort(403);
     }
 
     app(IMessageRepository::class)->create([

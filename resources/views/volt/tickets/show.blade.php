@@ -31,12 +31,27 @@ mount(function (Ticket $ticket) {
 
 title(fn () => Seo::pageTitle($this->ticket?->subject ?? 'Support ticket'));
 
-$loadMessages = function () {
-    if (! $this->ticket) {
-        return;
+$authorizedTicket = function (): Ticket {
+    $ticketId = $this->ticket?->id;
+
+    if (! $ticketId) {
+        abort(404);
     }
 
-    $this->ticketMessages = app(ITicketRepository::class)->messagesForTicket($this->ticket->id);
+    $record = app(ITicketRepository::class)->findForUser($ticketId, auth()->id());
+
+    if (! $record) {
+        abort(404);
+    }
+
+    $this->ticket = $record;
+
+    return $record;
+};
+
+$loadMessages = function () {
+    $ticket = $this->authorizedTicket();
+    $this->ticketMessages = app(ITicketRepository::class)->messagesForTicket($ticket->id);
 };
 
 $sendReply = function (ReplyToTicket $action) {
@@ -44,7 +59,8 @@ $sendReply = function (ReplyToTicket $action) {
         'replyBody' => 'required|string|max:5000',
     ]);
 
-    $action->execute($this->ticket, auth()->user(), $this->replyBody);
+    $ticket = $this->authorizedTicket();
+    $action->execute($ticket, auth()->user(), $this->replyBody);
     $this->replyBody = '';
     $this->ticket->refresh();
     $this->loadMessages();

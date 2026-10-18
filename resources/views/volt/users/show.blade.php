@@ -92,11 +92,14 @@ $activeSchedules = computed(function () {
 });
 
 $claimTarget = computed(function () {
-    if (! $this->claimScheduleId) {
+    if (! $this->claimScheduleId || ! $this->profileUser) {
         return null;
     }
 
     return Schedule::query()
+        ->where('status', 'active')
+        ->where('user_id', $this->profileUser->id)
+        ->when(auth()->check(), fn ($q) => $q->where('user_id', '!=', auth()->id()))
         ->with(['user.profile', 'user.languages', 'language', 'recurringRule', 'oneTimeSlot'])
         ->withCount([
             'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),

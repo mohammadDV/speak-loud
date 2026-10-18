@@ -3,6 +3,7 @@
 use function Livewire\Volt\{state, mount};
 use App\Actions\AcceptClaim;
 use App\Actions\RejectClaim;
+use App\Actions\WithdrawClaim;
 use App\Repositories\Contracts\IClaimRepository;
 
 state([
@@ -55,8 +56,8 @@ $confirmReject = function (RejectClaim $action) {
     $this->refreshClaims();
 };
 
-$withdraw = function (int $claimId) {
-    app(IClaimRepository::class)->updateStatus($claimId, 'withdrawn');
+$withdraw = function (int $claimId, WithdrawClaim $action) {
+    $action->execute($claimId, auth()->id());
     $this->refreshClaims();
 };
 

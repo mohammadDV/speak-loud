@@ -67,11 +67,31 @@ class Schedule extends Model
             return true;
         }
 
+        if ($this->hasPendingClaimFrom($userId)) {
+            return true;
+        }
+
+        // Active slots are publicly viewable (Discover "View details"); chat/members stay private.
         return $this->status === 'active';
+    }
+
+    public function userCanSeeParticipants(int $userId): bool
+    {
+        return $this->isHost($userId)
+            || $this->hasAcceptedMember($userId)
+            || $this->hasPendingClaimFrom($userId);
     }
 
     public function userCanAccessGroupChat(int $userId): bool
     {
         return $this->isHost($userId) || $this->hasAcceptedMember($userId);
+    }
+
+    public function hasPendingClaimFrom(int $userId): bool
+    {
+        return $this->claims()
+            ->where('sender_id', $userId)
+            ->where('status', 'pending')
+            ->exists();
     }
 }

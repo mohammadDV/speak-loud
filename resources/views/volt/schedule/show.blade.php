@@ -7,10 +7,9 @@ use App\Repositories\Contracts\IMessageRepository;
 use App\Support\ScheduleAccess;
 
 state([
-    'schedule'     => null,
-    'messages'     => [],
-    'newMessage'   => '',
-    'canViewChat'  => false,
+    'schedule'   => null,
+    'messages'   => [],
+    'newMessage' => '',
 ]);
 
 mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
@@ -30,10 +29,9 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
         abort(403);
     }
 
-    $this->schedule    = $schedule;
-    $this->canViewChat = $userId && ScheduleAccess::canAccessGroupChat($schedule, $userId);
+    $this->schedule = $schedule;
 
-    if ($this->canViewChat) {
+    if ($userId && ScheduleAccess::canAccessGroupChat($schedule, $userId)) {
         $syncGroupChat->execute($schedule);
         $schedule->load('groupConversation');
         $this->schedule = $schedule;
@@ -41,8 +39,20 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
     }
 });
 
+$canSeeParticipants = computed(function () {
+    $userId = auth()->id();
+
+    return $this->schedule && $userId && ScheduleAccess::canSeeParticipants($this->schedule, $userId);
+});
+
+$canViewChat = computed(function () {
+    $userId = auth()->id();
+
+    return $this->schedule && $userId && ScheduleAccess::canAccessGroupChat($this->schedule, $userId);
+});
+
 $members = computed(function () {
-    if (! $this->schedule) {
+    if (! $this->schedule || ! $this->canSeeParticipants) {
         return collect();
     }
 
@@ -74,25 +84,41 @@ $pendingClaims = computed(function () {
 });
 
 $loadMessages = function () {
-    if (! $this->canViewChat || ! $this->schedule?->groupConversation) {
+    $userId = auth()->id();
+
+    if (! $this->schedule || ! $userId || ! ScheduleAccess::canAccessGroupChat($this->schedule, $userId)) {
+        abort(403);
+    }
+
+    if (! $this->schedule->groupConversation) {
         return;
     }
 
     $repo = app(IMessageRepository::class);
     $this->messages = $repo->forConversation($this->schedule->groupConversation->id);
-    $repo->markRead($this->schedule->groupConversation->id, auth()->id());
+    $repo->markRead($this->schedule->groupConversation->id, $userId);
 };
 
 $sendMessage = function () {
-    if (! trim($this->newMessage) || ! $this->canViewChat || ! $this->schedule?->groupConversation) {
+    $userId = auth()->id();
+
+    if (! trim($this->newMessage) || ! $this->schedule || ! $userId) {
         return;
+    }
+
+    if (! ScheduleAccess::canAccessGroupChat($this->schedule, $userId)) {
+        abort(403);
     }
 
     $conversation = $this->schedule->groupConversation;
 
+    if (! $conversation) {
+        return;
+    }
+
     app(IMessageRepository::class)->create([
         'conversation_id' => $conversation->id,
-        'sender_id'       => auth()->id(),
+        'sender_id'       => $userId,
         'body'            => trim($this->newMessage),
     ]);
 
@@ -119,47 +145,49 @@ $sendMessage = function () {
             <div class="lg:col-span-2 space-y-6">
                 <x-schedule-details :schedule="$schedule" />
 
-                <flux:card class="bg-[#FFF0E0] p-4">
-                    <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Members</h2>
-                    <ul class="space-y-3">
-                        @foreach ($this->members as $member)
-                            @php $profile = $member['user']?->profile; @endphp
-                            <li class="flex items-center gap-3">
-                                <div class="w-10 h-10 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
-                                    {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    @if ($profile?->profile_slug)
-                                        <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-medium text-[#3D2B1F] hover:text-[#FF8C42] truncate block">
-                                            {{ $profile->display_name ?? 'User' }}
-                                        </a>
-                                    @else
-                                        <p class="font-medium text-[#3D2B1F] truncate">{{ $profile->display_name ?? 'User' }}</p>
-                                    @endif
-                                    <p class="text-xs text-[#3D2B1F]/50">{{ $member['role'] }}</p>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
+                @if ($this->canSeeParticipants)
+                    <flux:card class="bg-[#FFF0E0] p-4">
+                        <h2 class="text-sm font-semibold text-[#3D2B1F] mb-3">Members</h2>
+                        <ul class="space-y-3">
+                            @foreach ($this->members as $member)
+                                @php $profile = $member['user']?->profile; @endphp
+                                <li class="flex items-center gap-3">
+                                    <div class="w-10 h-10 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold">
+                                        {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        @if ($profile?->profile_slug)
+                                            <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-medium text-[#3D2B1F] hover:text-[#FF8C42] truncate block">
+                                                {{ $profile->display_name ?? 'User' }}
+                                            </a>
+                                        @else
+                                            <p class="font-medium text-[#3D2B1F] truncate">{{ $profile->display_name ?? 'User' }}</p>
+                                        @endif
+                                        <p class="text-xs text-[#3D2B1F]/50">{{ $member['role'] }}</p>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
 
-                    @if ($this->pendingClaims->isNotEmpty())
-                        <div class="mt-5 pt-4 border-t border-[#3D2B1F]/10">
-                            <h3 class="text-xs font-semibold text-[#3D2B1F]/50 uppercase tracking-wide mb-2">Pending claims</h3>
-                            <ul class="space-y-2">
-                                @foreach ($this->pendingClaims as $claim)
-                                    @php $profile = $claim->sender?->profile; @endphp
-                                    <li class="flex items-center gap-2 text-sm text-[#3D2B1F]/70">
-                                        <span class="w-8 h-8 shrink-0 rounded-full bg-[#FFD166]/50 flex items-center justify-center text-xs font-bold text-[#3D2B1F]">
-                                            {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
-                                        </span>
-                                        {{ $profile->display_name ?? 'User' }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <a href="{{ route('claims') }}" wire:navigate class="inline-block mt-3 text-sm text-[#FF8C42] hover:underline">Manage on Claims →</a>
-                        </div>
-                    @endif
-                </flux:card>
+                        @if ($this->pendingClaims->isNotEmpty())
+                            <div class="mt-5 pt-4 border-t border-[#3D2B1F]/10">
+                                <h3 class="text-xs font-semibold text-[#3D2B1F]/50 uppercase tracking-wide mb-2">Pending claims</h3>
+                                <ul class="space-y-2">
+                                    @foreach ($this->pendingClaims as $claim)
+                                        @php $profile = $claim->sender?->profile; @endphp
+                                        <li class="flex items-center gap-2 text-sm text-[#3D2B1F]/70">
+                                            <span class="w-8 h-8 shrink-0 rounded-full bg-[#FFD166]/50 flex items-center justify-center text-xs font-bold text-[#3D2B1F]">
+                                                {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
+                                            </span>
+                                            {{ $profile->display_name ?? 'User' }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <a href="{{ route('claims') }}" wire:navigate class="inline-block mt-3 text-sm text-[#FF8C42] hover:underline">Manage on Claims →</a>
+                            </div>
+                        @endif
+                    </flux:card>
+                @endif
 
                 @if ($schedule->isHost(auth()->id()))
                     <flux:button href="{{ route('schedule') }}" wire:navigate variant="ghost" class="w-full">Edit in My Schedule</flux:button>
@@ -173,7 +201,7 @@ $sendMessage = function () {
                         <p class="text-xs text-[#3D2B1F]/50 mt-0.5">Host and accepted members only</p>
                     </div>
 
-                    @if ($canViewChat)
+                    @if ($this->canViewChat)
                         <div class="flex-1 overflow-y-auto p-4 space-y-3 min-h-[280px]">
                             @forelse ($messages as $msg)
                                 @php
