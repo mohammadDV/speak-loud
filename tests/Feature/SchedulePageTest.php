@@ -102,7 +102,10 @@ test('schedule page can save a recurring slot', function () {
         ->set('max_participants', 1)
         ->call('saveSlot')
         ->assertSet('showModal', false)
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSee('Weekend English chat')
+        ->assertSee('1 of')
+        ->assertDontSee('No slots yet');
 
     $schedule = $user->schedules()->first();
 

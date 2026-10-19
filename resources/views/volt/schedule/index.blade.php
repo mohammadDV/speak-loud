@@ -101,8 +101,15 @@ $editSchedule = function (int $scheduleId) {
     $this->showModal = true;
 };
 
+$refreshSchedules = function () {
+    unset($this->schedules);
+    unset($this->canCreateSlot);
+};
+
 $deleteSchedule = function (int $scheduleId, DeleteSchedule $action) {
     $action->execute(auth()->id(), $scheduleId);
+
+    $this->refreshSchedules();
 
     if ($this->editingScheduleId === $scheduleId) {
         $this->showModal = false;
@@ -193,6 +200,8 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         $create->execute(auth()->id(), $payload);
     }
 
+    $this->refreshSchedules();
+
     $this->showModal = false;
     $this->resetForm();
 };
@@ -216,7 +225,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
 
     <div class="space-y-4">
         @forelse ($this->schedules as $schedule)
-            <flux:card class="bg-[#FFF0E0] p-4">
+            <flux:card wire:key="schedule-{{ $schedule->id }}" class="bg-[#FFF0E0] p-4">
                 <div class="flex items-center justify-between">
                     <div>
                         @if ($schedule->title)
@@ -292,7 +301,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                             label="Title"
                             maxlength="200"
                             placeholder="e.g. Saturday evening chat"
-                            description="Only you can see this — it helps you tell your slots apart."
+                            description="Only you can see this."
                         />
 
                         @if ($type === 'recurring')
