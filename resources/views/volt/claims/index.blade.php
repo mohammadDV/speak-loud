@@ -1,24 +1,48 @@
 <?php
 
-use function Livewire\Volt\{state, mount};
+use function Livewire\Volt\{state, mount, computed};
 use App\Actions\AcceptClaim;
 use App\Actions\RejectClaim;
 use App\Actions\WithdrawClaim;
 use App\Repositories\Contracts\IClaimRepository;
+use Illuminate\Support\Collection;
 
 state([
     'incoming'          => [],
     'outgoing'          => [],
     'tab'               => 'incoming',
+    'sort'              => 'newest',
+    'status'            => '',
     'showRejectModal'   => false,
     'rejectingClaimId'  => null,
     'rejectMessage'     => '',
 ]);
 
+$applyFilters = function (iterable $claims): Collection {
+    $collection = Collection::make($claims);
+
+    if ($this->status !== '') {
+        $collection = $collection->where('status', $this->status);
+    }
+
+    $collection = $this->sort === 'oldest'
+        ? $collection->sortBy('created_at')
+        : $collection->sortByDesc('created_at');
+
+    return $collection->values();
+};
+
+$visibleIncoming = computed(fn () => $this->applyFilters($this->incoming));
+
+$visibleOutgoing = computed(fn () => $this->applyFilters($this->outgoing));
+
 $refreshClaims = function () {
     $repo = app(IClaimRepository::class);
     $this->incoming = $repo->incomingForUser(auth()->id());
     $this->outgoing = $repo->outgoingForUser(auth()->id());
+
+    unset($this->visibleIncoming);
+    unset($this->visibleOutgoing);
 };
 
 mount(function () {
@@ -72,29 +96,47 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
         </div>
     @enderror
 
-    <div class="flex gap-1 p-1 bg-[#FFF0E0] rounded-lg w-fit" role="tablist">
-        <button type="button" wire:click="$set('tab', 'incoming')" role="tab"
-            @class([
-                'px-4 py-2 text-sm font-medium rounded-md transition-all',
-                'bg-white text-[#3D2B1F] shadow-sm' => $tab === 'incoming',
-                'text-[#3D2B1F]/60 hover:text-[#3D2B1F]' => $tab !== 'incoming',
-            ])>
-            Incoming ({{ count($incoming) }})
-        </button>
-        <button type="button" wire:click="$set('tab', 'outgoing')" role="tab"
-            @class([
-                'px-4 py-2 text-sm font-medium rounded-md transition-all',
-                'bg-white text-[#3D2B1F] shadow-sm' => $tab === 'outgoing',
-                'text-[#3D2B1F]/60 hover:text-[#3D2B1F]' => $tab !== 'outgoing',
-            ])>
-            Outgoing ({{ count($outgoing) }})
-        </button>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div class="flex gap-1 p-1 bg-[#FFF0E0] rounded-lg w-fit" role="tablist">
+            <button type="button" wire:click="$set('tab', 'incoming')" role="tab"
+                @class([
+                    'px-4 py-2 text-sm font-medium rounded-md transition-all',
+                    'bg-white text-[#3D2B1F] shadow-sm' => $tab === 'incoming',
+                    'text-[#3D2B1F]/60 hover:text-[#3D2B1F]' => $tab !== 'incoming',
+                ])>
+                Received ({{ $this->visibleIncoming->count() }})
+            </button>
+            <button type="button" wire:click="$set('tab', 'outgoing')" role="tab"
+                @class([
+                    'px-4 py-2 text-sm font-medium rounded-md transition-all',
+                    'bg-white text-[#3D2B1F] shadow-sm' => $tab === 'outgoing',
+                    'text-[#3D2B1F]/60 hover:text-[#3D2B1F]' => $tab !== 'outgoing',
+                ])>
+                Sent ({{ $this->visibleOutgoing->count() }})
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <flux:select wire:model.live="status" label="Status" class="sm:w-40">
+                <flux:select.option value="">All statuses</flux:select.option>
+                <flux:select.option value="pending">Pending</flux:select.option>
+                <flux:select.option value="accepted">Accepted</flux:select.option>
+                <flux:select.option value="rejected">Rejected</flux:select.option>
+                <flux:select.option value="withdrawn">Withdrawn</flux:select.option>
+                <flux:select.option value="expired">Expired</flux:select.option>
+            </flux:select>
+
+            <flux:select wire:model.live="sort" label="Sort" class="sm:w-44">
+                <flux:select.option value="newest">Newest first</flux:select.option>
+                <flux:select.option value="oldest">Oldest first</flux:select.option>
+            </flux:select>
+        </div>
     </div>
 
     <div class="mt-6 space-y-4">
         @if ($tab === 'incoming')
-            @forelse ($incoming as $claim)
-                <flux:card class="bg-[#FFF0E0] p-5">
+            @forelse ($this->visibleIncoming as $claim)
+                <flux:card wire:key="incoming-claim-{{ $claim->id }}" class="bg-[#FFF0E0] p-5">
                     <div class="flex items-start justify-between gap-4">
                         <div class="flex-1 min-w-0">
                             <p class="font-medium text-[#3D2B1F]">{{ $claim->sender->profile->display_name ?? 'User' }}</p>
@@ -148,11 +190,13 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                     </div>
                 </flux:card>
             @empty
-                <p class="text-center text-[#3D2B1F]/40 py-12">No incoming claims.</p>
+                <p class="text-center text-[#3D2B1F]/40 py-12">
+                    {{ count($incoming) === 0 ? 'No received claims.' : 'No claims match these filters.' }}
+                </p>
             @endforelse
         @else
-            @forelse ($outgoing as $claim)
-                <flux:card class="bg-[#FFF0E0] p-5">
+            @forelse ($this->visibleOutgoing as $claim)
+                <flux:card wire:key="outgoing-claim-{{ $claim->id }}" class="bg-[#FFF0E0] p-5">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
                             <p class="font-medium text-[#3D2B1F]">To: {{ $claim->receiver->profile->display_name ?? $claim->schedule?->user?->profile?->display_name ?? 'User' }}</p>
@@ -182,7 +226,9 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                     </div>
                 </flux:card>
             @empty
-                <p class="text-center text-[#3D2B1F]/40 py-12">No outgoing claims.</p>
+                <p class="text-center text-[#3D2B1F]/40 py-12">
+                    {{ count($outgoing) === 0 ? 'No sent claims.' : 'No claims match these filters.' }}
+                </p>
             @endforelse
         @endif
     </div>
