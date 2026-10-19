@@ -26,8 +26,8 @@ $applyFilters = function (iterable $claims): Collection {
     }
 
     $collection = $this->sort === 'oldest'
-        ? $collection->sortBy('created_at')
-        : $collection->sortByDesc('created_at');
+        ? $collection->sortBy([['created_at', 'asc'], ['id', 'asc']])
+        : $collection->sortBy([['created_at', 'desc'], ['id', 'desc']]);
 
     return $collection->values();
 };

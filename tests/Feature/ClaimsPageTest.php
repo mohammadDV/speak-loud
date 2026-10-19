@@ -110,25 +110,32 @@ test('claims page sorts received claims by newest and oldest', function () {
 
     $schedule = createClaimsPageSchedule($host, $language);
 
-    Claim::create([
+    $olderClaim = Claim::create([
         'sender_id' => $olderSender->id,
         'receiver_id' => $host->id,
         'schedule_id' => $schedule->id,
         'type' => 'schedule',
         'status' => 'pending',
-        'created_at' => now()->subDay(),
-        'updated_at' => now()->subDay(),
     ]);
 
-    Claim::create([
+    $newerClaim = Claim::create([
         'sender_id' => $newerSender->id,
         'receiver_id' => $host->id,
         'schedule_id' => $schedule->id,
         'type' => 'schedule',
         'status' => 'pending',
+    ]);
+
+    // created_at is not fillable, so set timestamps explicitly for deterministic sorting.
+    $olderClaim->forceFill([
+        'created_at' => now()->subDay(),
+        'updated_at' => now()->subDay(),
+    ])->saveQuietly();
+
+    $newerClaim->forceFill([
         'created_at' => now(),
         'updated_at' => now(),
-    ]);
+    ])->saveQuietly();
 
     Volt::actingAs($host)->test('claims.index')
         ->assertSet('sort', 'newest')
