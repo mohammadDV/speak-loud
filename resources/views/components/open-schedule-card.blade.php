@@ -29,64 +29,75 @@
     } else {
         $badge = $schedule->type === 'recurring' ? 'Weekly' : 'One-off';
     }
+
+    // Flux + Blaze drops auto wire:target params in loops; set explicitly so only the clicked button loads.
+    $claimWireTarget = $claimAction.'('.$schedule->id.')';
 @endphp
 
 @if ($layout === 'list')
-    <flux:card class="bg-[#FFF0E0]">
-        <div class="flex flex-col sm:flex-row sm:items-start gap-4 p-4">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-                @if ($avatarUrl)
-                    <img
-                        src="{{ $avatarUrl }}"
-                        alt="Profile picture of {{ $profile->display_name ?? 'Host' }}"
-                        class="w-12 h-12 shrink-0 rounded-full object-cover ring-2 ring-[#FFF8F0]"
-                    >
-                @else
-                    <div class="w-12 h-12 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-lg">
-                        {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
-                    </div>
-                @endif
-                <div class="min-w-0 flex-1">
-                    <div class="flex flex-wrap items-center gap-2">
-                        @if ($profile?->profile_slug)
-                            <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] hover:text-[#FF8C42]">{{ $profile->display_name ?? 'Host' }}</a>
-                        @else
-                            <p class="font-semibold text-[#3D2B1F]">{{ $profile->display_name ?? 'Host' }}</p>
-                        @endif
-                        <span class="text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">{{ $badge }}</span>
-                        <span class="text-xs text-[#3D2B1F]/50">{{ $schedule->language->name_en }}</span>
-                        @if ($hostCountry)
-                            <span class="text-xs text-[#3D2B1F]/45">· {{ $hostCountry }}</span>
-                        @endif
-                    </div>
-                    <p class="text-sm text-[#3D2B1F]/60 mt-0.5">{{ $when }}</p>
-                    @if ($schedule->description)
-                        <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-2">{{ $schedule->description }}</p>
+    <div {{ $attributes }}>
+        <flux:card class="bg-[#FFF0E0]">
+            <div class="flex flex-col sm:flex-row sm:items-start gap-4 p-4">
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    @if ($avatarUrl)
+                        <img
+                            src="{{ $avatarUrl }}"
+                            alt="Profile picture of {{ $profile->display_name ?? 'Host' }}"
+                            class="w-12 h-12 shrink-0 rounded-full object-cover ring-2 ring-[#FFF8F0]"
+                        >
+                    @else
+                        <div class="w-12 h-12 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-lg">
+                            {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
+                        </div>
                     @endif
-                    @if ($schedule->user?->interests?->isNotEmpty())
-                        <x-interest-tags :interests="$schedule->user->interests" :limit="4" size="xs" class="mt-2" />
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            @if ($profile?->profile_slug)
+                                <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] hover:text-[#FF8C42]">{{ $profile->display_name ?? 'Host' }}</a>
+                            @else
+                                <p class="font-semibold text-[#3D2B1F]">{{ $profile->display_name ?? 'Host' }}</p>
+                            @endif
+                            <span class="text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">{{ $badge }}</span>
+                            <span class="text-xs text-[#3D2B1F]/50">{{ $schedule->language->name_en }}</span>
+                            @if ($hostCountry)
+                                <span class="text-xs text-[#3D2B1F]/45">· {{ $hostCountry }}</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-[#3D2B1F]/60 mt-0.5">{{ $when }}</p>
+                        @if ($schedule->description)
+                            <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-2">{{ $schedule->description }}</p>
+                        @endif
+                        @if ($schedule->user?->interests?->isNotEmpty())
+                            <x-interest-tags :interests="$schedule->user->interests" :limit="4" size="xs" class="mt-2" />
+                        @endif
+                        <p class="text-xs text-[#3D2B1F]/45 mt-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
+                        <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mt-2 text-sm text-[#FF8C42] hover:underline">View details</a>
+                    </div>
+                </div>
+                <div class="shrink-0 sm:pt-1">
+                    @if ($myClaim?->status === 'pending')
+                        <flux:button type="button" variant="ghost" size="sm" disabled>Claim pending</flux:button>
+                    @elseif ($myClaim?->status === 'accepted')
+                        <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate variant="primary" size="sm">Open slot</flux:button>
+                    @elseif ($isFull)
+                        <flux:button type="button" variant="ghost" size="sm" disabled>Full</flux:button>
+                    @else
+                        <flux:button
+                            type="button"
+                            variant="primary"
+                            size="sm"
+                            wire:click="{{ $claimWireTarget }}"
+                            wire:target="{{ $claimWireTarget }}"
+                        >
+                            {{ auth()->check() ? 'Send claim' : 'Sign in' }}
+                        </flux:button>
                     @endif
-                    <p class="text-xs text-[#3D2B1F]/45 mt-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
-                    <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mt-2 text-sm text-[#FF8C42] hover:underline">View details</a>
                 </div>
             </div>
-            <div class="shrink-0 sm:pt-1">
-                @if ($myClaim?->status === 'pending')
-                    <flux:button type="button" variant="ghost" size="sm" disabled>Claim pending</flux:button>
-                @elseif ($myClaim?->status === 'accepted')
-                    <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate variant="primary" size="sm">Open slot</flux:button>
-                @elseif ($isFull)
-                    <flux:button type="button" variant="ghost" size="sm" disabled>Full</flux:button>
-                @else
-                    <flux:button type="button" variant="primary" size="sm" wire:click="{{ $claimAction }}({{ $schedule->id }})">
-                        {{ auth()->check() ? 'Send claim' : 'Sign in' }}
-                    </flux:button>
-                @endif
-            </div>
-        </div>
-    </flux:card>
+        </flux:card>
+    </div>
 @else
-    <div class="h-full">
+    <div {{ $attributes->class('h-full') }}>
         <flux:card class="bg-[#FFF0E0] hover:shadow-md transition-shadow !flex !flex-col h-full min-h-[280px]">
             @if ($backgroundUrl)
                 <div
@@ -141,7 +152,14 @@
                     @elseif ($isFull)
                         <flux:button type="button" variant="ghost" size="sm" class="w-full" disabled>Full</flux:button>
                     @else
-                        <flux:button type="button" variant="primary" size="sm" class="w-full" wire:click="{{ $claimAction }}({{ $schedule->id }})">
+                        <flux:button
+                            type="button"
+                            variant="primary"
+                            size="sm"
+                            class="w-full"
+                            wire:click="{{ $claimWireTarget }}"
+                            wire:target="{{ $claimWireTarget }}"
+                        >
                             {{ auth()->check() ? 'Send claim' : 'Sign in' }}
                         </flux:button>
                     @endif

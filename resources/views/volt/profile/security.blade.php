@@ -40,7 +40,7 @@ $updatePassword = function (ChangePassword $action) {
 
 ?>
 
-<div class="max-w-xl mx-auto px-4 py-8">
+<div class="max-w-3xl mx-auto px-4 py-8">
     <div class="mb-8 space-y-6">
         <x-profile-nav />
 

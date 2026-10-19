@@ -337,6 +337,7 @@ $levelLabels = [
                                 :schedule="$schedule"
                                 layout="grid"
                                 claim-action="openScheduleClaimModal"
+                                wire:key="profile-schedule-{{ $schedule->id }}"
                             />
                         @endforeach
                     </div>

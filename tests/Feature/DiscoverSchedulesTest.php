@@ -116,6 +116,69 @@ test('discover page lists other users open schedules', function () {
         ->assertSee(ScheduleDescription::EXAMPLES[0]);
 });
 
+test('discover claim buttons scope loading to the clicked schedule', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = User::create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'host-claim-loading@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id' => $host->id,
+        'username' => 'hostclaimloading',
+        'display_name' => 'Host Claim Loading',
+    ]);
+
+    $viewer = User::create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'viewer-claim-loading@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id' => $viewer->id,
+        'username' => 'viewerclaimloading',
+        'display_name' => 'Viewer Claim Loading',
+    ]);
+
+    $schedules = collect(['First loading slot', 'Second loading slot'])->map(function (string $description) use ($host, $language) {
+        $schedule = Schedule::create([
+            'user_id' => $host->id,
+            'description' => $description.' rules for practice partners.',
+            'type' => 'recurring',
+            'language_id' => $language->id,
+            'max_participants' => 1,
+            'status' => 'active',
+        ]);
+
+        ScheduleRecurringRule::create([
+            'schedule_id' => $schedule->id,
+            'day_of_week' => 'Fri',
+            'start_time' => '18:00:00',
+            'end_time' => '19:00:00',
+        ]);
+
+        return $schedule;
+    });
+
+    $component = Volt::actingAs($viewer)->test('discover.index');
+
+    foreach ($schedules as $schedule) {
+        $component
+            ->assertSeeHtml('wire:click="openClaimModal('.$schedule->id.')"')
+            ->assertSeeHtml('wire:target="openClaimModal('.$schedule->id.')"');
+    }
+});
+
 test('discover page can filter slots by host interests', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
