@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, computed};
+use function Livewire\Volt\{state, computed, mount, title};
 use App\Actions\CreateSchedule;
 use App\Actions\DeleteSchedule;
 use App\Actions\UpdateSchedule;
@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Support\ScheduleDayOfWeek;
 use App\Support\ScheduleDescription;
 use App\Support\ScheduleLimits;
+use App\Support\Seo;
 use App\Support\UtcTime;
 use Carbon\Carbon;
 
@@ -27,6 +28,17 @@ state([
     'start_datetime'   => '',
     'end_datetime'     => '',
 ]);
+
+mount(function () {
+    Seo::share([
+        'seoTitle' => 'My schedule',
+        'seoDescription' => 'Manage your SpeakLoud practice slots.',
+        'seoUrl' => route('schedule'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
+});
+
+title(fn () => Seo::pageTitle('My schedule'));
 
 $schedules = computed(function () {
     return Schedule::query()

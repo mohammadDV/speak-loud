@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
+use App\Support\SitemapBuilder;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
@@ -22,6 +23,17 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 {
     use HasFactory, LogsActivity, Notifiable, SoftDeletes;
 
+    protected static function booted(): void
+    {
+        static::saved(function (User $user): void {
+            if ($user->wasRecentlyCreated || $user->wasChanged(['status'])) {
+                SitemapBuilder::forgetCache();
+            }
+        });
+        static::deleted(fn () => SitemapBuilder::forgetCache());
+        static::restored(fn () => SitemapBuilder::forgetCache());
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->role === 'admin' && $this->status === 'active';
@@ -34,7 +46,13 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function getFilamentName(): string
     {
-        return $this->profile?->display_name ?? $this->email ?? 'User';
+        $profile = $this->profile;
+
+        if ($profile instanceof UserProfile && filled($profile->display_name)) {
+            return $profile->display_name;
+        }
+
+        return $this->email ?? 'User';
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -83,6 +101,9 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
         ];
     }
 
+    /**
+     * @return HasOne<UserProfile, $this>
+     */
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\LogsModelChanges;
+use App\Support\SitemapBuilder;
 use App\Support\StorageUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,16 @@ class BlogPost extends Model
         'published_at' => 'datetime',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(fn () => SitemapBuilder::forgetCache());
+        static::deleted(fn () => SitemapBuilder::forgetCache());
+        static::restored(fn () => SitemapBuilder::forgetCache());
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');

@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed};
+use function Livewire\Volt\{state, mount, computed, title};
 use App\Actions\SendClaim;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IClaimRepository;
@@ -8,6 +8,7 @@ use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Repositories\Contracts\IUserRepository;
 use App\Support\CountryCodes;
+use App\Support\Seo;
 
 state([
     'profileSlug'           => '',
@@ -36,6 +37,8 @@ mount(function (string $profileSlug) {
         abort(404);
     }
 
+    Seo::forProfile($user);
+
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
         $this->claimScheduleId        = session()->pull('pending_claim_schedule_id');
         $this->showScheduleClaimModal = true;
@@ -48,6 +51,14 @@ mount(function (string $profileSlug) {
             $this->showDirectClaimModal = true;
         }
     }
+});
+
+title(function () {
+    $name = $this->profileUser?->profile?->display_name
+        ?? $this->profileUser?->profile?->username
+        ?? 'Profile';
+
+    return Seo::pageTitle($name);
 });
 
 $profileUser = computed(function () {

@@ -9,11 +9,7 @@ state(['faqs' => []]);
 mount(function () {
     $this->faqs = Faq::where('is_active', true)->orderBy('sort_order')->get();
 
-    Seo::share([
-        'seoTitle'       => 'FAQ',
-        'seoDescription' => 'Answers to common questions about SpeakLoud schedules, claims, accounts, and safety.',
-        'seoUrl'         => route('faq.index'),
-    ]);
+    Seo::forFaq($this->faqs);
 });
 
 title(fn () => Seo::pageTitle('FAQ'));

@@ -1,10 +1,11 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed};
+use function Livewire\Volt\{state, mount, computed, title};
 use App\Actions\AcceptClaim;
 use App\Actions\RejectClaim;
 use App\Actions\WithdrawClaim;
 use App\Repositories\Contracts\IClaimRepository;
+use App\Support\Seo;
 use Illuminate\Support\Collection;
 
 state([
@@ -47,7 +48,16 @@ $refreshClaims = function () {
 
 mount(function () {
     $this->refreshClaims();
+
+    Seo::share([
+        'seoTitle' => 'Claims',
+        'seoDescription' => 'Manage your SpeakLoud schedule claims.',
+        'seoUrl' => route('claims'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
 });
+
+title(fn () => Seo::pageTitle('Claims'));
 
 $accept = function (int $claimId, AcceptClaim $action) {
     $action->execute($claimId, auth()->id());

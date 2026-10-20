@@ -1,9 +1,10 @@
 <?php
 
 use App\Models\Conversation;
-use function Livewire\Volt\{state, mount};
+use function Livewire\Volt\{state, mount, title};
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
+use App\Support\Seo;
 
 state([
     'conversations'      => [],
@@ -14,7 +15,16 @@ state([
 
 mount(function () {
     $this->conversations = app(IConversationRepository::class)->forUser(auth()->id());
+
+    Seo::share([
+        'seoTitle' => 'Messages',
+        'seoDescription' => 'Your SpeakLoud conversations.',
+        'seoUrl' => route('messages'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
 });
+
+title(fn () => Seo::pageTitle('Messages'));
 
 $selectConversation = function (int $conversationId) {
     $conversation = Conversation::find($conversationId);

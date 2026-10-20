@@ -1,10 +1,11 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed};
+use function Livewire\Volt\{state, mount, computed, title};
 use App\Actions\SyncScheduleGroupChat;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IMessageRepository;
 use App\Support\ScheduleAccess;
+use App\Support\Seo;
 
 state([
     'schedule'   => null,
@@ -31,6 +32,13 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
 
     $this->schedule = $schedule;
 
+    Seo::share([
+        'seoTitle' => $schedule->title ?: 'Schedule',
+        'seoDescription' => 'SpeakLoud practice schedule details.',
+        'seoUrl' => route('schedules.show', $schedule),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
+
     if ($userId && ScheduleAccess::canAccessGroupChat($schedule, $userId)) {
         $syncGroupChat->execute($schedule);
         $schedule->load('groupConversation');
@@ -38,6 +46,8 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
         $this->loadMessages();
     }
 });
+
+title(fn () => Seo::pageTitle($this->schedule?->title ?: 'Schedule'));
 
 $canSeeParticipants = computed(function () {
     $userId = auth()->id();

@@ -2,13 +2,23 @@
 
 use App\Actions\ChangePassword;
 use App\Support\PasswordRules;
-use function Livewire\Volt\{state, rules, mount};
+use App\Support\Seo;
+use function Livewire\Volt\{state, rules, mount, title};
 
 mount(function () {
+    Seo::share([
+        'seoTitle' => 'Security',
+        'seoDescription' => 'Manage your SpeakLoud account security.',
+        'seoUrl' => route('profile.security'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
+
     if (! auth()->user()->hasVerifiedEmail()) {
         $this->redirect(route('verification.notice'), navigate: true);
     }
 });
+
+title(fn () => Seo::pageTitle('Security'));
 
 state([
     'current_password'      => '',

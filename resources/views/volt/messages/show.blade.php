@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\Conversation;
-use function Livewire\Volt\{state, mount};
+use function Livewire\Volt\{state, mount, title};
 use App\Repositories\Contracts\IMessageRepository;
+use App\Support\Seo;
 
 state([
     'conversation' => null,
@@ -31,7 +32,16 @@ mount(function (int $id) {
 
     $this->conversation = $conversation;
     $this->loadMessages();
+
+    Seo::share([
+        'seoTitle' => 'Conversation',
+        'seoDescription' => 'SpeakLoud private conversation.',
+        'seoUrl' => route('messages.show', $id),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
 });
+
+title(fn () => Seo::pageTitle('Conversation'));
 
 $loadMessages = function () {
     if (! $this->conversation || ! $this->conversation->userCanAccess(auth()->id())) {

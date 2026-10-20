@@ -26,6 +26,7 @@ mount(function (Ticket $ticket) {
         'seoTitle'       => $record->subject,
         'seoDescription' => 'Support ticket conversation on SpeakLoud.',
         'seoUrl'         => route('tickets.show', $record),
+        'seoRobots'      => 'noindex, nofollow',
     ]);
 });
 

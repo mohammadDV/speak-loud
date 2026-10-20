@@ -12,6 +12,8 @@
 <img
     src="{{ $src }}"
     alt="{{ $alt }}"
+    width="1200"
+    height="675"
     loading="lazy"
     decoding="async"
     {{ $attributes->merge(['class' => trim("w-full object-cover {$aspect} {$class}")]) }}

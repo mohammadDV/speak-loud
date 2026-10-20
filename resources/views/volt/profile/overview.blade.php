@@ -1,8 +1,20 @@
 <?php
 
 use App\Support\CountryCodes;
+use App\Support\Seo;
 use App\Support\UserLanguageLevels;
-use function Livewire\Volt\{computed};
+use function Livewire\Volt\{computed, mount, title};
+
+mount(function () {
+    Seo::share([
+        'seoTitle' => 'My profile',
+        'seoDescription' => 'Your SpeakLoud profile overview.',
+        'seoUrl' => route('profile'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
+});
+
+title(fn () => Seo::pageTitle('My profile'));
 
 $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.language', 'interests']));
 

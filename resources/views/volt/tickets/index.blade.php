@@ -26,6 +26,7 @@ mount(function () {
         'seoTitle'       => 'Support tickets',
         'seoDescription' => 'Contact the SpeakLoud support team and track your requests.',
         'seoUrl'         => route('tickets.index'),
+        'seoRobots'      => 'noindex, nofollow',
     ]);
 });
 

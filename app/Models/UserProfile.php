@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\SitemapBuilder;
 use App\Support\StorageUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,6 +35,12 @@ class UserProfile extends Model
             'is_private' => 'boolean',
             'birthdate' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => SitemapBuilder::forgetCache());
+        static::deleted(fn () => SitemapBuilder::forgetCache());
     }
 
     public function user(): BelongsTo

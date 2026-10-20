@@ -2,8 +2,9 @@
 
 use App\Support\CountryCodes;
 use App\Support\ProfileSlug;
+use App\Support\Seo;
 use App\Support\UserLanguageLevels;
-use function Livewire\Volt\{state, mount, rules, usesFileUploads};
+use function Livewire\Volt\{state, mount, rules, usesFileUploads, title};
 use App\Models\Language;
 use App\Models\Interest;
 use App\Services\Uploads\UserImageUploadService;
@@ -27,6 +28,13 @@ state([
 ]);
 
 mount(function () {
+    Seo::share([
+        'seoTitle' => 'Edit profile',
+        'seoDescription' => 'Edit your SpeakLoud profile.',
+        'seoUrl' => route('profile.edit'),
+        'seoRobots' => 'noindex, nofollow',
+    ]);
+
     $user = auth()->user()->load(['profile', 'interests', 'languages']);
     if ($user->profile) {
         $this->display_name = $user->profile->display_name;
@@ -52,6 +60,8 @@ mount(function () {
         ->values()
         ->all();
 });
+
+title(fn () => Seo::pageTitle('Edit profile'));
 
 rules(function () {
     $profileId = auth()->user()?->profile?->id;
