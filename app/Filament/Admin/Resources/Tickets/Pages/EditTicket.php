@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources\Tickets\Pages;
 
 use App\Actions\ReplyToTicket;
 use App\Filament\Admin\Resources\Tickets\TicketResource;
+use App\Models\Ticket;
+use App\Models\User;
 use App\Repositories\Contracts\ITicketRepository;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -22,6 +24,17 @@ class EditTicket extends EditRecord
     public string $replyBody = '';
 
     public bool $replyIsInternal = false;
+
+    protected function getTicket(): Ticket
+    {
+        $record = $this->getRecord();
+
+        if (! $record instanceof Ticket) {
+            abort(404);
+        }
+
+        return $record;
+    }
 
     public function content(Schema $schema): Schema
     {
@@ -73,26 +86,33 @@ class EditTicket extends EditRecord
     public function getMessagesProperty()
     {
         return app(ITicketRepository::class)
-            ->messagesForTicket($this->record->id, includeInternal: true);
+            ->messagesForTicket($this->getTicket()->id, includeInternal: true);
     }
 
     public function sendReply(): void
     {
         $this->validate([
-            'replyBody' => 'required|string|max:5000',
+            'replyBody' => ['required', 'string', 'max:5000'],
         ], [
             'replyBody.required' => 'Please enter a reply before sending.',
         ]);
 
+        $ticket = $this->getTicket();
+        $user = auth()->user();
+
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
         app(ReplyToTicket::class)->execute(
-            $this->getRecord(),
-            auth()->user(),
+            $ticket,
+            $user,
             $this->replyBody,
             $this->replyIsInternal,
         );
 
         $this->reset('replyBody', 'replyIsInternal');
-        $this->record->refresh();
+        $ticket->refresh();
 
         Notification::make()
             ->title('Reply sent')
@@ -102,7 +122,9 @@ class EditTicket extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (in_array($data['status'] ?? null, ['resolved', 'closed'], true) && ! $this->record->resolved_at) {
+        $ticket = $this->getTicket();
+
+        if (in_array($data['status'] ?? null, ['resolved', 'closed'], true) && ! $ticket->resolved_at) {
             $data['resolved_at'] = now();
         }
 

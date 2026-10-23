@@ -57,7 +57,6 @@ class Ticket extends Model
             'waiting_user' => 'Awaiting your reply',
             'resolved' => 'Resolved',
             'closed' => 'Closed',
-            default => ucfirst(str_replace('_', ' ', $this->status)),
         };
     }
 
@@ -68,7 +67,6 @@ class Ticket extends Model
             'waiting_user' => 'bg-[#FF8C42]/20 text-[#FF8C42]',
             'resolved' => 'bg-green-100 text-green-700',
             'closed' => 'bg-[#3D2B1F]/10 text-[#3D2B1F]/60',
-            default => 'bg-[#FFF0E0] text-[#3D2B1F]',
         };
     }
 

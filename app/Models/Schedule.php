@@ -36,11 +36,17 @@ class Schedule extends Model
         return $this->belongsTo(Language::class);
     }
 
+    /**
+     * @return HasOne<ScheduleRecurringRule, $this>
+     */
     public function recurringRule(): HasOne
     {
         return $this->hasOne(ScheduleRecurringRule::class);
     }
 
+    /**
+     * @return HasOne<ScheduleOneTimeSlot, $this>
+     */
     public function oneTimeSlot(): HasOne
     {
         return $this->hasOne(ScheduleOneTimeSlot::class);
