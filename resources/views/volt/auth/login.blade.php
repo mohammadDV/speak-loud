@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\SafeInternalRedirect;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Auth;
@@ -46,6 +47,16 @@ $login = function () {
         return;
     }
 
+    $user = Auth::user();
+
+    if ($user === null || $user->status !== 'active') {
+        Auth::logout();
+        RateLimiter::hit($throttleKey, 60);
+        $this->addError('email', 'These credentials do not match our records.');
+
+        return;
+    }
+
     RateLimiter::clear($throttleKey);
     session()->regenerate();
 
@@ -55,7 +66,10 @@ $login = function () {
         return;
     }
 
-    $redirect = session()->pull('pending_claim_return', route('discover'));
+    $redirect = SafeInternalRedirect::url(
+        session()->pull('pending_claim_return'),
+        route('discover'),
+    );
     $this->redirect($redirect, navigate: true);
 };
 

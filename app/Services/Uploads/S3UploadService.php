@@ -45,7 +45,7 @@ class S3UploadService
         }
 
         $extension = strtolower($file->getClientOriginalExtension() ?: 'bin');
-        $safeExtension = in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf', 'svg'], true)
+        $safeExtension = in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'], true)
             ? $extension
             : 'bin';
 

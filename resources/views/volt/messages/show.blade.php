@@ -20,9 +20,7 @@ mount(function (int $id) {
         abort(404);
     }
 
-    if (! $conversation->userCanAccess(auth()->id())) {
-        abort(403);
-    }
+    $this->authorize('view', $conversation);
 
     if ($conversation->isScheduleGroup()) {
         $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
@@ -44,9 +42,11 @@ mount(function (int $id) {
 title(fn () => Seo::pageTitle('Conversation'));
 
 $loadMessages = function () {
-    if (! $this->conversation || ! $this->conversation->userCanAccess(auth()->id())) {
+    if (! $this->conversation) {
         abort(403);
     }
+
+    $this->authorize('view', $this->conversation);
 
     $messages = app(IMessageRepository::class);
     $this->messages = $messages->forConversation($this->conversation->id);
@@ -58,9 +58,7 @@ $sendMessage = function () {
         return;
     }
 
-    if (! $this->conversation->userCanAccess(auth()->id())) {
-        abort(403);
-    }
+    $this->authorize('sendMessage', $this->conversation);
 
     app(IMessageRepository::class)->create([
         'conversation_id' => $this->conversation->id,

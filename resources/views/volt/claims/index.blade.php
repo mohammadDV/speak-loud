@@ -4,6 +4,7 @@ use function Livewire\Volt\{state, mount, computed, title};
 use App\Actions\AcceptClaim;
 use App\Actions\RejectClaim;
 use App\Actions\WithdrawClaim;
+use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use App\Support\Seo;
 use Illuminate\Support\Collection;
@@ -60,6 +61,8 @@ mount(function () {
 title(fn () => Seo::pageTitle('Claims'));
 
 $accept = function (int $claimId, AcceptClaim $action) {
+    $claim = Claim::findOrFail($claimId);
+    $this->authorize('accept', $claim);
     $action->execute($claimId, auth()->id());
     $this->refreshClaims();
 };
@@ -82,6 +85,8 @@ $confirmReject = function (RejectClaim $action) {
         'rejectMessage' => 'nullable|string|max:500',
     ]);
 
+    $claim = Claim::findOrFail($this->rejectingClaimId);
+    $this->authorize('reject', $claim);
     $action->execute($this->rejectingClaimId, auth()->id(), $this->rejectMessage ?: null);
 
     $this->showRejectModal  = false;
@@ -91,6 +96,8 @@ $confirmReject = function (RejectClaim $action) {
 };
 
 $withdraw = function (int $claimId, WithdrawClaim $action) {
+    $claim = Claim::findOrFail($claimId);
+    $this->authorize('withdraw', $claim);
     $action->execute($claimId, auth()->id());
     $this->refreshClaims();
 };
@@ -151,7 +158,9 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                         <div class="flex-1 min-w-0">
                             <p class="font-medium text-[#3D2B1F]">{{ $claim->sender->profile->display_name ?? 'User' }}</p>
                             @if ($claim->schedule)
-                                <p class="text-xs text-[#3D2B1F]/50 mt-0.5">{{ $claim->schedule->language->name_en ?? 'Session' }} slot</p>
+                                <p class="text-xs text-[#3D2B1F]/50 mt-0.5">{{ $claim->schedule->language->name_en ?? 'Session' }} slot claim</p>
+                            @elseif ($claim->type === 'direct')
+                                <p class="text-xs text-[#3D2B1F]/50 mt-0.5">Message request</p>
                             @endif
                             @if ($claim->message)
                                 <p class="text-sm text-[#3D2B1F]/60 mt-1 italic">"{{ $claim->message }}"</p>
@@ -210,6 +219,11 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
                             <p class="font-medium text-[#3D2B1F]">To: {{ $claim->receiver->profile->display_name ?? $claim->schedule?->user?->profile?->display_name ?? 'User' }}</p>
+                            @if ($claim->schedule)
+                                <p class="text-xs text-[#3D2B1F]/50 mt-0.5">{{ $claim->schedule->language->name_en ?? 'Session' }} slot claim</p>
+                            @elseif ($claim->type === 'direct')
+                                <p class="text-xs text-[#3D2B1F]/50 mt-0.5">Message request</p>
+                            @endif
                             <span class="inline-block mt-2 text-xs px-2 py-0.5 rounded-full
                                 {{ $claim->status === 'pending' ? 'bg-[#FFD166]/40 text-[#3D2B1F]' : ($claim->status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600') }}">
                                 {{ $claim->status }}

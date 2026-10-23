@@ -3,18 +3,30 @@
 namespace App\Actions;
 
 use App\Models\Claim;
+use App\Models\Schedule;
+use App\Models\User;
 use App\Repositories\Contracts\IClaimRepository;
+use App\Repositories\Contracts\IUserRepository;
 use App\Support\ClaimLimits;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 
 class SendClaim
 {
-    public function __construct(private readonly IClaimRepository $claims) {}
+    public function __construct(
+        private readonly IClaimRepository $claims,
+        private readonly IUserRepository $users,
+    ) {}
 
     public function execute(array $data): Claim
     {
-        $senderId = $data['sender_id'];
+        $senderId = (int) $data['sender_id'];
+        $receiverId = (int) $data['receiver_id'];
+        $scheduleId = isset($data['schedule_id']) ? (int) $data['schedule_id'] : null;
+
+        $this->assertCanSend($senderId, $receiverId, $scheduleId);
+
         $limiterKey = ClaimLimits::rateLimiterKey($senderId);
 
         if (RateLimiter::tooManyAttempts($limiterKey, ClaimLimits::maxPerHour())) {
@@ -23,8 +35,8 @@ class SendClaim
             ]);
         }
 
-        if (isset($data['schedule_id'])) {
-            $existing = $this->claims->findBySenderAndSchedule($data['sender_id'], $data['schedule_id']);
+        if ($scheduleId !== null) {
+            $existing = $this->claims->findBySenderAndSchedule($senderId, $scheduleId);
 
             if ($existing) {
                 if (in_array($existing->status, ['pending', 'accepted'], true)) {
@@ -39,7 +51,7 @@ class SendClaim
                 }
             }
         } else {
-            $existing = $this->claims->findDirectClaimBetweenUsers($data['sender_id'], $data['receiver_id']);
+            $existing = $this->claims->findDirectClaimBetweenUsers($senderId, $receiverId);
 
             if ($existing) {
                 if (in_array($existing->status, ['pending', 'accepted'], true)) {
@@ -56,15 +68,50 @@ class SendClaim
         }
 
         $claim = $this->claims->create([
-            'sender_id' => $data['sender_id'],
-            'receiver_id' => $data['receiver_id'],
-            'schedule_id' => $data['schedule_id'] ?? null,
-            'type' => isset($data['schedule_id']) ? 'schedule' : 'direct',
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'schedule_id' => $scheduleId,
+            'type' => $scheduleId !== null ? 'schedule' : 'direct',
             'message' => $data['message'] ?? null,
         ]);
 
         RateLimiter::hit($limiterKey, ClaimLimits::windowSeconds());
 
         return $claim;
+    }
+
+    private function assertCanSend(int $senderId, int $receiverId, ?int $scheduleId): void
+    {
+        if ($senderId === $receiverId) {
+            throw new AuthorizationException('You cannot send a claim to yourself.');
+        }
+
+        if ($this->users->areBlocked($senderId, $receiverId)) {
+            throw new AuthorizationException('You cannot send a claim to this user.');
+        }
+
+        $receiver = User::query()->with('profile')->find($receiverId);
+
+        if ($receiver === null || $receiver->status !== 'active') {
+            throw new AuthorizationException('You cannot send a claim to this user.');
+        }
+
+        // Private profiles block cold direct messages only; schedule claims stay allowed.
+        if ($scheduleId === null && $receiver->profile?->is_private) {
+            throw new AuthorizationException('You cannot message this user.');
+        }
+
+        if ($scheduleId === null) {
+            return;
+        }
+
+        $schedule = Schedule::query()->find($scheduleId);
+
+        if ($schedule === null
+            || (int) $schedule->user_id !== $receiverId
+            || $schedule->status !== 'active'
+        ) {
+            throw new AuthorizationException('You cannot send a claim for this schedule.');
+        }
     }
 }

@@ -7,8 +7,8 @@ use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
 use App\Repositories\Contracts\IScheduleRepository;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
-use RuntimeException;
 
 class AcceptClaim
 {
@@ -25,11 +25,11 @@ class AcceptClaim
         $claim = $this->claims->findById($claimId);
 
         if (! $claim || $claim->receiver_id !== $receiverId) {
-            throw new RuntimeException('Claim not found.');
+            throw new AuthorizationException('This action is unauthorized.');
         }
 
         if ($claim->status !== 'pending') {
-            throw new RuntimeException('This claim can no longer be accepted.');
+            throw new AuthorizationException('This claim can no longer be accepted.');
         }
 
         if ($claim->schedule_id) {

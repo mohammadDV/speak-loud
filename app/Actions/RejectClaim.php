@@ -6,7 +6,7 @@ use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
-use RuntimeException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class RejectClaim
 {
@@ -21,11 +21,11 @@ class RejectClaim
         $claim = $this->claims->findById($claimId);
 
         if (! $claim || $claim->receiver_id !== $receiverId) {
-            throw new RuntimeException('Claim not found.');
+            throw new AuthorizationException('This action is unauthorized.');
         }
 
         if ($claim->status !== 'pending') {
-            throw new RuntimeException('This claim can no longer be declined.');
+            throw new AuthorizationException('This claim can no longer be declined.');
         }
 
         $claim = $this->claims->updateStatus($claimId, 'rejected');

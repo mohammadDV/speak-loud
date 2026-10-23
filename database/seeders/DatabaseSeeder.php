@@ -12,7 +12,10 @@ class DatabaseSeeder extends Seeder
             LanguageSeeder::class,
             InterestSeeder::class,
             ContentSeeder::class,
-            DemoDataSeeder::class,
         ]);
+
+        if (app()->environment(['local', 'testing'])) {
+            $this->call(DemoDataSeeder::class);
+        }
     }
 }

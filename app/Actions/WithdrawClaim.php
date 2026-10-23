@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
-use RuntimeException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class WithdrawClaim
 {
@@ -15,11 +15,11 @@ class WithdrawClaim
         $claim = $this->claims->findById($claimId);
 
         if (! $claim || $claim->sender_id !== $senderId) {
-            throw new RuntimeException('Claim not found.');
+            throw new AuthorizationException('This action is unauthorized.');
         }
 
         if ($claim->status !== 'pending') {
-            throw new RuntimeException('This claim can no longer be withdrawn.');
+            throw new AuthorizationException('This claim can no longer be withdrawn.');
         }
 
         return $this->claims->updateStatus($claimId, 'withdrawn');

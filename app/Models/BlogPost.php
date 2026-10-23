@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\HtmlSanitizer;
 use App\Support\LogsModelChanges;
 use App\Support\SitemapBuilder;
 use App\Support\StorageUrl;
@@ -25,6 +26,11 @@ class BlogPost extends Model
 
     protected static function booted(): void
     {
+        static::saving(function (BlogPost $post): void {
+            if ($post->isDirty('body')) {
+                $post->body = HtmlSanitizer::sanitize($post->body);
+            }
+        });
         static::saved(fn () => SitemapBuilder::forgetCache());
         static::deleted(fn () => SitemapBuilder::forgetCache());
         static::restored(fn () => SitemapBuilder::forgetCache());

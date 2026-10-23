@@ -61,6 +61,7 @@ $sendReply = function (ReplyToTicket $action) {
     ]);
 
     $ticket = $this->authorizedTicket();
+    $this->authorize('reply', $ticket);
     $action->execute($ticket, auth()->user(), $this->replyBody);
     $this->replyBody = '';
     $this->ticket->refresh();

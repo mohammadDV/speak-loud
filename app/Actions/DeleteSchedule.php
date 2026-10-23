@@ -3,7 +3,7 @@
 namespace App\Actions;
 
 use App\Repositories\Contracts\IScheduleRepository;
-use RuntimeException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class DeleteSchedule
 {
@@ -14,7 +14,7 @@ class DeleteSchedule
         $schedule = $this->schedules->findById($scheduleId);
 
         if (! $schedule || $schedule->user_id !== $userId) {
-            throw new RuntimeException('Schedule not found.');
+            throw new AuthorizationException('This action is unauthorized.');
         }
 
         $this->schedules->delete($scheduleId);

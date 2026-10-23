@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Support\ScheduleDayOfWeek;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
@@ -17,7 +18,7 @@ class UpdateSchedule
         $schedule = $this->schedules->findById($scheduleId);
 
         if (! $schedule || $schedule->user_id !== $userId) {
-            throw new RuntimeException('Schedule not found.');
+            throw new AuthorizationException('This action is unauthorized.');
         }
 
         if ($data['type'] !== $schedule->type) {

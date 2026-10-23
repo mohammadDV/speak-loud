@@ -62,6 +62,8 @@ alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
 
 After `migrate --seed`, the database includes ~100 demo users plus sample schedules, claims, conversations, blog posts, and FAQs.
 
+Local demo credentials only (`DemoDataSeeder` refuses non-local/testing environments):
+
 | Role | Email | Password |
 |------|--------|----------|
 | Admin | `admin@speakloud.test` | `123456789` |

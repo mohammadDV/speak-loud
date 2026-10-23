@@ -8,32 +8,54 @@ use App\Support\ScheduleAccess;
 use App\Support\Seo;
 
 state([
-    'schedule'   => null,
-    'messages'   => [],
-    'newMessage' => '',
+    'schedule'              => null,
+    'messages'              => [],
+    'newMessage'            => '',
+    'viewerHasPendingClaim' => false,
 ]);
 
 mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
-    $schedule->load([
-        'user.profile',
-        'user.languages',
-        'language',
-        'recurringRule',
-        'oneTimeSlot',
-        'claims.sender.profile',
-        'groupConversation',
-    ]);
-
     $userId = auth()->id();
 
     if (! ScheduleAccess::canView($schedule, $userId)) {
         abort(403);
     }
 
+    $relations = [
+        'user.profile',
+        'user.languages',
+        'language',
+        'recurringRule',
+        'oneTimeSlot',
+        'groupConversation',
+    ];
+
+    $canSeeParticipants = $userId && ScheduleAccess::canSeeParticipants($schedule, $userId);
+
+    if ($canSeeParticipants) {
+        $relations[] = 'claims.sender.profile';
+    }
+
+    $schedule->load($relations);
+    $schedule->loadCount([
+        'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+    ]);
+
+    $this->viewerHasPendingClaim = $userId
+        ? $schedule->hasPendingClaimFrom($userId)
+        : false;
+
+    if (! $schedule->isHost($userId)) {
+        $schedule->makeHidden(['title']);
+        $schedule->title = null;
+    }
+
     $this->schedule = $schedule;
 
     Seo::share([
-        'seoTitle' => $schedule->title ?: 'Schedule',
+        'seoTitle' => $schedule->isHost($userId) && $schedule->title
+            ? $schedule->title
+            : 'Schedule',
         'seoDescription' => 'SpeakLoud practice schedule details.',
         'seoUrl' => route('schedules.show', $schedule),
         'seoRobots' => 'noindex, nofollow',
@@ -47,7 +69,11 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
     }
 });
 
-title(fn () => Seo::pageTitle($this->schedule?->title ?: 'Schedule'));
+title(fn () => Seo::pageTitle(
+    ($this->schedule && auth()->id() && $this->schedule->isHost(auth()->id()) && $this->schedule->title)
+        ? $this->schedule->title
+        : 'Schedule'
+));
 
 $canSeeParticipants = computed(function () {
     $userId = auth()->id();
@@ -62,7 +88,7 @@ $canViewChat = computed(function () {
 });
 
 $members = computed(function () {
-    if (! $this->schedule || ! $this->canSeeParticipants) {
+    if (! $this->schedule || ! $this->canSeeParticipants || ! $this->schedule->relationLoaded('claims')) {
         return collect();
     }
 
@@ -84,7 +110,10 @@ $members = computed(function () {
 });
 
 $pendingClaims = computed(function () {
-    if (! $this->schedule || ! $this->schedule->isHost(auth()->id())) {
+    if (! $this->schedule
+        || ! $this->schedule->isHost(auth()->id())
+        || ! $this->schedule->relationLoaded('claims')
+    ) {
         return collect();
     }
 
@@ -142,7 +171,7 @@ $sendMessage = function () {
 <div class="max-w-5xl mx-auto px-4 py-8">
     @if ($schedule)
         <div class="mb-6">
-            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('discover') }}" wire:navigate class="text-sm text-[#FF8C42] hover:underline">← Back</a>
+            <a href="{{ route('discover') }}" wire:navigate class="text-sm text-[#FF8C42] hover:underline">← Back</a>
             <h1 class="text-2xl font-bold text-[#3D2B1F] mt-2">
                 {{ $schedule->language->name_en }} practice slot
             </h1>
@@ -241,7 +270,7 @@ $sendMessage = function () {
                         <div class="flex-1 flex items-center justify-center p-8 text-center text-sm text-[#3D2B1F]/50">
                             @if ($schedule->hasAcceptedMember(auth()->id()))
                                 <p>Group chat is loading…</p>
-                            @elseif ($schedule->claims->where('sender_id', auth()->id())->where('status', 'pending')->isNotEmpty())
+                            @elseif ($viewerHasPendingClaim)
                                 <p>Group chat opens once the host accepts your claim.</p>
                             @else
                                 <p>Send a claim and get accepted to join the group chat.</p>

@@ -8,8 +8,7 @@
     $hostCountry = CountryCodes::name($profile?->country_code);
     $avatarUrl = $profile?->profileImageUrl();
     $accepted = $schedule->accepted_claims_count
-        ?? $schedule->claims?->where('status', 'accepted')->count()
-        ?? 0;
+        ?? $schedule->claims()->where('status', 'accepted')->count();
     $spotsLeft = max(0, $schedule->max_participants - $accepted);
 
     $hostLevel = $schedule->user?->languages

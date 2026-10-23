@@ -119,6 +119,8 @@ $refreshSchedules = function () {
 };
 
 $deleteSchedule = function (int $scheduleId, DeleteSchedule $action) {
+    $schedule = Schedule::findOrFail($scheduleId);
+    $this->authorize('delete', $schedule);
     $action->execute(auth()->id(), $scheduleId);
 
     $this->refreshSchedules();
@@ -201,6 +203,8 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     }
 
     if ($this->editingScheduleId) {
+        $schedule = Schedule::findOrFail($this->editingScheduleId);
+        $this->authorize('update', $schedule);
         $update->execute(auth()->id(), $this->editingScheduleId, $payload);
     } else {
         if (! $this->canCreateSlot) {

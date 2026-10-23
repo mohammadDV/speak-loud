@@ -275,7 +275,7 @@ $save = function (UserImageUploadService $uploader) {
             <span>
                 <span class="block text-sm font-medium text-[#3D2B1F]">Private profile</span>
                 <span class="block text-xs text-[#3D2B1F]/60 mt-1">
-                    Visitors only see your display name. Country, languages, interests, and open slots are hidden.
+                    Visitors only see your display name and cannot message you from your profile. Your open practice slots still appear on Discover.
                 </span>
             </span>
         </label>

@@ -48,6 +48,10 @@ class DemoDataSeeder extends Seeder
 
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing'])) {
+            throw new \RuntimeException('DemoDataSeeder may only run in local or testing environments.');
+        }
+
         $languages = Language::where('is_active', true)->get();
         $interests = Interest::all();
 
@@ -78,16 +82,15 @@ class DemoDataSeeder extends Seeder
     {
         $users = collect();
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@speakloud.test'],
-            [
-                'uuid' => Str::uuid()->toString(),
-                'password' => self::PASSWORD,
-                'role' => 'admin',
-                'status' => 'active',
-                'email_verified_at' => now(),
-            ]
-        );
+        $admin = User::firstOrNew(['email' => 'admin@speakloud.test']);
+        $admin->forceFill([
+            'uuid' => $admin->uuid ?: Str::uuid()->toString(),
+            'password' => self::PASSWORD,
+            'role' => 'admin',
+            'status' => 'active',
+            'email_verified_at' => $admin->email_verified_at ?? now(),
+        ]);
+        $admin->save();
 
         UserProfile::firstOrCreate(
             ['user_id' => $admin->id],
@@ -107,17 +110,18 @@ class DemoDataSeeder extends Seeder
         for ($i = 1; $i <= self::USER_COUNT; $i++) {
             $email = "user{$i}@speakloud.test";
 
-            $user = User::firstOrCreate(
-                ['email' => $email],
-                [
+            $user = User::firstOrNew(['email' => $email]);
+            if (! $user->exists) {
+                $user->forceFill([
                     'uuid' => Str::uuid()->toString(),
                     'password' => self::PASSWORD,
                     'role' => 'user',
                     'status' => 'active',
                     'email_verified_at' => now()->subDays(rand(1, 90)),
                     'last_login_at' => now()->subDays(rand(0, 14)),
-                ]
-            );
+                ]);
+                $user->save();
+            }
 
             $firstName = fake()->firstName();
             $username = 'user'.$i;

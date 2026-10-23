@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Support\ScheduleAccess;
 use App\Support\ScheduleDescription;
+use Illuminate\Auth\Access\AuthorizationException;
 use Livewire\Volt\Volt;
 
 function isolationLanguage(): Language
@@ -67,12 +68,13 @@ test('user cannot withdraw another users claim', function () {
     ]);
 
     expect(fn () => app(WithdrawClaim::class)->execute($claim->id, $attacker->id))
-        ->toThrow(RuntimeException::class, 'Claim not found.');
+        ->toThrow(AuthorizationException::class);
 
     expect($claim->fresh()->status)->toBe('pending');
 
-    expect(fn () => Volt::actingAs($attacker)->test('claims.index')->call('withdraw', $claim->id))
-        ->toThrow(RuntimeException::class);
+    Volt::actingAs($attacker)->test('claims.index')
+        ->call('withdraw', $claim->id)
+        ->assertForbidden();
 
     expect($claim->fresh()->status)->toBe('pending');
 });

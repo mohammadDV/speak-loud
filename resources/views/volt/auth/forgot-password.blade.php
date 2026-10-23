@@ -3,6 +3,7 @@
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
 
 mount(function () {
     Seo::share([
@@ -27,16 +28,21 @@ rules([
 $sendResetLink = function () {
     $this->validate();
 
-    $status = Password::sendResetLink(['email' => $this->email]);
+    $throttleKey = 'password-reset|'.request()->ip();
 
-    if ($status === Password::RESET_LINK_SENT) {
-        $this->status = 'reset-link-sent';
-        $this->reset('email');
+    if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->addError('email', 'Too many reset attempts. Please try again in '.$seconds.' seconds.');
 
         return;
     }
 
-    $this->addError('email', __($status));
+    RateLimiter::hit($throttleKey, 3600);
+
+    Password::sendResetLink(['email' => $this->email]);
+
+    $this->status = 'reset-link-sent';
+    $this->reset('email');
 };
 
 ?>

@@ -61,7 +61,7 @@ test('public user profile page shows profile details and open schedules', functi
         ->assertSee('Friendly conversation partner.')
         ->assertSee('Languages')
         ->assertSee(ScheduleDescription::EXAMPLES[0])
-        ->assertSee('Sign in to connect');
+        ->assertSee('Sign in to message');
 });
 
 test('profile page shows open chat when conversation exists', function () {

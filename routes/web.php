@@ -36,7 +36,7 @@ Route::middleware('guest')->group(function () {
     Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active'])->group(function () {
     Volt::route('/email/verify', 'auth.verify-email')->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
@@ -45,12 +45,12 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('profile.edit')->with('verified', true);
     })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
-    Volt::route('/profile', 'profile.overview')->name('profile');
-    Volt::route('/profile/edit', 'profile.edit')->name('profile.edit');
-    Volt::route('/profile/security', 'profile.security')->name('profile.security');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     Route::middleware('verified')->group(function () {
+        Volt::route('/profile', 'profile.overview')->name('profile');
+        Volt::route('/profile/edit', 'profile.edit')->name('profile.edit');
+        Volt::route('/profile/security', 'profile.security')->name('profile.security');
         Volt::route('/schedule', 'schedule.index')->name('schedule');
         Volt::route('/schedules/{schedule}', 'schedule.show')->name('schedules.show');
         Volt::route('/messages', 'messages.index')->name('messages');

@@ -41,4 +41,20 @@ class UserFactory extends Factory
             'role' => 'admin',
         ]);
     }
+
+    public function banned(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'banned',
+            'banned_at' => now(),
+            'ban_reason' => 'Test ban',
+        ]);
+    }
+
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'inactive',
+        ]);
+    }
 }

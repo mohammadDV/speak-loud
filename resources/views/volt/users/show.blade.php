@@ -47,7 +47,10 @@ mount(function (string $profileSlug) {
     if (auth()->check() && session()->has('pending_direct_claim')) {
         $pending = session()->pull('pending_direct_claim');
 
-        if (($pending['receiver_id'] ?? null) === $user->id) {
+        if (
+            ($pending['receiver_id'] ?? null) === $user->id
+            && ! $user->profile?->is_private
+        ) {
             $this->showDirectClaimModal = true;
         }
     }
@@ -119,6 +122,10 @@ $claimTarget = computed(function () {
 });
 
 $openDirectClaimModal = function () {
+    if ($this->profileUser?->profile?->is_private) {
+        return;
+    }
+
     if (! auth()->check()) {
         session([
             'pending_direct_claim' => [
@@ -171,6 +178,10 @@ $sendDirectClaim = function (SendClaim $action) {
 
     if (! $user) {
         abort(404);
+    }
+
+    if ($user->profile?->is_private) {
+        abort(403);
     }
 
     $this->validate([
@@ -277,15 +288,15 @@ $levelLabels = [
                                         Open chat
                                     </flux:button>
                                 @elseif ($directClaim?->status === 'pending')
-                                    <flux:button type="button" variant="ghost" size="sm" disabled>Claim pending</flux:button>
+                                    <flux:button type="button" variant="ghost" size="sm" disabled>Message pending</flux:button>
                                 @else
                                     <flux:button type="button" wire:click="openDirectClaimModal" variant="primary" size="sm">
-                                        Send claim
+                                        Send message
                                     </flux:button>
                                 @endif
                             @else
                                 <flux:button type="button" wire:click="openDirectClaimModal" variant="primary" size="sm">
-                                    Sign in to connect
+                                    Sign in to message
                                 </flux:button>
                             @endauth
                         </div>
@@ -368,7 +379,7 @@ $levelLabels = [
 
             <div class="relative w-full max-w-md rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10">
                 <div class="p-6">
-                    <h2 class="text-lg font-semibold text-[#3D2B1F]">Send claim</h2>
+                    <h2 class="text-lg font-semibold text-[#3D2B1F]">Send message</h2>
                     <p class="text-sm text-[#3D2B1F]/60 mt-1">
                         Ask to practice with {{ $this->profileUser?->profile?->display_name ?? 'this host' }}. They can accept or decline on Claims.
                     </p>
@@ -383,7 +394,7 @@ $levelLabels = [
 
                         <div class="flex justify-end gap-3 pt-2">
                             <flux:button type="button" wire:click="closeDirectClaimModal" variant="ghost">Cancel</flux:button>
-                            <flux:button type="submit" variant="primary">Send claim</flux:button>
+                            <flux:button type="submit" variant="primary">Send message</flux:button>
                         </div>
                     </form>
                 </div>
