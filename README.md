@@ -6,7 +6,7 @@
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Laravel 13, PHP 8.5+ |
+| Framework | Laravel 13, PHP 8.5.12+ |
 | UI | Livewire 4, Volt (single-file components), Flux UI, Tailwind CSS v4 |
 | Database | MySQL 8 |
 | Cache / queues | Redis |
