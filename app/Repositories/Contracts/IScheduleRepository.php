@@ -3,7 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Schedule;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
 
 interface IScheduleRepository
@@ -22,7 +22,7 @@ interface IScheduleRepository
 
     public function countAcceptedClaims(int $scheduleId): int;
 
-    public function searchOpenSchedules(array $filters, ?int $viewerId): LengthAwarePaginator;
+    public function searchOpenSchedules(array $filters, ?int $viewerId): Paginator;
 
     public function openSchedulesForHost(int $hostId, ?int $viewerId): Collection;
 }

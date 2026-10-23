@@ -14,7 +14,7 @@ interface ITicketRepository
 
     public function pendingStaffReplyForUser(int $userId): ?Ticket;
 
-    public function messagesForTicket(int $ticketId, bool $includeInternal = false): Collection;
+    public function messagesForTicket(int $ticketId, bool $includeInternal = false, int $limit = 100): Collection;
 
     public function create(array $data, string $initialMessage): Ticket;
 

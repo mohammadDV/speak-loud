@@ -19,7 +19,13 @@ interface IClaimRepository
 
     public function reopen(int $id, ?string $message): Claim;
 
-    public function incomingForUser(int $userId): Collection;
+    /**
+     * @param  array{status?: string, sort?: string}  $filters
+     */
+    public function incomingForUser(int $userId, array $filters = []): Collection;
 
-    public function outgoingForUser(int $userId): Collection;
+    /**
+     * @param  array{status?: string, sort?: string}  $filters
+     */
+    public function outgoingForUser(int $userId, array $filters = []): Collection;
 }

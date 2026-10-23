@@ -17,9 +17,11 @@ class MessageForm
             ->components([
                 Select::make('conversation_id')
                     ->relationship('conversation', 'id')
+                    ->searchable()
                     ->required(),
                 Select::make('sender_id')
-                    ->relationship('sender', 'id')
+                    ->relationship('sender', 'email')
+                    ->searchable()
                     ->required(),
                 Textarea::make('body')
                     ->required()

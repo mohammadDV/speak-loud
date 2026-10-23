@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed, title};
+use function Livewire\Volt\{state, mount, computed, title, updated, hydrate};
 use App\Actions\AcceptClaim;
 use App\Actions\RejectClaim;
 use App\Actions\WithdrawClaim;
@@ -20,28 +20,20 @@ state([
     'rejectMessage'     => '',
 ]);
 
-$applyFilters = function (iterable $claims): Collection {
-    $collection = Collection::make($claims);
+$listFilters = fn (): array => [
+    'status' => $this->status !== '' ? $this->status : null,
+    'sort' => $this->sort,
+];
 
-    if ($this->status !== '') {
-        $collection = $collection->where('status', $this->status);
-    }
+$visibleIncoming = computed(fn () => Collection::make($this->incoming));
 
-    $collection = $this->sort === 'oldest'
-        ? $collection->sortBy([['created_at', 'asc'], ['id', 'asc']])
-        : $collection->sortBy([['created_at', 'desc'], ['id', 'desc']]);
-
-    return $collection->values();
-};
-
-$visibleIncoming = computed(fn () => $this->applyFilters($this->incoming));
-
-$visibleOutgoing = computed(fn () => $this->applyFilters($this->outgoing));
+$visibleOutgoing = computed(fn () => Collection::make($this->outgoing));
 
 $refreshClaims = function () {
     $repo = app(IClaimRepository::class);
-    $this->incoming = $repo->incomingForUser(auth()->id());
-    $this->outgoing = $repo->outgoingForUser(auth()->id());
+    $filters = $this->listFilters();
+    $this->incoming = $repo->incomingForUser(auth()->id(), $filters);
+    $this->outgoing = $repo->outgoingForUser(auth()->id(), $filters);
 
     unset($this->visibleIncoming);
     unset($this->visibleOutgoing);
@@ -56,6 +48,19 @@ mount(function () {
         'seoUrl' => route('claims'),
         'seoRobots' => 'noindex, nofollow',
     ]);
+});
+
+updated([
+    'status' => function () {
+        $this->refreshClaims();
+    },
+    'sort' => function () {
+        $this->refreshClaims();
+    },
+]);
+
+hydrate(function () {
+    $this->refreshClaims();
 });
 
 title(fn () => Seo::pageTitle('Claims'));

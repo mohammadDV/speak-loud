@@ -37,14 +37,21 @@ class TicketRepository implements ITicketRepository
             ->first();
     }
 
-    public function messagesForTicket(int $ticketId, bool $includeInternal = false): Collection
+    public function messagesForTicket(int $ticketId, bool $includeInternal = false, int $limit = 100): Collection
     {
         return TicketMessage::query()
             ->with(['sender.profile'])
             ->where('ticket_id', $ticketId)
             ->when(! $includeInternal, fn ($query) => $query->where('is_internal', false))
-            ->orderBy('created_at')
-            ->get();
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get()
+            ->sortBy([
+                ['created_at', 'asc'],
+                ['id', 'asc'],
+            ])
+            ->values();
     }
 
     public function create(array $data, string $initialMessage): Ticket

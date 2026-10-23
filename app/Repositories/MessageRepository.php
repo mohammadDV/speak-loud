@@ -8,12 +8,22 @@ use Illuminate\Support\Collection;
 
 class MessageRepository implements IMessageRepository
 {
-    public function forConversation(int $conversationId): Collection
+    public const DEFAULT_LIMIT = 50;
+
+    public function forConversation(int $conversationId, int $limit = self::DEFAULT_LIMIT): Collection
     {
-        return Message::where('conversation_id', $conversationId)
-            ->with('sender')
-            ->orderBy('created_at')
-            ->get();
+        return Message::query()
+            ->where('conversation_id', $conversationId)
+            ->with('sender.profile')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get()
+            ->sortBy([
+                ['created_at', 'asc'],
+                ['id', 'asc'],
+            ])
+            ->values();
     }
 
     public function create(array $data): Message

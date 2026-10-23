@@ -1,13 +1,13 @@
 <?php
 
-use App\Models\Faq;
+use App\Support\LookupCache;
 use App\Support\Seo;
 use function Livewire\Volt\{state, mount, title};
 
 state(['faqs' => []]);
 
 mount(function () {
-    $this->faqs = Faq::where('is_active', true)->orderBy('sort_order')->get();
+    $this->faqs = LookupCache::activeFaqs();
 
     Seo::forFaq($this->faqs);
 });

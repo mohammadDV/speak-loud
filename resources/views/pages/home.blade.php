@@ -70,10 +70,7 @@
                 ['name'=>'Aisha', 'lang'=>'EN→AR', 'flag'=>'🇳🇬', 'time'=>'Mon 21:00', 'loc'=>'Egypt',  'claims'=>6],
                 ['name'=>'Lucia', 'lang'=>'EN→IT', 'flag'=>'🇮🇹', 'time'=>'Wed 12:00', 'loc'=>'Italy',  'claims'=>2],
             ];
-            $openSlots = \App\Models\Schedule::with(['user.profile','language','oneTimeSlot','recurringRule','claims'])
-                ->where('status','active')
-                ->whereHas('user', fn($q) => $q->where('status','active'))
-                ->latest()->take(4)->get();
+            $openSlots = \App\Support\LookupCache::homeOpenSlots(4);
         @endphp
 
         <div class="grid grid-cols-2 gap-3 px-3 pb-4">
@@ -84,7 +81,7 @@
                         $name    = $profile?->display_name ?? 'User';
                         $lang    = strtoupper($slot->language?->code ?? '??');
                         $loc     = $profile?->country_code ?? '';
-                        $cnt     = $slot->claims->count();
+                        $cnt     = $slot->claims_count ?? 0;
                         $g       = $gradients[$i % 4];
                         if ($slot->oneTimeSlot) {
                             $time = \App\Support\UtcTime::format($slot->oneTimeSlot->start_datetime, 'D H:i').' UTC';

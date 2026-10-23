@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 interface IMessageRepository
 {
-    public function forConversation(int $conversationId): Collection;
+    public function forConversation(int $conversationId, int $limit = 50): Collection;
 
     public function create(array $data): Message;
 

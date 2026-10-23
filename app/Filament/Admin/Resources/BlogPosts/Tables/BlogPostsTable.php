@@ -11,12 +11,27 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class BlogPostsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('published_at', 'desc')
+            ->modifyQueryUsing(fn (Builder $query) => $query->select([
+                'id',
+                'author_id',
+                'category_id',
+                'title',
+                'slug',
+                'cover_image_path',
+                'status',
+                'published_at',
+                'created_at',
+                'updated_at',
+                'deleted_at',
+            ]))
             ->columns([
                 TextColumn::make('author.id')
                     ->searchable(),

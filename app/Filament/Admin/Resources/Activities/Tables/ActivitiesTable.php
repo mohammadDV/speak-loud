@@ -2,11 +2,11 @@
 
 namespace App\Filament\Admin\Resources\Activities\Tables;
 
+use App\Support\LookupCache;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Spatie\Activitylog\Models\Activity;
 
 class ActivitiesTable
 {
@@ -55,11 +55,7 @@ class ActivitiesTable
                         'deleted' => 'Deleted',
                     ]),
                 SelectFilter::make('log_name')
-                    ->options(fn () => Activity::query()
-                        ->whereNotNull('log_name')
-                        ->distinct()
-                        ->pluck('log_name', 'log_name')
-                        ->all()),
+                    ->options(fn () => LookupCache::activityLogNames()),
             ])
             ->recordActions([
                 ViewAction::make(),

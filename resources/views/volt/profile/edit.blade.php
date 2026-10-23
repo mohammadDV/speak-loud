@@ -5,9 +5,8 @@ use App\Support\ProfileSlug;
 use App\Support\Seo;
 use App\Support\UserLanguageLevels;
 use function Livewire\Volt\{state, mount, rules, usesFileUploads, title};
-use App\Models\Language;
-use App\Models\Interest;
 use App\Services\Uploads\UserImageUploadService;
+use App\Support\LookupCache;
 
 usesFileUploads();
 
@@ -35,7 +34,7 @@ mount(function () {
         'seoRobots' => 'noindex, nofollow',
     ]);
 
-    $user = auth()->user()->load(['profile', 'interests', 'languages']);
+    $user = auth()->user()->load(['profile', 'interests', 'languages.language']);
     if ($user->profile) {
         $this->display_name = $user->profile->display_name;
         $this->profile_slug = $user->profile->profile_slug ?? $user->profile->username;
@@ -45,8 +44,8 @@ mount(function () {
         $this->current_profile_image_url = $user->profile->profileImageUrl();
         $this->current_background_image_url = $user->profile->backgroundImageUrl();
     }
-    $this->allLanguages = Language::where('is_active', true)->orderBy('name_en')->get();
-    $this->allInterests = Interest::orderBy('name_en')->get();
+    $this->allLanguages = LookupCache::activeLanguages();
+    $this->allInterests = LookupCache::interests();
     $this->selected_interest_ids = $user->interests
         ->pluck('id')
         ->map(fn ($id) => (string) $id)

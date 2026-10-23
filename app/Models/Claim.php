@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\LogsModelChanges;
+use App\Support\LookupCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -19,6 +20,12 @@ class Claim extends Model
         'responded_at' => 'datetime',
         'expires_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => LookupCache::flushHomeOpenSlots());
+        static::deleted(fn () => LookupCache::flushHomeOpenSlots());
+    }
 
     public function sender(): BelongsTo
     {

@@ -4,7 +4,7 @@ use App\Actions\ReplyToTicket;
 use App\Models\Ticket;
 use App\Repositories\Contracts\ITicketRepository;
 use App\Support\Seo;
-use function Livewire\Volt\{state, mount, title};
+use function Livewire\Volt\{state, mount, title, hydrate};
 
 state([
     'ticket'         => null,
@@ -29,6 +29,16 @@ mount(function (Ticket $ticket) {
         'seoRobots'      => 'noindex, nofollow',
     ]);
 });
+
+hydrate([
+    'ticket' => function (?Ticket $ticket) {
+        if (! $ticket) {
+            return null;
+        }
+
+        return app(ITicketRepository::class)->findForUser($ticket->id, auth()->id()) ?? $ticket;
+    },
+]);
 
 title(fn () => Seo::pageTitle($this->ticket?->subject ?? 'Support ticket'));
 

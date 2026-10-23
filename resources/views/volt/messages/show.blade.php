@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Conversation;
-use function Livewire\Volt\{state, mount, title};
+use function Livewire\Volt\{state, mount, title, hydrate};
 use App\Repositories\Contracts\IMessageRepository;
 use App\Support\Seo;
 
@@ -37,6 +37,13 @@ mount(function (int $id) {
         'seoUrl' => route('messages.show', $id),
         'seoRobots' => 'noindex, nofollow',
     ]);
+});
+
+hydrate(function () {
+    if ($this->conversation) {
+        $this->conversation->loadMissing(['userA.profile', 'userB.profile']);
+        $this->loadMessages();
+    }
 });
 
 title(fn () => Seo::pageTitle('Conversation'));

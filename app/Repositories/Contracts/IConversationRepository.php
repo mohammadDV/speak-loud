@@ -20,7 +20,7 @@ interface IConversationRepository
 
     public function userCanAccess(int $conversationId, int $userId): bool;
 
-    public function forUser(int $userId): Collection;
+    public function forUser(int $userId, int $limit = 50): Collection;
 
     public function create(array $data): Conversation;
 }

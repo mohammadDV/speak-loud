@@ -18,7 +18,9 @@ class TicketForm
                     ->searchable()
                     ->required(),
                 Select::make('category_id')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('subject')
                     ->required(),
                 Select::make('status')

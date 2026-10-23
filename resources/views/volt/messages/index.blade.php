@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Conversation;
-use function Livewire\Volt\{state, mount, title};
+use function Livewire\Volt\{state, mount, title, hydrate};
 use App\Repositories\Contracts\IConversationRepository;
 use App\Repositories\Contracts\IMessageRepository;
 use App\Support\Seo;
@@ -13,8 +13,12 @@ state([
     'newMessage'         => '',
 ]);
 
-mount(function () {
+$refreshConversations = function () {
     $this->conversations = app(IConversationRepository::class)->forUser(auth()->id());
+};
+
+mount(function () {
+    $this->refreshConversations();
 
     Seo::share([
         'seoTitle' => 'Messages',
@@ -22,6 +26,14 @@ mount(function () {
         'seoUrl' => route('messages'),
         'seoRobots' => 'noindex, nofollow',
     ]);
+});
+
+hydrate(function () {
+    $this->refreshConversations();
+
+    if ($this->activeConversation) {
+        $this->messages = app(IMessageRepository::class)->forConversation($this->activeConversation);
+    }
 });
 
 title(fn () => Seo::pageTitle('Messages'));

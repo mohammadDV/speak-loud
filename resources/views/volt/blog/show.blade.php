@@ -1,7 +1,8 @@
 <?php
 
+use App\Models\BlogPost;
 use App\Support\Seo;
-use function Livewire\Volt\{state, mount, title};
+use function Livewire\Volt\{state, mount, title, hydrate};
 use App\Repositories\Contracts\IBlogPostRepository;
 
 state(['post' => null]);
@@ -14,6 +15,16 @@ mount(function (string $slug) {
 
     Seo::forPost($this->post);
 });
+
+hydrate([
+    'post' => function (?BlogPost $post) {
+        if (! $post) {
+            return null;
+        }
+
+        return $post->loadMissing(['author.profile', 'category', 'tags']);
+    },
+]);
 
 title(fn () => $this->post ? Seo::pageTitle($this->post->title) : Seo::pageTitle('Blog'));
 

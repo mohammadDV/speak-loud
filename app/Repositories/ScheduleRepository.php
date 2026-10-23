@@ -5,7 +5,7 @@ namespace App\Repositories;
 use App\Models\Claim;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -51,11 +51,12 @@ class ScheduleRepository implements IScheduleRepository
             ->count();
     }
 
-    public function searchOpenSchedules(array $filters, ?int $viewerId): LengthAwarePaginator
+    public function searchOpenSchedules(array $filters, ?int $viewerId): Paginator
     {
         $with = [
             'user.profile',
             'user.interests',
+            'user.languages.language',
             'language',
             'recurringRule',
             'oneTimeSlot',
@@ -74,21 +75,14 @@ class ScheduleRepository implements IScheduleRepository
             ])
             ->where('schedules.status', 'active')
             ->whereHas('user', fn ($q) => $q->where('status', 'active'))
-            ->whereRaw(
-                '(SELECT COUNT(*) FROM claims WHERE claims.schedule_id = schedules.id AND claims.status = ?) < schedules.max_participants',
-                ['accepted']
-            )
+            ->havingRaw('accepted_claims_count < schedules.max_participants')
             ->where(function ($q) {
                 $q->where('schedules.type', 'recurring')
                     ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));
             });
 
         if ($viewerId !== null) {
-            $blockedIds = DB::table('user_blocks')
-                ->where('blocker_id', $viewerId)
-                ->orWhere('blocked_id', $viewerId)
-                ->pluck(DB::raw("CASE WHEN blocker_id = {$viewerId} THEN blocked_id ELSE blocker_id END"))
-                ->all();
+            $blockedIds = $this->blockedUserIdsFor($viewerId);
 
             $query
                 ->where('schedules.user_id', '!=', $viewerId)
@@ -135,14 +129,16 @@ class ScheduleRepository implements IScheduleRepository
 
         return $query
             ->latest('schedules.created_at')
-            ->paginate(20, ['*'], 'page', $filters['page'] ?? 1);
+            ->simplePaginate(20, ['*'], 'page', $filters['page'] ?? 1);
     }
 
     public function openSchedulesForHost(int $hostId, ?int $viewerId): Collection
     {
         $with = [
             'language',
+            'user.profile',
             'user.interests',
+            'user.languages.language',
             'recurringRule',
             'oneTimeSlot',
         ];
@@ -160,15 +156,33 @@ class ScheduleRepository implements IScheduleRepository
             ])
             ->where('user_id', $hostId)
             ->where('status', 'active')
-            ->whereRaw(
-                '(SELECT COUNT(*) FROM claims WHERE claims.schedule_id = schedules.id AND claims.status = ?) < schedules.max_participants',
-                ['accepted']
-            )
+            ->havingRaw('accepted_claims_count < schedules.max_participants')
             ->where(function ($q) {
                 $q->where('type', 'recurring')
                     ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));
             })
             ->latest('created_at')
             ->get();
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function blockedUserIdsFor(int $viewerId): array
+    {
+        $asBlocker = DB::table('user_blocks')
+            ->where('blocker_id', $viewerId)
+            ->pluck('blocked_id');
+
+        $asBlocked = DB::table('user_blocks')
+            ->where('blocked_id', $viewerId)
+            ->pluck('blocker_id');
+
+        return $asBlocker
+            ->merge($asBlocked)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

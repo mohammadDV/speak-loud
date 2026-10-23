@@ -17,11 +17,14 @@ class ConversationForm
                     ->default('direct')
                     ->required(),
                 Select::make('schedule_id')
-                    ->relationship('schedule', 'title'),
+                    ->relationship('schedule', 'title')
+                    ->searchable(),
                 Select::make('user_a_id')
-                    ->relationship('userA', 'id'),
+                    ->relationship('userA', 'email')
+                    ->searchable(),
                 Select::make('user_b_id')
-                    ->relationship('userB', 'id'),
+                    ->relationship('userB', 'email')
+                    ->searchable(),
                 DateTimePicker::make('last_message_at'),
             ]);
     }

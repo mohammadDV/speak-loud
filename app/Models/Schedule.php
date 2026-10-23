@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\LogsModelChanges;
+use App\Support\LookupCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,13 @@ class Schedule extends Model
         'user_id', 'title', 'description', 'type', 'language_id',
         'max_participants', 'status',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => LookupCache::flushHomeOpenSlots());
+        static::deleted(fn () => LookupCache::flushHomeOpenSlots());
+        static::restored(fn () => LookupCache::flushHomeOpenSlots());
+    }
 
     public function user(): BelongsTo
     {

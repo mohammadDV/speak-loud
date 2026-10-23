@@ -15,7 +15,9 @@ class FaqForm
         return $schema
             ->components([
                 Select::make('category_id')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('question')
                     ->required(),
                 Textarea::make('answer')

@@ -77,7 +77,7 @@ class ConversationRepository implements IConversationRepository
         return $conversation?->userCanAccess($userId) ?? false;
     }
 
-    public function forUser(int $userId): Collection
+    public function forUser(int $userId, int $limit = 50): Collection
     {
         return Conversation::query()
             ->where(function ($query) use ($userId) {
@@ -97,6 +97,7 @@ class ConversationRepository implements IConversationRepository
             ])
             ->orderByDesc('last_message_at')
             ->orderByDesc('created_at')
+            ->limit($limit)
             ->get();
     }
 

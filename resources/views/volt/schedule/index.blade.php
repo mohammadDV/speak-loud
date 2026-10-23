@@ -4,8 +4,8 @@ use function Livewire\Volt\{state, computed, mount, title};
 use App\Actions\CreateSchedule;
 use App\Actions\DeleteSchedule;
 use App\Actions\UpdateSchedule;
-use App\Models\Language;
 use App\Models\Schedule;
+use App\Support\LookupCache;
 use App\Support\ScheduleDayOfWeek;
 use App\Support\ScheduleDescription;
 use App\Support\ScheduleLimits;
@@ -48,12 +48,7 @@ $schedules = computed(function () {
         ->get();
 });
 
-$languages = computed(function () {
-    return Language::query()
-        ->where('is_active', true)
-        ->orderBy('name_en')
-        ->get();
-});
+$languages = computed(fn () => LookupCache::activeLanguages());
 
 $maxSlots = computed(fn () => ScheduleLimits::maxSlotsForUser());
 

@@ -46,6 +46,8 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function getFilamentName(): string
     {
+        $this->loadMissing('profile');
+
         $profile = $this->profile;
 
         if ($profile instanceof UserProfile && filled($profile->display_name)) {

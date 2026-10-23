@@ -11,7 +11,10 @@ class BlogPostRepository implements IBlogPostRepository
 {
     public function findBySlug(string $slug): ?BlogPost
     {
-        return BlogPost::where('slug', $slug)->first();
+        return BlogPost::query()
+            ->with(['author.profile', 'category', 'tags'])
+            ->where('slug', $slug)
+            ->first();
     }
 
     public function published(int $page = 1): LengthAwarePaginator

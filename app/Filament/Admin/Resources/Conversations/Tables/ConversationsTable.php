@@ -13,6 +13,7 @@ class ConversationsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('last_message_at', 'desc')
             ->columns([
                 TextColumn::make('type')
                     ->badge(),

@@ -14,13 +14,16 @@ class ClaimForm
         return $schema
             ->components([
                 Select::make('sender_id')
-                    ->relationship('sender', 'id')
+                    ->relationship('sender', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('receiver_id')
-                    ->relationship('receiver', 'id')
+                    ->relationship('receiver', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('schedule_id')
-                    ->relationship('schedule', 'title'),
+                    ->relationship('schedule', 'title')
+                    ->searchable(),
                 Select::make('type')
                     ->options(['schedule' => 'Schedule', 'direct' => 'Direct'])
                     ->required(),

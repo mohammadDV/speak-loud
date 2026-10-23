@@ -20,6 +20,7 @@ use App\Services\Uploads\S3UploadService;
 use App\Support\Seo;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\UnableToCheckFileExistence;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -39,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Model::preventLazyLoading(! $this->app->isProduction());
+
         Seo::share();
 
         FileUpload::configureUsing(function (FileUpload $component): void {

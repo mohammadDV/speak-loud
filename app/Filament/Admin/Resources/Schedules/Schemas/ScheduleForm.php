@@ -14,7 +14,8 @@ class ScheduleForm
         return $schema
             ->components([
                 Select::make('user_id')
-                    ->relationship('user', 'id')
+                    ->relationship('user', 'email')
+                    ->searchable()
                     ->required(),
                 TextInput::make('title'),
                 Textarea::make('description')
@@ -23,7 +24,9 @@ class ScheduleForm
                     ->options(['recurring' => 'Recurring', 'one_time' => 'One time'])
                     ->required(),
                 Select::make('language_id')
-                    ->relationship('language', 'id')
+                    ->relationship('language', 'name_en')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 TextInput::make('max_participants')
                     ->required()

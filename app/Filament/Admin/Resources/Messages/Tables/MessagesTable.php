@@ -11,12 +11,25 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MessagesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
+            ->modifyQueryUsing(fn (Builder $query) => $query->select([
+                'id',
+                'conversation_id',
+                'sender_id',
+                'type',
+                'attachment_path',
+                'is_read',
+                'read_at',
+                'created_at',
+                'deleted_at',
+            ]))
             ->columns([
                 TextColumn::make('conversation.id')
                     ->searchable(),

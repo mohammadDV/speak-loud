@@ -16,10 +16,13 @@ class BlogPostForm
         return $schema
             ->components([
                 Select::make('author_id')
-                    ->relationship('author', 'id')
+                    ->relationship('author', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('category_id')
-                    ->relationship('category', 'name'),
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 TextInput::make('title')
                     ->required(),
                 TextInput::make('slug')

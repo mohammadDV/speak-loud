@@ -15,10 +15,12 @@ class ReportForm
         return $schema
             ->components([
                 Select::make('reporter_id')
-                    ->relationship('reporter', 'id')
+                    ->relationship('reporter', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('reported_id')
-                    ->relationship('reported', 'id')
+                    ->relationship('reported', 'email')
+                    ->searchable()
                     ->required(),
                 Select::make('reason')
                     ->options([

@@ -1,13 +1,13 @@
 <?php
 
 use App\Support\Seo;
-use function Livewire\Volt\{state, mount, computed, title};
+use function Livewire\Volt\{state, mount, computed, title, hydrate};
 use App\Actions\SendClaim;
-use App\Models\Interest;
-use App\Models\Language;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IScheduleRepository;
 use App\Support\CountryCodes;
+use App\Support\LookupCache;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 state([
     'search'                => '',
@@ -75,14 +75,46 @@ mount(function () {
         'seoUrl'         => route('discover'),
     ]);
 
-    $this->languages = Language::where('is_active', true)->orderBy('name_en')->get();
-    $this->allInterests = Interest::orderBy('name_en')->get();
+    $this->languages = LookupCache::activeLanguages();
+    $this->allInterests = LookupCache::interests();
     $this->loadSchedules();
 
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
         $this->claimScheduleId = session()->pull('pending_claim_schedule_id');
         $this->showClaimModal  = true;
     }
+});
+
+hydrate(function () {
+    $this->languages = LookupCache::activeLanguages();
+    $this->allInterests = LookupCache::interests();
+
+    $schedules = collect($this->loadedSchedules)->filter(fn ($schedule) => $schedule instanceof Schedule);
+
+    if ($schedules->isEmpty()) {
+        return;
+    }
+
+    $with = [
+        'user.profile',
+        'user.interests',
+        'user.languages.language',
+        'language',
+        'recurringRule',
+        'oneTimeSlot',
+    ];
+
+    if (auth()->check()) {
+        $viewerId = auth()->id();
+        $with['claims'] = fn ($q) => $q
+            ->where('sender_id', $viewerId)
+            ->whereIn('status', ['pending', 'accepted']);
+    }
+
+    (new EloquentCollection($schedules->all()))->load($with);
+    (new EloquentCollection($schedules->all()))->loadCount([
+        'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
+    ]);
 });
 
 title(fn () => Seo::pageTitle('Discover practice partners'));
@@ -121,7 +153,7 @@ $claimTarget = computed(function () {
     return Schedule::query()
         ->where('status', 'active')
         ->when(auth()->check(), fn ($q) => $q->where('user_id', '!=', auth()->id()))
-        ->with(['user.profile', 'user.interests', 'user.languages', 'language', 'recurringRule', 'oneTimeSlot'])
+        ->with(['user.profile', 'user.interests', 'user.languages.language', 'language', 'recurringRule', 'oneTimeSlot'])
         ->withCount([
             'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
         ])

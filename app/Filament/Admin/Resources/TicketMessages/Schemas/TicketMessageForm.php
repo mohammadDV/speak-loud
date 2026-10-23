@@ -14,10 +14,12 @@ class TicketMessageForm
         return $schema
             ->components([
                 Select::make('ticket_id')
-                    ->relationship('ticket', 'id')
+                    ->relationship('ticket', 'subject')
+                    ->searchable()
                     ->required(),
                 Select::make('sender_id')
-                    ->relationship('sender', 'id')
+                    ->relationship('sender', 'email')
+                    ->searchable()
                     ->required(),
                 Textarea::make('body')
                     ->required()

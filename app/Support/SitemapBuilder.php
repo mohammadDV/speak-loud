@@ -67,17 +67,24 @@ class SitemapBuilder
      */
     private function blogPostUrls(): array
     {
-        return BlogPost::query()
+        $urls = [];
+
+        BlogPost::query()
             ->where('status', 'published')
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
-            ->orderByDesc('published_at')
-            ->get(['slug', 'updated_at', 'published_at'])
-            ->map(fn (BlogPost $post) => [
-                'loc' => route('blog.show', $post->slug),
-                'lastmod' => $this->formatLastmod($post->updated_at ?? $post->published_at),
-            ])
-            ->all();
+            ->select(['id', 'slug', 'updated_at', 'published_at'])
+            ->chunkById(500, function ($posts) use (&$urls) {
+                foreach ($posts as $post) {
+                    /** @var BlogPost $post */
+                    $urls[] = [
+                        'loc' => route('blog.show', $post->slug),
+                        'lastmod' => $this->formatLastmod($post->updated_at ?? $post->published_at),
+                    ];
+                }
+            });
+
+        return $urls;
     }
 
     /**
@@ -85,18 +92,26 @@ class SitemapBuilder
      */
     private function profileUrls(): array
     {
-        return UserProfile::query()
+        $urls = [];
+
+        UserProfile::query()
             ->where('is_private', false)
             ->whereNotNull('profile_slug')
             ->where('profile_slug', '!=', '')
             ->whereHas('user', fn ($query) => $query->where('status', 'active'))
             ->orderBy('id')
-            ->get(['profile_slug', 'updated_at'])
-            ->map(fn (UserProfile $profile) => [
-                'loc' => route('users.show', $profile->profile_slug),
-                'lastmod' => $this->formatLastmod($profile->updated_at),
-            ])
-            ->all();
+            ->select(['id', 'profile_slug', 'updated_at'])
+            ->chunkById(500, function ($profiles) use (&$urls) {
+                foreach ($profiles as $profile) {
+                    /** @var UserProfile $profile */
+                    $urls[] = [
+                        'loc' => route('users.show', $profile->profile_slug),
+                        'lastmod' => $this->formatLastmod($profile->updated_at),
+                    ];
+                }
+            });
+
+        return $urls;
     }
 
     private function formatLastmod(?CarbonInterface $date): ?string

@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, mount, computed, title};
+use function Livewire\Volt\{state, mount, computed, title, hydrate};
 use App\Actions\SyncScheduleGroupChat;
 use App\Models\Schedule;
 use App\Repositories\Contracts\IMessageRepository;
@@ -14,25 +14,19 @@ state([
     'viewerHasPendingClaim' => false,
 ]);
 
-mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
+$loadScheduleRelations = function (Schedule $schedule): Schedule {
     $userId = auth()->id();
-
-    if (! ScheduleAccess::canView($schedule, $userId)) {
-        abort(403);
-    }
 
     $relations = [
         'user.profile',
-        'user.languages',
+        'user.languages.language',
         'language',
         'recurringRule',
         'oneTimeSlot',
         'groupConversation',
     ];
 
-    $canSeeParticipants = $userId && ScheduleAccess::canSeeParticipants($schedule, $userId);
-
-    if ($canSeeParticipants) {
+    if ($userId && ScheduleAccess::canSeeParticipants($schedule, $userId)) {
         $relations[] = 'claims.sender.profile';
     }
 
@@ -41,14 +35,26 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
         'claims as accepted_claims_count' => fn ($q) => $q->where('status', 'accepted'),
     ]);
 
-    $this->viewerHasPendingClaim = $userId
-        ? $schedule->hasPendingClaimFrom($userId)
-        : false;
-
-    if (! $schedule->isHost($userId)) {
+    if ($userId && ! $schedule->isHost($userId)) {
         $schedule->makeHidden(['title']);
         $schedule->title = null;
     }
+
+    return $schedule;
+};
+
+mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
+    $userId = auth()->id();
+
+    if (! ScheduleAccess::canView($schedule, $userId)) {
+        abort(403);
+    }
+
+    $schedule = $this->loadScheduleRelations($schedule);
+
+    $this->viewerHasPendingClaim = $userId
+        ? $schedule->hasPendingClaimFrom($userId)
+        : false;
 
     $this->schedule = $schedule;
 
@@ -63,11 +69,16 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
 
     if ($userId && ScheduleAccess::canAccessGroupChat($schedule, $userId)) {
         $syncGroupChat->execute($schedule);
-        $schedule->load('groupConversation');
-        $this->schedule = $schedule;
+        $this->schedule = $this->loadScheduleRelations($schedule);
         $this->loadMessages();
     }
 });
+
+hydrate([
+    'schedule' => function (?Schedule $schedule) {
+        return $schedule ? $this->loadScheduleRelations($schedule) : null;
+    },
+]);
 
 title(fn () => Seo::pageTitle(
     ($this->schedule && auth()->id() && $this->schedule->isHost(auth()->id()) && $this->schedule->title)
