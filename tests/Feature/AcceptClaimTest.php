@@ -196,3 +196,45 @@ test('claims page disables accept when schedule is at capacity', function () {
     Volt::actingAs($host)->test('claims.index')
         ->assertSee('Slot full (2/2). Increase max claims or decline.');
 });
+
+test('accepting a claim for a deleted schedule shows a validation error', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $host = User::factory()->create(['email_verified_at' => now()]);
+    $sender = User::factory()->create(['email_verified_at' => now()]);
+
+    UserProfile::create(['user_id' => $host->id, 'username' => 'hostdel', 'display_name' => 'Host Del']);
+    UserProfile::create(['user_id' => $sender->id, 'username' => 'senderdel', 'display_name' => 'Sender Del']);
+
+    $schedule = Schedule::create([
+        'user_id' => $host->id,
+        'description' => ScheduleDescription::EXAMPLES[0],
+        'type' => 'recurring',
+        'language_id' => $language->id,
+        'max_participants' => 1,
+        'status' => 'active',
+    ]);
+
+    ScheduleRecurringRule::create([
+        'schedule_id' => $schedule->id,
+        'day_of_week' => 'Wed',
+        'start_time' => '18:00:00',
+        'end_time' => '19:00:00',
+    ]);
+
+    $claim = Claim::create([
+        'sender_id' => $sender->id,
+        'receiver_id' => $host->id,
+        'schedule_id' => $schedule->id,
+        'type' => 'schedule',
+        'status' => 'pending',
+    ]);
+
+    $schedule->delete();
+
+    expect(fn () => app(AcceptClaim::class)->execute($claim->id, $host->id))
+        ->toThrow(ValidationException::class, 'This schedule is no longer available');
+
+    expect($claim->fresh()->status)->toBe('pending');
+});

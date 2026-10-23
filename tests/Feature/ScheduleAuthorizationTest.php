@@ -102,7 +102,7 @@ test('outsider schedule show snapshot does not leak claims or host title', funct
         'message' => 'Please let me in',
     ]);
 
-    $component = Volt::actingAs($outsider)->test('schedule.show', ['schedule' => $schedule->id]);
+    $component = Volt::actingAs($outsider)->test('schedule.show', ['schedule' => $schedule->uuid]);
 
     $html = $component->html();
 

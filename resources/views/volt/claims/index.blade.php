@@ -203,7 +203,7 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                                 </div>
                             </div>
                         @elseif ($claim->status === 'accepted' && $claim->schedule_id)
-                            <flux:button href="{{ route('schedules.show', $claim->schedule_id) }}" wire:navigate variant="primary" size="sm">
+                            <flux:button href="{{ route('schedules.show', $claim->schedule) }}" wire:navigate variant="primary" size="sm">
                                 Group chat
                             </flux:button>
                         @elseif (in_array($claim->status, ['accepted', 'rejected'], true) && $claim->conversation)
@@ -243,7 +243,7 @@ $withdraw = function (int $claimId, WithdrawClaim $action) {
                                     size="sm"
                                 >Withdraw</flux:button>
                             @elseif ($claim->status === 'accepted' && $claim->schedule_id)
-                                <flux:button href="{{ route('schedules.show', $claim->schedule_id) }}" wire:navigate variant="primary" size="sm">
+                                <flux:button href="{{ route('schedules.show', $claim->schedule) }}" wire:navigate variant="primary" size="sm">
                                     Open slot
                                 </flux:button>
                             @elseif (in_array($claim->status, ['accepted', 'rejected'], true) && $claim->conversation)

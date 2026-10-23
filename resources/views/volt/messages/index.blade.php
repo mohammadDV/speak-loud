@@ -46,7 +46,8 @@ $selectConversation = function (int $conversationId) {
     }
 
     if ($conversation->isScheduleGroup()) {
-        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+        $conversation->loadMissing('schedule');
+        $this->redirect(route('schedules.show', $conversation->schedule), navigate: true);
 
         return;
     }
@@ -68,7 +69,8 @@ $sendMessage = function () {
     }
 
     if ($conversation->isScheduleGroup()) {
-        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+        $conversation->loadMissing('schedule');
+        $this->redirect(route('schedules.show', $conversation->schedule), navigate: true);
 
         return;
     }
@@ -96,7 +98,9 @@ $sendMessage = function () {
                 if ($conv->isScheduleGroup()) {
                     $label = ($conv->schedule?->language?->name_en ?? 'Schedule').' group';
                     $initial = 'G';
-                    $href = route('schedules.show', $conv->schedule_id);
+                    $href = $conv->schedule
+                        ? route('schedules.show', $conv->schedule)
+                        : null;
                     $avatarUrl = null;
                 } else {
                     $partner = $conv->user_a_id === auth()->id() ? $conv->userB : $conv->userA;

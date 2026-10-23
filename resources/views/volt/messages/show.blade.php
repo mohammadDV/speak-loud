@@ -23,7 +23,8 @@ mount(function (int $id) {
     $this->authorize('view', $conversation);
 
     if ($conversation->isScheduleGroup()) {
-        $this->redirect(route('schedules.show', $conversation->schedule_id), navigate: true);
+        $conversation->loadMissing('schedule');
+        $this->redirect(route('schedules.show', $conversation->schedule), navigate: true);
 
         return;
     }

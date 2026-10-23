@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Schedule extends Model
 {
@@ -21,9 +22,20 @@ class Schedule extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (Schedule $schedule): void {
+            if (blank($schedule->uuid)) {
+                $schedule->uuid = (string) Str::uuid();
+            }
+        });
+
         static::saved(fn () => LookupCache::flushHomeOpenSlots());
         static::deleted(fn () => LookupCache::flushHomeOpenSlots());
         static::restored(fn () => LookupCache::flushHomeOpenSlots());
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
     public function user(): BelongsTo

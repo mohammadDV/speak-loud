@@ -33,8 +33,15 @@ class AcceptClaim
         }
 
         if ($claim->schedule_id) {
-            $accepted = $this->schedules->countAcceptedClaims($claim->schedule_id);
             $schedule = $this->schedules->findById($claim->schedule_id);
+
+            if (! $schedule) {
+                throw ValidationException::withMessages([
+                    'claim' => 'This schedule is no longer available, so the claim cannot be accepted.',
+                ]);
+            }
+
+            $accepted = $this->schedules->countAcceptedClaims($claim->schedule_id);
 
             if ($accepted >= $schedule->max_participants) {
                 throw ValidationException::withMessages([

@@ -49,7 +49,7 @@ test('schedule show page displays details and members for host', function () {
 
     app(SyncScheduleGroupChat::class)->execute($schedule);
 
-    Volt::actingAs($host)->test('schedule.show', ['schedule' => $schedule->id])
+    Volt::actingAs($host)->test('schedule.show', ['schedule' => $schedule->uuid])
         ->assertSee('English practice slot')
         ->assertSee('Host-only label')
         ->assertSee('Host Show')
@@ -108,7 +108,7 @@ test('schedule show page hides private title from non-host viewers', function ()
 
     app(SyncScheduleGroupChat::class)->execute($schedule);
 
-    Volt::actingAs($member)->test('schedule.show', ['schedule' => $schedule->id])
+    Volt::actingAs($member)->test('schedule.show', ['schedule' => $schedule->uuid])
         ->assertSee('Visible session rules for everyone.')
         ->assertDontSee('Secret host title');
 });
@@ -168,7 +168,7 @@ test('accepted member can access group chat on schedule page', function () {
     expect($group)->not->toBeNull()
         ->and(ConversationParticipant::where('conversation_id', $group->id)->where('user_id', $member->id)->exists())->toBeTrue();
 
-    Volt::actingAs($member)->test('schedule.show', ['schedule' => $schedule->id])
+    Volt::actingAs($member)->test('schedule.show', ['schedule' => $schedule->uuid])
         ->assertSee('Member M')
         ->assertSee('Group chat')
         ->set('newMessage', 'Hello everyone')

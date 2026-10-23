@@ -17,6 +17,11 @@ class SchedulesTable
     {
         return $table
             ->columns([
+                TextColumn::make('uuid')
+                    ->label('UUID')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->copyable()
+                    ->searchable(),
                 TextColumn::make('user.id')
                     ->searchable(),
                 TextColumn::make('title')
