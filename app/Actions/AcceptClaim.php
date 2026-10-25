@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Events\ClaimAccepted;
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
@@ -79,6 +80,8 @@ class AcceptClaim
         }
 
         $claim->setRelation('conversation', $conversation->fresh());
+
+        ClaimAccepted::dispatch($claim);
 
         return $claim;
     }

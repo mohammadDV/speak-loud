@@ -149,7 +149,14 @@ class DemoDataSeeder extends Seeder
 
     private function seedUserRelations(Collection $users, Collection $languages, Collection $interests): void
     {
-        $notificationTypes = ['claim_received', 'claim_accepted', 'new_message', 'schedule_reminder'];
+        $notificationTypes = [
+            'claim_received',
+            'claim_accepted',
+            'claim_rejected',
+            'claim_withdrawn',
+            'new_message',
+            'schedule_reminder',
+        ];
 
         foreach ($users as $user) {
             $nativeLang = $languages->random();

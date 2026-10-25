@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Events\ClaimWithdrawn;
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -22,6 +23,10 @@ class WithdrawClaim
             throw new AuthorizationException('This claim can no longer be withdrawn.');
         }
 
-        return $this->claims->updateStatus($claimId, 'withdrawn');
+        $claim = $this->claims->updateStatus($claimId, 'withdrawn');
+
+        ClaimWithdrawn::dispatch($claim);
+
+        return $claim;
     }
 }

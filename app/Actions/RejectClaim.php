@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Events\ClaimRejected;
 use App\Models\Claim;
 use App\Repositories\Contracts\IClaimRepository;
 use App\Repositories\Contracts\IConversationRepository;
@@ -38,6 +39,8 @@ class RejectClaim
         $this->seedClaimThread($conversation->id, $claim, $message);
 
         $claim->setRelation('conversation', $conversation->fresh());
+
+        ClaimRejected::dispatch($claim);
 
         return $claim;
     }

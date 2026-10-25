@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Events\ClaimSent;
 use App\Models\Claim;
 use App\Models\Schedule;
 use App\Models\User;
@@ -46,6 +47,7 @@ class SendClaim
                 if (in_array($existing->status, ['rejected', 'withdrawn', 'expired'], true)) {
                     $claim = $this->claims->reopen($existing->id, $data['message'] ?? null);
                     RateLimiter::hit($limiterKey, ClaimLimits::windowSeconds());
+                    ClaimSent::dispatch($claim);
 
                     return $claim;
                 }
@@ -61,6 +63,7 @@ class SendClaim
                 if (in_array($existing->status, ['rejected', 'withdrawn', 'expired'], true)) {
                     $claim = $this->claims->reopen($existing->id, $data['message'] ?? null);
                     RateLimiter::hit($limiterKey, ClaimLimits::windowSeconds());
+                    ClaimSent::dispatch($claim);
 
                     return $claim;
                 }
@@ -76,6 +79,7 @@ class SendClaim
         ]);
 
         RateLimiter::hit($limiterKey, ClaimLimits::windowSeconds());
+        ClaimSent::dispatch($claim);
 
         return $claim;
     }

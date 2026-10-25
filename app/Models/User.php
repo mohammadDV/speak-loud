@@ -139,6 +139,11 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
         return $this->hasMany(Claim::class, 'receiver_id');
     }
 
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(UserNotificationPreference::class);
+    }
+
     public function conversationsAsA(): HasMany
     {
         return $this->hasMany(Conversation::class, 'user_a_id');

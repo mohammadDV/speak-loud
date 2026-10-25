@@ -27,16 +27,25 @@ class Claim extends Model
         static::deleted(fn () => LookupCache::flushHomeOpenSlots());
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function receiver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    /**
+     * @return BelongsTo<Schedule, $this>
+     */
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);

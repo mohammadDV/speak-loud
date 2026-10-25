@@ -38,8 +38,11 @@ docker run --rm \
   laravelsail/php85-composer:latest \
   composer install --ignore-platform-reqs
 
-# 3. Start containers (app, MySQL, Redis)
+# 3. Build/rebuild the app image (pulls PHP 8.5.12+ from packages.sury.org)
+#    Required after security advisories — do not stay on 8.5.11.
+./vendor/bin/sail build --no-cache
 ./vendor/bin/sail up -d
+./vendor/bin/sail php -v   # must report 8.5.12 or newer
 
 # 4. Application key & database
 ./vendor/bin/sail artisan key:generate
@@ -88,8 +91,9 @@ Seeders: `LanguageSeeder`, `InterestSeeder`, `ContentSeeder`, `DemoDataSeeder` (
 ./vendor/bin/sail artisan migrate
 ./vendor/bin/sail artisan db:seed
 
-# Queue worker
-./vendor/bin/sail artisan queue:work redis
+# Queue worker (Horizon dashboard at /horizon — active admins only in non-local)
+./vendor/bin/sail artisan horizon
+# Or: composer run dev  (runs serve + horizon + pail + vite)
 
 # Tests
 ./vendor/bin/sail pest
@@ -205,9 +209,11 @@ Feature tests use `RefreshDatabase` (see `tests/Pest.php`). GitHub Actions runs 
 
 ## Environment notes
 
+- **PHP must be 8.5.12+** everywhere (Composer platform, CI, Sail, Herd/host). 8.5.11 is rejected because of CVE-2026-109618 / CVE-2026-109619. Rebuild Sail after PHP security releases: `./vendor/bin/sail build --no-cache`.
 - Copy `.env.example` to `.env` and set `APP_URL` / `APP_PORT` to match how you access the app.
 - `DB_HOST=mysql` is correct **inside** Sail; use `127.0.0.1` and `FORWARD_DB_PORT` from GUI clients on the host.
-- Session and queue drivers are configured for MySQL/Redis in the shipped `.env`.
+- `QUEUE_CONNECTION=redis`. Use `REDIS_HOST=redis` inside Sail; use `127.0.0.1` (and `FORWARD_REDIS_PORT`) when PHP runs on the host.
+- After deploy, restart workers with `php artisan horizon:terminate` so Horizon picks up new code.
 
 ## Further documentation
 
