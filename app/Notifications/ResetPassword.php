@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\SpeaksLoudMail;
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,7 +10,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPassword extends BaseResetPassword implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, SpeaksLoudMail;
 
     public function __construct($token)
     {
@@ -26,11 +27,14 @@ class ResetPassword extends BaseResetPassword implements ShouldQueue
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        return (new MailMessage)
-            ->subject('Reset your SpeakLoud password')
-            ->line('You requested a password reset. Click the button below to choose a new password.')
-            ->action('Reset password', $url)
-            ->line('This link expires in '.config('auth.passwords.users.expire').' minutes.')
-            ->line('If you did not request a reset, you can ignore this email.');
+        return $this->withSpeakLoudVoice(
+            (new MailMessage)
+                ->subject('Reset your SpeakLoud password')
+                ->line('You requested a password reset. Click the button below to choose a new password.')
+                ->action('Reset password', $url)
+                ->line('This link expires in '.config('auth.passwords.users.expire').' minutes.')
+                ->line('If you did not request a reset, you can ignore this email.'),
+            $notifiable,
+        );
     }
 }

@@ -1,0 +1,338 @@
+/* SpeakLoud branded markdown mail theme */
+
+@import url('https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap');
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    position: relative;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #FFF8F0;
+    color: #3D2B1F;
+    height: 100%;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.5;
+    text-align: start;
+}
+
+a {
+    color: #FF8C42;
+}
+
+a img {
+    border: none;
+}
+
+/* Typography */
+
+h1 {
+    color: #3D2B1F;
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 0;
+    text-align: start;
+}
+
+h2 {
+    color: #3D2B1F;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 0;
+    text-align: start;
+}
+
+h3 {
+    color: #3D2B1F;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 0;
+    text-align: left;
+}
+
+p {
+    color: #3D2B1F;
+    font-size: 16px;
+    line-height: 1.55em;
+    margin-top: 0;
+    text-align: left;
+}
+
+p.sub {
+    color: #6B5344;
+    font-size: 12px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #FFF8F0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Header */
+
+.header {
+    padding: 28px 0 18px;
+    text-align: center;
+}
+
+.header a {
+    color: #3D2B1F;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.brand-mark {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.brand-badge {
+    background-color: #FF8C42;
+    border-radius: 10px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 700;
+    height: 36px;
+    line-height: 36px;
+    margin-right: 10px;
+    text-align: center;
+    vertical-align: middle;
+    width: 36px;
+}
+
+.brand-name {
+    color: #3D2B1F;
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    vertical-align: middle;
+}
+
+/* Logo */
+
+.logo {
+    height: 75px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    max-height: 75px;
+    width: 75px;
+}
+
+/* Body */
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #FFF8F0;
+    border-bottom: 1px solid #FFF8F0;
+    border-top: 1px solid #FFF8F0;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    background-color: #ffffff;
+    border-color: #FFF0E0;
+    border-radius: 12px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 8px 24px rgba(61, 43, 31, 0.06);
+    margin: 0 auto;
+    padding: 0;
+    width: 570px;
+}
+
+.inner-body a {
+    color: #FF8C42;
+    word-break: break-all;
+}
+
+/* Subcopy */
+
+.subcopy {
+    border-top: 1px solid #FFF0E0;
+    margin-top: 28px;
+    padding-top: 24px;
+}
+
+.subcopy p {
+    color: #6B5344;
+    font-size: 14px;
+}
+
+/* Footer */
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 570px;
+    margin: 0 auto;
+    padding: 0;
+    text-align: center;
+    width: 570px;
+}
+
+.footer p {
+    color: #6B5344;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.footer a {
+    color: #FF8C42;
+    text-decoration: none;
+}
+
+/* Tables */
+
+.table table {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 30px auto;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #FFF0E0;
+    color: #3D2B1F;
+    margin: 0;
+    padding-bottom: 8px;
+}
+
+.table td {
+    color: #3D2B1F;
+    font-size: 15px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 36px 32px;
+}
+
+/* Buttons */
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 28px auto;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    float: unset;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    border-radius: 10px;
+    color: #fff !important;
+    display: inline-block;
+    font-weight: 600;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.button-blue,
+.button-primary {
+    background-color: #FF8C42;
+    border-bottom: 10px solid #FF8C42;
+    border-left: 22px solid #FF8C42;
+    border-right: 22px solid #FF8C42;
+    border-top: 10px solid #FF8C42;
+}
+
+.button-green,
+.button-success {
+    background-color: #16a34a;
+    border-bottom: 10px solid #16a34a;
+    border-left: 22px solid #16a34a;
+    border-right: 22px solid #16a34a;
+    border-top: 10px solid #16a34a;
+}
+
+.button-red,
+.button-error {
+    background-color: #D94F3D;
+    border-bottom: 10px solid #D94F3D;
+    border-left: 22px solid #D94F3D;
+    border-right: 22px solid #D94F3D;
+    border-top: 10px solid #D94F3D;
+}
+
+/* Panels */
+
+.panel {
+    border-left: #FF8C42 solid 4px;
+    margin: 21px 0;
+}
+
+.panel-content {
+    background-color: #FFF0E0;
+    color: #3D2B1F;
+    padding: 16px;
+}
+
+.panel-content p {
+    color: #3D2B1F;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}

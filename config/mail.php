@@ -115,4 +115,21 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Settings
+    |--------------------------------------------------------------------------
+    |
+    | SpeakLoud uses a custom markdown theme so notification emails match the
+    | product palette (cream background, orange CTAs, Instrument Sans).
+    |
+    */
+
+    'markdown' => [
+        'theme' => 'speakloud',
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];

@@ -6,6 +6,7 @@ use App\Enums\NotificationType;
 use App\Models\Claim;
 use App\Models\User;
 use App\Notifications\Concerns\FormatsClaimMail;
+use App\Notifications\Concerns\SpeaksLoudMail;
 use App\Support\UserWantsNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +15,7 @@ use Illuminate\Notifications\Notification;
 
 class ClaimRejectedNotification extends Notification implements ShouldQueue
 {
-    use FormatsClaimMail, Queueable;
+    use FormatsClaimMail, Queueable, SpeaksLoudMail;
 
     public function __construct(public Claim $claim)
     {
@@ -50,8 +51,11 @@ class ClaimRejectedNotification extends Notification implements ShouldQueue
             $mail->line("Schedule: {$scheduleContext}");
         }
 
-        return $mail
-            ->action('View claims', $this->claimsUrl())
-            ->line('You can explore other schedules on SpeakLoud.');
+        return $this->withSpeakLoudVoice(
+            $mail
+                ->action('View claims', $this->claimsUrl())
+                ->line('You can explore other schedules on SpeakLoud.'),
+            $notifiable,
+        );
     }
 }
