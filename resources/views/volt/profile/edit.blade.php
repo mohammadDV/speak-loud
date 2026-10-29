@@ -63,11 +63,14 @@ mount(function () {
 title(fn () => Seo::pageTitle('Edit profile'));
 
 rules(function () {
-    $profileId = auth()->user()?->profile?->id;
+    $profile = auth()->user()?->profile;
 
     return [
         'display_name' => 'required|string|max:100',
-        'profile_slug' => ProfileSlug::validationRules($profileId),
+        'profile_slug' => ProfileSlug::validationRules(
+            $profile?->id,
+            $profile?->profile_slug ?? $profile?->username,
+        ),
         'bio'          => 'nullable|string|max:500',
         'country_code' => 'nullable|string|size:2|in:'.implode(',', array_keys(CountryCodes::LIST)),
         'is_private'              => 'boolean',

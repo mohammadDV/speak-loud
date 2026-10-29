@@ -27,7 +27,11 @@ class ProfileSlug
         return in_array(strtolower($slug), self::RESERVED, true);
     }
 
-    public static function validationRules(?int $ignoreProfileId = null): array
+    /**
+     * An existing link may stay, even when it is now reserved.
+     * Choosing a different reserved link is still rejected.
+     */
+    public static function validationRules(?int $ignoreProfileId = null, ?string $currentSlug = null): array
     {
         $unique = 'unique:user_profiles,profile_slug';
 
@@ -42,10 +46,16 @@ class ProfileSlug
             'max:50',
             'regex:/^[a-zA-Z0-9]+$/',
             $unique,
-            function (string $attribute, mixed $value, \Closure $fail): void {
-                if (is_string($value) && self::isReserved($value)) {
-                    $fail('This profile link is reserved. Please choose another.');
+            function (string $attribute, mixed $value, \Closure $fail) use ($currentSlug): void {
+                if (! is_string($value) || ! self::isReserved($value)) {
+                    return;
                 }
+
+                if ($currentSlug !== null && strtolower($value) === strtolower($currentSlug)) {
+                    return;
+                }
+
+                $fail('This profile link is reserved. Please choose another.');
             },
         ];
     }

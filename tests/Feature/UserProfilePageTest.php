@@ -286,3 +286,84 @@ test('user can change profile slug when unique', function () {
 
     $this->actingAs($viewer)->get(route('users.show', 'user9'))->assertNotFound();
 });
+
+test('user can save profile without changing a reserved profile link', function () {
+    $user = User::create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'reserved-keep@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id' => $user->id,
+        'username' => 'admin',
+        'profile_slug' => 'admin',
+        'display_name' => 'Reserved Keeper',
+    ]);
+
+    Volt::actingAs($user)->test('profile.edit')
+        ->assertSet('profile_slug', 'admin')
+        ->set('bio', 'Updated without changing the link')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $profile = $user->profile->fresh();
+
+    expect($profile->profile_slug)->toBe('admin')
+        ->and($profile->bio)->toBe('Updated without changing the link');
+});
+
+test('user can replace a reserved profile link with an available one', function () {
+    $user = User::create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'reserved-change@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id' => $user->id,
+        'username' => 'schedule',
+        'profile_slug' => 'schedule',
+        'display_name' => 'Reserved Changer',
+    ]);
+
+    Volt::actingAs($user)->test('profile.edit')
+        ->set('profile_slug', 'newpubliclink')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($user->profile->fresh()->profile_slug)->toBe('newpubliclink');
+});
+
+test('user cannot change profile link to a reserved word', function () {
+    $user = User::create([
+        'uuid' => (string) Str::uuid(),
+        'email' => 'reserved-block@speakloud.test',
+        'password' => '123456789',
+        'role' => 'user',
+        'status' => 'active',
+        'email_verified_at' => now(),
+    ]);
+
+    UserProfile::create([
+        'user_id' => $user->id,
+        'username' => 'availablelink',
+        'profile_slug' => 'availablelink',
+        'display_name' => 'Available Linker',
+    ]);
+
+    $component = Volt::actingAs($user)->test('profile.edit')
+        ->set('profile_slug', 'login')
+        ->call('save')
+        ->assertHasErrors('profile_slug');
+
+    expect($component->errors()->first('profile_slug'))
+        ->toBe('This profile link is reserved. Please choose another.')
+        ->and($user->profile->fresh()->profile_slug)->toBe('availablelink');
+});
