@@ -22,7 +22,7 @@ mount(function () {
 
     Seo::share([
         'seoTitle' => 'Messages',
-        'seoDescription' => 'Your SpeakLoud conversations.',
+        'seoDescription' => 'Your SpeakLoudMate conversations.',
         'seoUrl' => route('messages'),
         'seoRobots' => 'noindex, nofollow',
     ]);

@@ -24,7 +24,7 @@ mount(function () {
 
     Seo::share([
         'seoTitle'       => 'Support tickets',
-        'seoDescription' => 'Contact the SpeakLoud support team and track your requests.',
+        'seoDescription' => 'Contact the SpeakLoudMate support team and track your requests.',
         'seoUrl'         => route('tickets.index'),
         'seoRobots'      => 'noindex, nofollow',
     ]);

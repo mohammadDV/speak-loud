@@ -11,7 +11,7 @@ use Livewire\Volt\Volt;
 Route::get('/', function () {
     Seo::share([
         'seoTitle' => 'Practice languages with real people',
-        'seoDescription' => 'SpeakLoud connects language learners with partners for scheduled practice. Publish slots, accept claims, and talk with real people.',
+        'seoDescription' => 'SpeakLoudMate connects language learners with partners for scheduled practice. Publish slots, accept claims, and talk with real people.',
         'seoUrl' => route('home'),
     ]);
 

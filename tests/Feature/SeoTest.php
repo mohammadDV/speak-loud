@@ -44,7 +44,7 @@ test('home page includes seo meta tags and blog cover image alt', function () {
         ->assertSee('application/ld+json', false)
         ->assertSee('"@type":"Organization"', false)
         ->assertSee('images/og-default.png', false)
-        ->assertSee('Practice languages with real people | SpeakLoud', false)
+        ->assertSee('Practice languages with real people | SpeakLoudMate', false)
         ->assertSee('alt="Cover image for SEO spotlight post"', false)
         ->assertSee('width="1200"', false)
         ->assertSee('height="675"', false);
@@ -73,7 +73,7 @@ test('blog post page includes article meta and cover image', function () {
 
     $this->get(route('blog.show', $post->slug))
         ->assertOk()
-        ->assertSee('Article for SEO | SpeakLoud', false)
+        ->assertSee('Article for SEO | SpeakLoudMate', false)
         ->assertSee('property="og:type" content="article"', false)
         ->assertSee('property="article:published_time"', false)
         ->assertSee('property="article:author" content="Post Author"', false)
@@ -87,8 +87,8 @@ test('blog post page includes article meta and cover image', function () {
 test('about page has unique title and description', function () {
     $this->get(route('about'))
         ->assertOk()
-        ->assertSee('About SpeakLoud | SpeakLoud', false)
-        ->assertSee('Learn how SpeakLoud helps language learners', false);
+        ->assertSee('About SpeakLoudMate | SpeakLoudMate', false)
+        ->assertSee('Learn how SpeakLoudMate helps language learners', false);
 });
 
 test('login page is noindex', function () {
@@ -126,7 +126,7 @@ test('public profile page has unique seo meta', function () {
 
     $this->get(route('users.show', 'seoprofile'))
         ->assertOk()
-        ->assertSee('SEO Profile User | SpeakLoud', false)
+        ->assertSee('SEO Profile User | SpeakLoudMate', false)
         ->assertSee('I love practicing Spanish every morning.', false)
         ->assertSee('"@type":"Person"', false)
         ->assertDontSee('name="robots" content="noindex, nofollow"', false);
@@ -147,7 +147,7 @@ test('private profile page is noindex and does not leak bio', function () {
     $this->get(route('users.show', 'privateuser'))
         ->assertOk()
         ->assertSee('name="robots" content="noindex, nofollow"', false)
-        ->assertSee('This SpeakLoud profile is private.', false)
+        ->assertSee('This SpeakLoudMate profile is private.', false)
         ->assertDontSee('Hidden bio secret content.', false)
         ->assertDontSee('"@type":"Person"', false);
 });

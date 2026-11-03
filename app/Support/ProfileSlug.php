@@ -18,6 +18,8 @@ class ProfileSlug
         'profile',
         'register',
         'schedule',
+        'speakloud',
+        'speakloudmate',
         'support',
         'u',
     ];

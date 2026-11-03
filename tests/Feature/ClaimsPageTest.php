@@ -52,7 +52,7 @@ function createClaimsPageSchedule(User $host, Language $language): Schedule
 }
 
 test('claims page shows received and sent labels', function () {
-    $host = createClaimsPageUser('claims-labels@speakloud.test', 'claimslabels');
+    $host = createClaimsPageUser('claims-labels@speakloudmate.test', 'claimslabels');
 
     Volt::actingAs($host)->test('claims.index')
         ->assertSee('Received')
@@ -65,9 +65,9 @@ test('claims page filters received claims by status', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $host = createClaimsPageUser('claims-filter-host@speakloud.test', 'claimsfilterhost');
-    $pendingSender = createClaimsPageUser('claims-filter-pending@speakloud.test', 'claimsfilterpending');
-    $acceptedSender = createClaimsPageUser('claims-filter-accepted@speakloud.test', 'claimsfilteraccepted');
+    $host = createClaimsPageUser('claims-filter-host@speakloudmate.test', 'claimsfilterhost');
+    $pendingSender = createClaimsPageUser('claims-filter-pending@speakloudmate.test', 'claimsfilterpending');
+    $acceptedSender = createClaimsPageUser('claims-filter-accepted@speakloudmate.test', 'claimsfilteraccepted');
 
     $schedule = createClaimsPageSchedule($host, $language);
 
@@ -104,9 +104,9 @@ test('claims page sorts received claims by newest and oldest', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $host = createClaimsPageUser('claims-sort-host@speakloud.test', 'claimssorthost');
-    $olderSender = createClaimsPageUser('claims-sort-older@speakloud.test', 'claimssortolder');
-    $newerSender = createClaimsPageUser('claims-sort-newer@speakloud.test', 'claimssortnewer');
+    $host = createClaimsPageUser('claims-sort-host@speakloudmate.test', 'claimssorthost');
+    $olderSender = createClaimsPageUser('claims-sort-older@speakloudmate.test', 'claimssortolder');
+    $newerSender = createClaimsPageUser('claims-sort-newer@speakloudmate.test', 'claimssortnewer');
 
     $schedule = createClaimsPageSchedule($host, $language);
 

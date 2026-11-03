@@ -18,7 +18,7 @@ test('schedule show page displays details and members for host', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-show@speakloud.test',
+        'email' => 'host-show@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -63,7 +63,7 @@ test('schedule show page hides private title from non-host viewers', function ()
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-title-hide@speakloud.test',
+        'email' => 'host-title-hide@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -72,7 +72,7 @@ test('schedule show page hides private title from non-host viewers', function ()
 
     $member = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'member-title-hide@speakloud.test',
+        'email' => 'member-title-hide@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -119,7 +119,7 @@ test('accepted member can access group chat on schedule page', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-member@speakloud.test',
+        'email' => 'host-member@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -128,7 +128,7 @@ test('accepted member can access group chat on schedule page', function () {
 
     $member = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'member-show@speakloud.test',
+        'email' => 'member-show@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

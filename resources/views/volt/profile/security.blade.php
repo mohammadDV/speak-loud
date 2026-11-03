@@ -8,7 +8,7 @@ use function Livewire\Volt\{state, rules, mount, title};
 mount(function () {
     Seo::share([
         'seoTitle' => 'Security',
-        'seoDescription' => 'Manage your SpeakLoud account security.',
+        'seoDescription' => 'Manage your SpeakLoudMate account security.',
         'seoUrl' => route('profile.security'),
         'seoRobots' => 'noindex, nofollow',
     ]);

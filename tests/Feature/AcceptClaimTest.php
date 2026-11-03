@@ -18,7 +18,7 @@ test('accepting a claim beyond schedule capacity shows a validation error', func
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-capacity@speakloud.test',
+        'email' => 'host-capacity@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -33,7 +33,7 @@ test('accepting a claim beyond schedule capacity shows a validation error', func
 
     $senderOne = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-one@speakloud.test',
+        'email' => 'sender-one@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -42,7 +42,7 @@ test('accepting a claim beyond schedule capacity shows a validation error', func
 
     $senderTwo = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-two@speakloud.test',
+        'email' => 'sender-two@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -51,7 +51,7 @@ test('accepting a claim beyond schedule capacity shows a validation error', func
 
     $senderThree = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-three@speakloud.test',
+        'email' => 'sender-three@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -114,7 +114,7 @@ test('claims page disables accept when schedule is at capacity', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-claims-ui@speakloud.test',
+        'email' => 'host-claims-ui@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -123,7 +123,7 @@ test('claims page disables accept when schedule is at capacity', function () {
 
     $senderOne = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-ui-one@speakloud.test',
+        'email' => 'sender-ui-one@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -132,7 +132,7 @@ test('claims page disables accept when schedule is at capacity', function () {
 
     $senderTwo = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-ui-two@speakloud.test',
+        'email' => 'sender-ui-two@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -141,7 +141,7 @@ test('claims page disables accept when schedule is at capacity', function () {
 
     $senderThree = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-ui-three@speakloud.test',
+        'email' => 'sender-ui-three@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

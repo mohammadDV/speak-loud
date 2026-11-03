@@ -44,7 +44,7 @@ mount(function () {
 
     Seo::share([
         'seoTitle' => 'Claims',
-        'seoDescription' => 'Manage your SpeakLoud schedule claims.',
+        'seoDescription' => 'Manage your SpeakLoudMate schedule claims.',
         'seoUrl' => route('claims'),
         'seoRobots' => 'noindex, nofollow',
     ]);

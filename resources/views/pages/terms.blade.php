@@ -1,19 +1,19 @@
 <x-marketing-page
     title="Terms of Service"
     heading="Terms of Service & User Agreement"
-    description="Rules, limitations of liability, chat retention, privacy, and security policies for using SpeakLoud."
+    description="Rules, limitations of liability, chat retention, privacy, and security policies for using SpeakLoudMate."
 >
     <p class="text-sm text-[#3D2B1F]/50 -mt-4 mb-8">Last updated: {{ config('legal.terms_version') }}</p>
 
     <p>
-        These Terms of Service and User Agreement (“Terms”) govern your access to and use of SpeakLoud
+        These Terms of Service and User Agreement (“Terms”) govern your access to and use of SpeakLoudMate
         (“we”, “us”, “our”). By creating an account or using the service, you agree to these Terms.
-        If you do not agree, do not register or use SpeakLoud.
+        If you do not agree, do not register or use SpeakLoudMate.
     </p>
 
-    <h2 class="font-bold text-[#3D2B1F]">1. What SpeakLoud provides</h2>
+    <h2 class="font-bold text-[#3D2B1F]">1. What SpeakLoudMate provides</h2>
     <p>
-        SpeakLoud is a platform that helps language learners discover practice partners, publish
+        SpeakLoudMate is a platform that helps language learners discover practice partners, publish
         availability, send claims, and coordinate through messaging. We do not provide language
         instruction, payment processing between members, or guarantees about any user’s identity,
         intentions, or conduct.
@@ -21,14 +21,14 @@
 
     <h2 class="font-bold text-[#3D2B1F]">2. Payments and money between users</h2>
     <p>
-        <strong>SpeakLoud is not involved in payments between users.</strong> If another member asks you
+        <strong>SpeakLoudMate is not involved in payments between users.</strong> If another member asks you
         for money, gifts, subscriptions, crypto, wire transfers, or any form of payment, that request
         is solely between you and that person. We do not verify payment requests, collect fees on behalf
         of users, or mediate financial disputes.
     </p>
     <p>
         You are responsible for your own financial decisions. Never send money to someone you met on
-        SpeakLoud unless you fully trust them and understand the risks.
+        SpeakLoudMate unless you fully trust them and understand the risks.
     </p>
 
     <h2 class="font-bold text-[#3D2B1F]">3. Links and external content</h2>
@@ -48,13 +48,13 @@
     </p>
     <p>
         If you believe you are a victim of fraud, contact local authorities and your financial institution
-        immediately. You can also report the user through SpeakLoud and email
-        <a href="mailto:support@speakloud.app" class="text-[#FF8C42] font-semibold hover:underline">support@speakloud.app</a>.
+        immediately. You can also report the user through SpeakLoudMate and email
+        <a href="mailto:support@speakloudmate.app" class="text-[#FF8C42] font-semibold hover:underline">support@speakloudmate.app</a>.
     </p>
 
     <h2 class="font-bold text-[#3D2B1F]">5. Chat and message retention</h2>
     <p>
-        Messaging on SpeakLoud is provided for coordination around practice sessions. Chat history is
+        Messaging on SpeakLoudMate is provided for coordination around practice sessions. Chat history is
         <strong>temporary</strong>. We may archive, restrict access to, or delete messages after approximately
         <strong>six (6) months</strong>, or sooner if required for security, legal compliance, or system
         maintenance. Do not rely on chat as permanent storage—keep your own records if needed.
@@ -62,10 +62,10 @@
 
     <h2 class="font-bold text-[#3D2B1F]">6. Your account and acceptable use</h2>
     <ul>
-        <li>You must be at least 13 years old (or the minimum age required in your country) to use SpeakLoud.</li>
+        <li>You must be at least 13 years old (or the minimum age required in your country) to use SpeakLoudMate.</li>
         <li>Provide accurate registration information and keep your credentials secure.</li>
         <li>Do not harass, threaten, spam, or post illegal content.</li>
-        <li>Do not use SpeakLoud for unsolicited commercial solicitation or pyramid schemes.</li>
+        <li>Do not use SpeakLoudMate for unsolicited commercial solicitation or pyramid schemes.</li>
         <li>Respect other members’ blocks and reports; attempts to evade blocks may result in suspension.</li>
     </ul>
 
@@ -92,14 +92,14 @@
 
     <h2 class="font-bold text-[#3D2B1F]">9. Intellectual property</h2>
     <p>
-        SpeakLoud’s name, branding, and software are owned by us or our licensors. You retain rights to
+        SpeakLoudMate’s name, branding, and software are owned by us or our licensors. You retain rights to
         content you submit, but grant us a license to host and display it as needed to operate the service.
     </p>
 
     <h2 class="font-bold text-[#3D2B1F]">10. Disclaimers and limitation of liability</h2>
     <p>
         THE SERVICE IS PROVIDED “AS IS” AND “AS AVAILABLE” WITHOUT WARRANTIES OF ANY KIND. TO THE
-        MAXIMUM EXTENT PERMITTED BY LAW, SPEAKLOUD AND ITS OPERATORS ARE NOT LIABLE FOR INDIRECT,
+        MAXIMUM EXTENT PERMITTED BY LAW, SPEAKLOUDMATE AND ITS OPERATORS ARE NOT LIABLE FOR INDIRECT,
         INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR FOR LOSS OF PROFITS, DATA, OR
         GOODWILL ARISING FROM YOUR USE OF THE SERVICE OR INTERACTIONS WITH OTHER USERS.
     </p>
@@ -119,7 +119,7 @@
     <h2 class="font-bold text-[#3D2B1F]">12. Contact</h2>
     <p>
         Questions about these Terms:
-        <a href="mailto:legal@speakloud.app" class="text-[#FF8C42] font-semibold hover:underline">legal@speakloud.app</a>.
+        <a href="mailto:legal@speakloudmate.app" class="text-[#FF8C42] font-semibold hover:underline">legal@speakloudmate.app</a>.
         General support:
         <a href="{{ route('support') }}" class="text-[#FF8C42] font-semibold hover:underline">Support</a>.
     </p>

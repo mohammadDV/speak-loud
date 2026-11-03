@@ -21,7 +21,7 @@ mount(function () {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SpeakLoud — Practice languages with real people</title>
+    <title>SpeakLoudMate — Practice languages with real people</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased">
@@ -33,7 +33,7 @@ mount(function () {
         {{-- Logo --}}
         <a href="/" class="flex items-center gap-2 shrink-0">
             <span class="w-7 h-7 rounded-lg bg-[#FF8C42] text-white font-black text-sm flex items-center justify-center leading-none select-none">S</span>
-            <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoud</span>
+            <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoudMate</span>
         </a>
 
         {{-- Nav links --}}
@@ -254,7 +254,7 @@ mount(function () {
 {{-- ─── Footer ─────────────────────────────────────────────── --}}
 <footer class="border-t border-black/[0.06] py-6">
     <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-        <span>© {{ date('Y') }} SpeakLoud</span>
+        <span>© {{ date('Y') }} SpeakLoudMate</span>
         <div class="flex gap-5">
             <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
             <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>

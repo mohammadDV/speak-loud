@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class Seo
 {
-    public const SITE_NAME = 'SpeakLoud';
+    public const SITE_NAME = 'SpeakLoudMate';
 
     public static function pageTitle(?string $pageTitle): string
     {
@@ -29,7 +29,7 @@ class Seo
 
     public static function defaultDescription(): string
     {
-        return 'SpeakLoud connects language learners with partners for scheduled practice sessions. Publish slots, accept claims, and practice with real people.';
+        return 'SpeakLoudMate connects language learners with partners for scheduled practice sessions. Publish slots, accept claims, and practice with real people.';
     }
 
     public static function defaultImage(): string
@@ -118,7 +118,7 @@ class Seo
 
         self::share([
             'seoTitle' => 'FAQ',
-            'seoDescription' => 'Answers to common questions about SpeakLoud schedules, claims, accounts, and safety.',
+            'seoDescription' => 'Answers to common questions about SpeakLoudMate schedules, claims, accounts, and safety.',
             'seoUrl' => route('faq.index'),
             'seoJsonLd' => [
                 self::organizationSchema(),
@@ -142,7 +142,7 @@ class Seo
         if ($isPrivate) {
             self::share([
                 'seoTitle' => $displayName,
-                'seoDescription' => 'This SpeakLoud profile is private.',
+                'seoDescription' => 'This SpeakLoudMate profile is private.',
                 'seoImage' => self::defaultImage(),
                 'seoImageAlt' => self::SITE_NAME,
                 'seoUrl' => route('users.show', $profile->profile_slug),
@@ -160,7 +160,7 @@ class Seo
         $bio = trim(strip_tags((string) $profile->bio));
         $description = $bio !== ''
             ? self::descriptionFromText($bio)
-            : "{$displayName} on SpeakLoud — practice languages with real people.";
+            : "{$displayName} on SpeakLoudMate — practice languages with real people.";
         $image = $profile->profileImageUrl()
             ?? $profile->backgroundImageUrl()
             ?? self::defaultImage();

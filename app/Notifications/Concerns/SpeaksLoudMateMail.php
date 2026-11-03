@@ -6,9 +6,9 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Notifications\Messages\MailMessage;
 
-trait SpeaksLoudMail
+trait SpeaksLoudMateMail
 {
-    protected function speakLoudGreeting(object $notifiable): string
+    protected function speakLoudMateGreeting(object $notifiable): string
     {
         $name = null;
 
@@ -28,10 +28,10 @@ trait SpeaksLoudMail
         return "Hi {$label},";
     }
 
-    protected function withSpeakLoudVoice(MailMessage $mail, object $notifiable): MailMessage
+    protected function withSpeakLoudMateVoice(MailMessage $mail, object $notifiable): MailMessage
     {
         return $mail
-            ->greeting($this->speakLoudGreeting($notifiable))
-            ->salutation("Talk soon,\nThe SpeakLoud team");
+            ->greeting($this->speakLoudMateGreeting($notifiable))
+            ->salutation("Talk soon,\nThe SpeakLoudMate team");
     }
 }

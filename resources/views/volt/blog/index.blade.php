@@ -47,7 +47,7 @@ $loadMorePostsFromScroll = function () {
 mount(function () {
     Seo::share([
         'seoTitle'       => 'Blog',
-        'seoDescription' => 'Tips for language practice, community stories, and product updates from SpeakLoud.',
+        'seoDescription' => 'Tips for language practice, community stories, and product updates from SpeakLoudMate.',
         'seoUrl'         => route('blog.index'),
     ]);
 
@@ -86,7 +86,7 @@ title(fn () => Seo::pageTitle('Blog'));
                                 <p class="text-sm text-[#3D2B1F]/60 mt-1 line-clamp-2">{{ Str::limit(strip_tags($post->excerpt), 100) }}</p>
                             @endif
                             <p class="text-xs text-[#3D2B1F]/40 mt-3">
-                                {{ $post->author->profile->display_name ?? 'SpeakLoud' }}
+                                {{ $post->author->profile->display_name ?? 'SpeakLoudMate' }}
                                 · {{ $post->published_at?->format('M j, Y') }}
                             </p>
                         </div>

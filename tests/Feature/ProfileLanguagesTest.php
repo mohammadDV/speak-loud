@@ -14,7 +14,7 @@ test('user can save languages on profile edit', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'languages-save@speakloud.test',
+        'email' => 'languages-save@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -49,7 +49,7 @@ test('profile edit rejects duplicate language and type combinations', function (
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'languages-dup@speakloud.test',
+        'email' => 'languages-dup@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -78,7 +78,7 @@ test('profile overview shows saved languages', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'languages-overview@speakloud.test',
+        'email' => 'languages-overview@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

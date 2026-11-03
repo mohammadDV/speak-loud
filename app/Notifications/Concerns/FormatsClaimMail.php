@@ -11,7 +11,7 @@ trait FormatsClaimMail
     protected function counterpartName(?User $user): string
     {
         if ($user === null) {
-            return 'a SpeakLoud user';
+            return 'a SpeakLoudMate user';
         }
 
         $user->loadMissing('profile');
@@ -26,7 +26,7 @@ trait FormatsClaimMail
             return $profile->username;
         }
 
-        return $user->email ?? 'a SpeakLoud user';
+        return $user->email ?? 'a SpeakLoudMate user';
     }
 
     protected function scheduleContext(Claim $claim): ?string

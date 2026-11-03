@@ -58,8 +58,8 @@ function scheduleAuthSchedule(User $host, string $title = 'Host private title'):
 }
 
 test('user cannot update another users schedule', function () {
-    $host = scheduleAuthUser('host-update@speakloud.test', 'hostupdate');
-    $attacker = scheduleAuthUser('attacker-update@speakloud.test', 'attackerupdate');
+    $host = scheduleAuthUser('host-update@speakloudmate.test', 'hostupdate');
+    $attacker = scheduleAuthUser('attacker-update@speakloudmate.test', 'attackerupdate');
     $schedule = scheduleAuthSchedule($host);
 
     expect(fn () => app(UpdateSchedule::class)->execute($attacker->id, $schedule->id, [
@@ -77,8 +77,8 @@ test('user cannot update another users schedule', function () {
 });
 
 test('user cannot delete another users schedule', function () {
-    $host = scheduleAuthUser('host-delete@speakloud.test', 'hostdelete');
-    $attacker = scheduleAuthUser('attacker-delete@speakloud.test', 'attackerdelete');
+    $host = scheduleAuthUser('host-delete@speakloudmate.test', 'hostdelete');
+    $attacker = scheduleAuthUser('attacker-delete@speakloudmate.test', 'attackerdelete');
     $schedule = scheduleAuthSchedule($host);
 
     expect(fn () => app(DeleteSchedule::class)->execute($attacker->id, $schedule->id))
@@ -88,9 +88,9 @@ test('user cannot delete another users schedule', function () {
 });
 
 test('outsider schedule show snapshot does not leak claims or host title', function () {
-    $host = scheduleAuthUser('host-leak@speakloud.test', 'hostleak');
-    $claimer = scheduleAuthUser('claimer-leak@speakloud.test', 'claimerleak');
-    $outsider = scheduleAuthUser('outsider-leak@speakloud.test', 'outsiderleak');
+    $host = scheduleAuthUser('host-leak@speakloudmate.test', 'hostleak');
+    $claimer = scheduleAuthUser('claimer-leak@speakloudmate.test', 'claimerleak');
+    $outsider = scheduleAuthUser('outsider-leak@speakloudmate.test', 'outsiderleak');
     $schedule = scheduleAuthSchedule($host, 'Secret Host Title');
 
     Claim::create([
@@ -108,7 +108,7 @@ test('outsider schedule show snapshot does not leak claims or host title', funct
 
     expect($html)->not->toContain('Secret Host Title')
         ->and($html)->not->toContain('claimerleak')
-        ->and($html)->not->toContain('claimer-leak@speakloud.test');
+        ->and($html)->not->toContain('claimer-leak@speakloudmate.test');
 
     $payload = $component->get('schedule');
     expect($payload->relationLoaded('claims'))->toBeFalse();

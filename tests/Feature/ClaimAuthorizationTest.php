@@ -60,9 +60,9 @@ function claimAuthSchedule(User $host): Schedule
 }
 
 test('user cannot accept another users claim', function () {
-    $host = claimAuthUser('host-accept@speakloud.test', 'hostaccept');
-    $sender = claimAuthUser('sender-accept@speakloud.test', 'senderaccept');
-    $attacker = claimAuthUser('attacker-accept@speakloud.test', 'attackeraccept');
+    $host = claimAuthUser('host-accept@speakloudmate.test', 'hostaccept');
+    $sender = claimAuthUser('sender-accept@speakloudmate.test', 'senderaccept');
+    $attacker = claimAuthUser('attacker-accept@speakloudmate.test', 'attackeraccept');
     $schedule = claimAuthSchedule($host);
 
     $claim = Claim::create([
@@ -80,9 +80,9 @@ test('user cannot accept another users claim', function () {
 });
 
 test('user cannot reject another users claim', function () {
-    $host = claimAuthUser('host-reject@speakloud.test', 'hostreject');
-    $sender = claimAuthUser('sender-reject@speakloud.test', 'senderreject');
-    $attacker = claimAuthUser('attacker-reject@speakloud.test', 'attackerreject');
+    $host = claimAuthUser('host-reject@speakloudmate.test', 'hostreject');
+    $sender = claimAuthUser('sender-reject@speakloudmate.test', 'senderreject');
+    $attacker = claimAuthUser('attacker-reject@speakloudmate.test', 'attackerreject');
     $schedule = claimAuthSchedule($host);
 
     $claim = Claim::create([
@@ -100,8 +100,8 @@ test('user cannot reject another users claim', function () {
 });
 
 test('cannot send claim to blocked user', function () {
-    $host = claimAuthUser('host-block@speakloud.test', 'hostblock');
-    $sender = claimAuthUser('sender-block@speakloud.test', 'senderblock');
+    $host = claimAuthUser('host-block@speakloudmate.test', 'hostblock');
+    $sender = claimAuthUser('sender-block@speakloudmate.test', 'senderblock');
     $schedule = claimAuthSchedule($host);
 
     DB::table('user_blocks')->insert([
@@ -119,8 +119,8 @@ test('cannot send claim to blocked user', function () {
 });
 
 test('cannot send direct message to private profile', function () {
-    $host = claimAuthUser('host-private@speakloud.test', 'hostprivate', ['is_private' => true]);
-    $sender = claimAuthUser('sender-private@speakloud.test', 'senderprivate');
+    $host = claimAuthUser('host-private@speakloudmate.test', 'hostprivate', ['is_private' => true]);
+    $sender = claimAuthUser('sender-private@speakloudmate.test', 'senderprivate');
 
     expect(fn () => app(SendClaim::class)->execute([
         'sender_id' => $sender->id,
@@ -130,8 +130,8 @@ test('cannot send direct message to private profile', function () {
 });
 
 test('can send schedule claim to private host', function () {
-    $host = claimAuthUser('host-private-slot@speakloud.test', 'hostprivateslot', ['is_private' => true]);
-    $sender = claimAuthUser('sender-private-slot@speakloud.test', 'senderprivateslot');
+    $host = claimAuthUser('host-private-slot@speakloudmate.test', 'hostprivateslot', ['is_private' => true]);
+    $sender = claimAuthUser('sender-private-slot@speakloudmate.test', 'senderprivateslot');
     $schedule = claimAuthSchedule($host);
 
     $claim = app(SendClaim::class)->execute([
@@ -146,9 +146,9 @@ test('can send schedule claim to private host', function () {
 });
 
 test('cannot send claim with mismatched schedule and receiver', function () {
-    $host = claimAuthUser('host-mismatch@speakloud.test', 'hostmismatch');
-    $other = claimAuthUser('other-mismatch@speakloud.test', 'othermismatch');
-    $sender = claimAuthUser('sender-mismatch@speakloud.test', 'sendermismatch');
+    $host = claimAuthUser('host-mismatch@speakloudmate.test', 'hostmismatch');
+    $other = claimAuthUser('other-mismatch@speakloudmate.test', 'othermismatch');
+    $sender = claimAuthUser('sender-mismatch@speakloudmate.test', 'sendermismatch');
     $schedule = claimAuthSchedule($host);
 
     expect(fn () => app(SendClaim::class)->execute([
@@ -160,11 +160,11 @@ test('cannot send claim with mismatched schedule and receiver', function () {
 });
 
 test('private host schedules still appear on discover', function () {
-    $host = claimAuthUser('host-discover-private@speakloud.test', 'hostdiscpriv', [
+    $host = claimAuthUser('host-discover-private@speakloudmate.test', 'hostdiscpriv', [
         'is_private' => true,
         'display_name' => 'Private Discover Host',
     ]);
-    $viewer = claimAuthUser('viewer-discover-private@speakloud.test', 'viewerdiscpriv');
+    $viewer = claimAuthUser('viewer-discover-private@speakloudmate.test', 'viewerdiscpriv');
     claimAuthSchedule($host);
 
     Volt::actingAs($viewer)->test('discover.index')

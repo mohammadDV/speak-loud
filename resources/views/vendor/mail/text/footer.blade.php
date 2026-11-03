@@ -1,3 +1,3 @@
-SpeakLoud · practice speaking out loud
+SpeakLoudMate · practice speaking out loud
 {{ config('app.url') }}
-© {{ date('Y') }} SpeakLoud
+© {{ date('Y') }} SpeakLoudMate

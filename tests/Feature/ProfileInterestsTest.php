@@ -13,7 +13,7 @@ test('user can save interests on profile edit', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'interests-save@speakloud.test',
+        'email' => 'interests-save@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -44,7 +44,7 @@ test('profile overview shows saved interests', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'interests-overview@speakloud.test',
+        'email' => 'interests-overview@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

@@ -11,7 +11,7 @@ mount(function () {
 
     Seo::share([
         'seoTitle'       => 'Verify email',
-        'seoDescription' => 'Verify your SpeakLoud email address to unlock your account.',
+        'seoDescription' => 'Verify your SpeakLoudMate email address to unlock your account.',
         'seoUrl'         => route('verification.notice'),
         'seoRobots'      => 'noindex, nofollow',
     ]);
@@ -58,7 +58,7 @@ $resend = function () {
         </div>
 
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoud</h1>
+            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoudMate</h1>
             <p class="text-[#3D2B1F]/60 mt-1">Verify your email address</p>
         </div>
 

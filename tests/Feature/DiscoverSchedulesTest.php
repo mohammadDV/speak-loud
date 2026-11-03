@@ -17,7 +17,7 @@ test('guests can browse discover without logging in', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-guest@speakloud.test',
+        'email' => 'host-guest@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -66,7 +66,7 @@ test('discover page lists other users open schedules', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-discover@speakloud.test',
+        'email' => 'host-discover@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -81,7 +81,7 @@ test('discover page lists other users open schedules', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-discover@speakloud.test',
+        'email' => 'viewer-discover@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -122,7 +122,7 @@ test('discover claim buttons scope loading to the clicked schedule', function ()
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-claim-loading@speakloud.test',
+        'email' => 'host-claim-loading@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -137,7 +137,7 @@ test('discover claim buttons scope loading to the clicked schedule', function ()
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-claim-loading@speakloud.test',
+        'email' => 'viewer-claim-loading@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -188,7 +188,7 @@ test('discover page can filter slots by host interests', function () {
 
     $musicHost = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-music@speakloud.test',
+        'email' => 'host-music@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -197,7 +197,7 @@ test('discover page can filter slots by host interests', function () {
 
     $travelHost = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-travel@speakloud.test',
+        'email' => 'host-travel@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -206,7 +206,7 @@ test('discover page can filter slots by host interests', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-interest@speakloud.test',
+        'email' => 'viewer-interest@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -268,7 +268,7 @@ test('discover apply my interests sets filter from viewer profile', function () 
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-gaming@speakloud.test',
+        'email' => 'host-gaming@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -277,7 +277,7 @@ test('discover apply my interests sets filter from viewer profile', function () 
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-gaming@speakloud.test',
+        'email' => 'viewer-gaming@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -318,7 +318,7 @@ test('discover page can send a claim for a schedule', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-claim@speakloud.test',
+        'email' => 'host-claim@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -333,7 +333,7 @@ test('discover page can send a claim for a schedule', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-claim@speakloud.test',
+        'email' => 'viewer-claim@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -388,7 +388,7 @@ test('discover page still allows claim when another user has a pending claim and
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-multi@speakloud.test',
+        'email' => 'host-multi@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -403,7 +403,7 @@ test('discover page still allows claim when another user has a pending claim and
 
     $existingClaimant = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'claimant-multi@speakloud.test',
+        'email' => 'claimant-multi@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -418,7 +418,7 @@ test('discover page still allows claim when another user has a pending claim and
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-multi@speakloud.test',
+        'email' => 'viewer-multi@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -475,7 +475,7 @@ test('discover page hides schedules with no remaining spots', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-full@speakloud.test',
+        'email' => 'host-full@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -490,7 +490,7 @@ test('discover page hides schedules with no remaining spots', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-full@speakloud.test',
+        'email' => 'viewer-full@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -521,7 +521,7 @@ test('discover page hides schedules with no remaining spots', function () {
 
     $applicant = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'applicant-full@speakloud.test',
+        'email' => 'applicant-full@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -569,7 +569,7 @@ test('discover page hides schedules while claim is pending or accepted', functio
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-hide@speakloud.test',
+        'email' => 'host-hide@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -584,7 +584,7 @@ test('discover page hides schedules while claim is pending or accepted', functio
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-hide@speakloud.test',
+        'email' => 'viewer-hide@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -654,7 +654,7 @@ test('discover page shows schedule again after claim is declined', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-reject@speakloud.test',
+        'email' => 'host-reject@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -669,7 +669,7 @@ test('discover page shows schedule again after claim is declined', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-reject@speakloud.test',
+        'email' => 'viewer-reject@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -722,7 +722,7 @@ test('discover page load more appends additional open schedules', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-loadmore@speakloud.test',
+        'email' => 'host-loadmore@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

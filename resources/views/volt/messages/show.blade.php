@@ -34,7 +34,7 @@ mount(function (int $id) {
 
     Seo::share([
         'seoTitle' => 'Conversation',
-        'seoDescription' => 'SpeakLoud private conversation.',
+        'seoDescription' => 'SpeakLoudMate private conversation.',
         'seoUrl' => route('messages.show', $id),
         'seoRobots' => 'noindex, nofollow',
     ]);

@@ -35,7 +35,7 @@
 
     <footer class="border-t border-black/[0.06] py-6 mt-12">
         <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-            <span>© {{ date('Y') }} SpeakLoud</span>
+            <span>© {{ date('Y') }} SpeakLoudMate</span>
             <div class="flex gap-5">
                 <a href="{{ route('blog.index') }}" class="hover:text-[#3D2B1F] transition-colors">Blog</a>
                 <a href="{{ route('faq.index') }}" class="hover:text-[#3D2B1F] transition-colors">FAQ</a>

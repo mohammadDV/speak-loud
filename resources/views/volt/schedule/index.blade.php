@@ -32,7 +32,7 @@ state([
 mount(function () {
     Seo::share([
         'seoTitle' => 'My schedule',
-        'seoDescription' => 'Manage your SpeakLoud practice slots.',
+        'seoDescription' => 'Manage your SpeakLoudMate practice slots.',
         'seoUrl' => route('schedule'),
         'seoRobots' => 'noindex, nofollow',
     ]);

@@ -27,7 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('SpeakLoud Admin')
+            ->brandName('SpeakLoudMate Admin')
             ->colors([
                 'primary' => Color::Amber,
             ])

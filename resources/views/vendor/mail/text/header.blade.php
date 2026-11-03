@@ -1,2 +1,2 @@
-SpeakLoud
+SpeakLoudMate
 {{ $url }}

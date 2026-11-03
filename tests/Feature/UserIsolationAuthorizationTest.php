@@ -38,9 +38,9 @@ function isolationUser(string $email, string $username): User
 }
 
 test('user cannot withdraw another users claim', function () {
-    $host = isolationUser('host-withdraw@speakloud.test', 'hostwithdraw');
-    $sender = isolationUser('sender-withdraw@speakloud.test', 'senderwithdraw');
-    $attacker = isolationUser('attacker-withdraw@speakloud.test', 'attackerwithdraw');
+    $host = isolationUser('host-withdraw@speakloudmate.test', 'hostwithdraw');
+    $sender = isolationUser('sender-withdraw@speakloudmate.test', 'senderwithdraw');
+    $attacker = isolationUser('attacker-withdraw@speakloudmate.test', 'attackerwithdraw');
 
     $schedule = Schedule::create([
         'user_id' => $host->id,
@@ -80,8 +80,8 @@ test('user cannot withdraw another users claim', function () {
 });
 
 test('sender can withdraw their own pending claim', function () {
-    $host = isolationUser('host-own-withdraw@speakloud.test', 'hostownwithdraw');
-    $sender = isolationUser('sender-own-withdraw@speakloud.test', 'senderownwithdraw');
+    $host = isolationUser('host-own-withdraw@speakloudmate.test', 'hostownwithdraw');
+    $sender = isolationUser('sender-own-withdraw@speakloudmate.test', 'senderownwithdraw');
 
     $claim = Claim::create([
         'sender_id' => $sender->id,
@@ -97,9 +97,9 @@ test('sender can withdraw their own pending claim', function () {
 });
 
 test('user cannot open another users direct conversation', function () {
-    $alice = isolationUser('alice-msg@speakloud.test', 'alicemsg');
-    $bob = isolationUser('bob-msg@speakloud.test', 'bobmsg');
-    $attacker = isolationUser('attacker-msg@speakloud.test', 'attackermsg');
+    $alice = isolationUser('alice-msg@speakloudmate.test', 'alicemsg');
+    $bob = isolationUser('bob-msg@speakloudmate.test', 'bobmsg');
+    $attacker = isolationUser('attacker-msg@speakloudmate.test', 'attackermsg');
 
     $conversation = Conversation::create([
         'type' => 'direct',
@@ -119,9 +119,9 @@ test('user cannot open another users direct conversation', function () {
 });
 
 test('user cannot send a message into another users conversation via livewire state', function () {
-    $alice = isolationUser('alice-send@speakloud.test', 'alicesend');
-    $bob = isolationUser('bob-send@speakloud.test', 'bobsend');
-    $attacker = isolationUser('attacker-send@speakloud.test', 'attackersend');
+    $alice = isolationUser('alice-send@speakloudmate.test', 'alicesend');
+    $bob = isolationUser('bob-send@speakloudmate.test', 'bobsend');
+    $attacker = isolationUser('attacker-send@speakloudmate.test', 'attackersend');
 
     $conversation = Conversation::create([
         'type' => 'direct',
@@ -139,9 +139,9 @@ test('user cannot send a message into another users conversation via livewire st
 });
 
 test('outsider can view an active schedule details page but not members or group chat', function () {
-    $host = isolationUser('host-sched@speakloud.test', 'hostsched');
-    $member = isolationUser('member-sched@speakloud.test', 'membersched');
-    $outsider = isolationUser('outsider-sched@speakloud.test', 'outsidersched');
+    $host = isolationUser('host-sched@speakloudmate.test', 'hostsched');
+    $member = isolationUser('member-sched@speakloudmate.test', 'membersched');
+    $outsider = isolationUser('outsider-sched@speakloudmate.test', 'outsidersched');
 
     $schedule = Schedule::create([
         'user_id' => $host->id,
@@ -181,8 +181,8 @@ test('outsider can view an active schedule details page but not members or group
 });
 
 test('pending claimer can view schedule but not group chat', function () {
-    $host = isolationUser('host-pending@speakloud.test', 'hostpending');
-    $claimer = isolationUser('claimer-pending@speakloud.test', 'claimerpending');
+    $host = isolationUser('host-pending@speakloudmate.test', 'hostpending');
+    $claimer = isolationUser('claimer-pending@speakloudmate.test', 'claimerpending');
 
     $schedule = Schedule::create([
         'user_id' => $host->id,

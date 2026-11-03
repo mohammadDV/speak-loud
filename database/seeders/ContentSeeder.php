@@ -39,8 +39,8 @@ class ContentSeeder extends Seeder
         $categories = FaqCategory::pluck('id', 'slug');
 
         $faqs = [
-            ['getting-started', 'What is SpeakLoud?', 'SpeakLoud connects language learners with partners for scheduled or direct practice sessions.'],
-            ['getting-started', 'Is SpeakLoud free?', 'Yes. Core features are free while we grow the community.'],
+            ['getting-started', 'What is SpeakLoudMate?', 'SpeakLoudMate connects language learners with partners for scheduled or direct practice sessions.'],
+            ['getting-started', 'Is SpeakLoudMate free?', 'Yes. Core features are free while we grow the community.'],
             ['schedules-claims', 'How do I publish a time slot?', 'Open Schedule, create a recurring or one-off slot, and set your practice language.'],
             ['schedules-claims', 'What happens when I accept a claim?', 'You share one chat thread with that person to coordinate before your session.'],
             ['account-safety', 'How do I block someone?', 'Visit their profile and use the block option. Blocked users never appear in search.'],
@@ -143,13 +143,13 @@ class ContentSeeder extends Seeder
             ['category' => 'tips', 'title' => 'Making the most of your first session', 'excerpt' => 'A simple structure keeps first conversations comfortable and useful.', 'body' => '<p>Warm up for five minutes, agree on a topic, and leave time for feedback at the end.</p>', 'cover' => 'images/blog/first-session.svg'],
             ['category' => 'community', 'title' => 'Why recurring slots work better than one-offs', 'excerpt' => 'Consistency beats intensity when you are building long-term fluency.', 'body' => '<p>Weekly slots build habit and trust with the same partners over time.</p>', 'cover' => 'images/blog/recurring.svg'],
             ['category' => 'community', 'title' => 'How shared interests make practice easier', 'excerpt' => 'Talking about something you both enjoy lowers anxiety from day one.', 'body' => '<p>Add interests to your profile so others can find you on Discover.</p>', 'cover' => 'images/blog/interests.svg'],
-            ['category' => 'updates', 'title' => 'Welcome to SpeakLoud schedules and group chat', 'excerpt' => 'Create slots, accept claims, and coordinate with your group in one place.', 'body' => '<p>Hosts publish availability; accepted members join a group chat for each slot.</p>', 'cover' => 'images/blog/welcome.svg'],
+            ['category' => 'updates', 'title' => 'Welcome to SpeakLoudMate schedules and group chat', 'excerpt' => 'Create slots, accept claims, and coordinate with your group in one place.', 'body' => '<p>Hosts publish availability; accepted members join a group chat for each slot.</p>', 'cover' => 'images/blog/welcome.svg'],
             ['category' => 'tips', 'title' => 'Setting session rules that partners actually read', 'excerpt' => 'Clear notes on your slot reduce no-shows and awkward mismatches.', 'body' => '<p>Mention camera on/off, language split, and tools in your session rules field.</p>', 'cover' => 'images/blog/session-rules.svg'],
             ['category' => 'tips', 'title' => 'Building confidence before you speak', 'excerpt' => 'Small habits before each call make speaking feel less intimidating.', 'body' => '<p>Review your topic, breathe, and remember that partners are learners too.</p>'],
             ['category' => 'tips', 'title' => 'How to handle awkward silences', 'excerpt' => 'Pauses are normal — have a few questions ready to restart the flow.', 'body' => '<p>Keep a short list of follow-up questions about hobbies, travel, or daily routines.</p>'],
             ['category' => 'tips', 'title' => 'Choosing between video and audio-only calls', 'excerpt' => 'Pick the format that matches your energy and privacy needs.', 'body' => '<p>State your preference in session rules so claims align with your comfort level.</p>'],
             ['category' => 'tips', 'title' => 'Writing a profile bio that gets claims', 'excerpt' => 'Be specific about languages, level, and what you enjoy discussing.', 'body' => '<p>Two or three concrete sentences beat a long list of vague goals.</p>'],
-            ['category' => 'updates', 'title' => 'Understanding UTC times on SpeakLoud', 'excerpt' => 'All slot times are stored in UTC so partners worldwide see the same moment.', 'body' => '<p>Compare UTC with your local clock when you publish or claim a slot.</p>'],
+            ['category' => 'updates', 'title' => 'Understanding UTC times on SpeakLoudMate', 'excerpt' => 'All slot times are stored in UTC so partners worldwide see the same moment.', 'body' => '<p>Compare UTC with your local clock when you publish or claim a slot.</p>'],
             ['category' => 'community', 'title' => 'Group chat etiquette for hosts', 'excerpt' => 'A short welcome message sets tone before the session starts.', 'body' => '<p>Greet new members, confirm the meeting link, and recap language split expectations.</p>'],
             ['category' => 'tips', 'title' => 'When to decline a claim politely', 'excerpt' => 'It is okay to say no — a kind note keeps the community respectful.', 'body' => '<p>Thank the learner, mention a mismatch if helpful, and invite them to try another slot.</p>'],
             ['category' => 'community', 'title' => 'Practicing two languages in one week', 'excerpt' => 'Alternate focus days so neither language gets neglected.', 'body' => '<p>Publish separate slots per language instead of mixing both in one session.</p>'],
@@ -168,7 +168,7 @@ class ContentSeeder extends Seeder
             'making-the-most-of-your-first-session' => 'images/blog/first-session.svg',
             'why-recurring-slots-work-better-than-one-offs' => 'images/blog/recurring.svg',
             'how-shared-interests-make-practice-easier' => 'images/blog/interests.svg',
-            'welcome-to-speakloud-schedules-and-group-chat' => 'images/blog/welcome.svg',
+            'welcome-to-speakloudmate-schedules-and-group-chat' => 'images/blog/welcome.svg',
             'setting-session-rules-that-partners-actually-read' => 'images/blog/session-rules.svg',
         ];
 

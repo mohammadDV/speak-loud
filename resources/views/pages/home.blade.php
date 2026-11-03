@@ -175,7 +175,7 @@
             <div>
                 <span class="text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">From the blog</span>
                 <h2 class="text-[1.75rem] font-black text-[#3D2B1F] tracking-tight mt-2">Tips for better practice</h2>
-                <p class="text-sm text-[#3D2B1F]/50 mt-1 max-w-md">Guides on finding partners, running sessions, and getting the most from SpeakLoud.</p>
+                <p class="text-sm text-[#3D2B1F]/50 mt-1 max-w-md">Guides on finding partners, running sessions, and getting the most from SpeakLoudMate.</p>
             </div>
             <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[#FF8C42] hover:underline shrink-0">
                 View all posts →
@@ -195,7 +195,7 @@
                             <p class="text-sm text-[#3D2B1F]/55 mt-2 line-clamp-3">{{ strip_tags($post->excerpt) }}</p>
                         @endif
                         <p class="text-xs text-[#3D2B1F]/40 mt-4">
-                            {{ $post->author?->profile?->display_name ?? 'SpeakLoud' }}
+                            {{ $post->author?->profile?->display_name ?? 'SpeakLoudMate' }}
                             · {{ $post->published_at?->format('M j, Y') }}
                         </p>
                     </div>
@@ -227,7 +227,7 @@
 {{-- ─── Footer ─────────────────────────────────────────────── --}}
 <footer class="border-t border-black/[0.06] py-6">
     <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-        <span>© {{ date('Y') }} SpeakLoud</span>
+        <span>© {{ date('Y') }} SpeakLoudMate</span>
         <div class="flex gap-5">
             <a href="{{ route('blog.index') }}" class="hover:text-[#3D2B1F] transition-colors">Blog</a>
             <a href="{{ route('faq.index') }}" class="hover:text-[#3D2B1F] transition-colors">FAQ</a>

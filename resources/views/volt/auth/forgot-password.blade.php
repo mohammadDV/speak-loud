@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\RateLimiter;
 mount(function () {
     Seo::share([
         'seoTitle'       => 'Forgot password',
-        'seoDescription' => 'Reset your SpeakLoud password via email.',
+        'seoDescription' => 'Reset your SpeakLoudMate password via email.',
         'seoUrl'         => route('password.request'),
         'seoRobots'      => 'noindex, nofollow',
     ]);
@@ -50,7 +50,7 @@ $sendResetLink = function () {
 <div class="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoud</h1>
+            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoudMate</h1>
             <p class="text-[#3D2B1F]/60 mt-1">Reset your password</p>
         </div>
 

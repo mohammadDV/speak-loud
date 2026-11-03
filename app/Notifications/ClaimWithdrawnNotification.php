@@ -6,7 +6,7 @@ use App\Enums\NotificationType;
 use App\Models\Claim;
 use App\Models\User;
 use App\Notifications\Concerns\FormatsClaimMail;
-use App\Notifications\Concerns\SpeaksLoudMail;
+use App\Notifications\Concerns\SpeaksLoudMateMail;
 use App\Support\UserWantsNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notification;
 
 class ClaimWithdrawnNotification extends Notification implements ShouldQueue
 {
-    use FormatsClaimMail, Queueable, SpeaksLoudMail;
+    use FormatsClaimMail, Queueable, SpeaksLoudMateMail;
 
     public function __construct(public Claim $claim)
     {
@@ -51,7 +51,7 @@ class ClaimWithdrawnNotification extends Notification implements ShouldQueue
             $mail->line("Schedule: {$scheduleContext}");
         }
 
-        return $this->withSpeakLoudVoice(
+        return $this->withSpeakLoudMateVoice(
             $mail
                 ->action('View claims', $this->claimsUrl())
                 ->line('No further action is needed.'),

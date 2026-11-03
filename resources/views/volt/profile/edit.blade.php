@@ -29,7 +29,7 @@ state([
 mount(function () {
     Seo::share([
         'seoTitle' => 'Edit profile',
-        'seoDescription' => 'Edit your SpeakLoud profile.',
+        'seoDescription' => 'Edit your SpeakLoudMate profile.',
         'seoUrl' => route('profile.edit'),
         'seoRobots' => 'noindex, nofollow',
     ]);

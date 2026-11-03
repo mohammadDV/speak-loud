@@ -22,7 +22,7 @@ function createActiveHostWithSchedule(string $suffix, Language $language): array
 {
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => "host-{$suffix}@speakloud.test",
+        'email' => "host-{$suffix}@speakloudmate.test",
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

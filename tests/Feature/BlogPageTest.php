@@ -8,7 +8,7 @@ use Livewire\Volt\Volt;
 
 test('blog and faq are separate pages', function () {
     Faq::create([
-        'question' => 'What is SpeakLoud?',
+        'question' => 'What is SpeakLoudMate?',
         'answer' => 'A community for language practice.',
         'is_active' => true,
         'sort_order' => 1,
@@ -22,7 +22,7 @@ test('blog and faq are separate pages', function () {
     $this->get(route('faq.index'))
         ->assertOk()
         ->assertSee('Frequently asked questions', false)
-        ->assertSee('What is SpeakLoud?', false)
+        ->assertSee('What is SpeakLoudMate?', false)
         ->assertDontSee('<h1 class="text-2xl font-bold text-[#3D2B1F]">Blog</h1>', false);
 });
 

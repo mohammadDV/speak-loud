@@ -32,7 +32,7 @@ function createClaimPair(string $suffix): array
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => "host-{$suffix}@speakloud.test",
+        'email' => "host-{$suffix}@speakloudmate.test",
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -47,7 +47,7 @@ function createClaimPair(string $suffix): array
 
     $sender = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => "sender-{$suffix}@speakloud.test",
+        'email' => "sender-{$suffix}@speakloudmate.test",
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

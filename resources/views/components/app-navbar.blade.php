@@ -23,9 +23,9 @@
 
 <header class="sticky top-0 z-50 bg-[#FFF8F0]/95 backdrop-blur border-b border-black/[0.06]">
     <div class="max-w-6xl mx-auto px-5 h-[52px] flex items-center justify-between gap-4">
-        <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0" aria-label="SpeakLoud home">
+        <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0" aria-label="SpeakLoudMate home">
             <span class="w-7 h-7 rounded-lg bg-[#FF8C42] text-white font-black text-sm flex items-center justify-center leading-none select-none">S</span>
-            <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoud</span>
+            <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoudMate</span>
         </a>
 
         <nav class="hidden md:flex items-center gap-1 overflow-x-auto">

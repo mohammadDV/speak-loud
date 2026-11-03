@@ -73,8 +73,8 @@ class DemoDataSeeder extends Seeder
         $this->seedBlocksAndReports($users, $admin);
 
         $this->command?->info('Demo data seeded: '.self::USER_COUNT.' users (password: '.self::PASSWORD.').');
-        $this->command?->info('Admin login: admin@speakloud.test / '.self::PASSWORD);
-        $this->command?->info('Sample user: user1@speakloud.test / '.self::PASSWORD);
+        $this->command?->info('Admin login: admin@speakloudmate.test / '.self::PASSWORD);
+        $this->command?->info('Sample user: user1@speakloudmate.test / '.self::PASSWORD);
     }
 
     /** @return Collection<int, User> */
@@ -82,7 +82,7 @@ class DemoDataSeeder extends Seeder
     {
         $users = collect();
 
-        $admin = User::firstOrNew(['email' => 'admin@speakloud.test']);
+        $admin = User::firstOrNew(['email' => 'admin@speakloudmate.test']);
         $admin->forceFill([
             'uuid' => $admin->uuid ?: Str::uuid()->toString(),
             'password' => self::PASSWORD,
@@ -97,7 +97,7 @@ class DemoDataSeeder extends Seeder
             [
                 'username' => 'admin',
                 'profile_slug' => 'admin',
-                'display_name' => 'SpeakLoud Admin',
+                'display_name' => 'SpeakLoudMate Admin',
                 'bio' => 'Platform administrator account for local development.',
                 'nationality' => 'Global',
                 'country_code' => 'US',
@@ -108,7 +108,7 @@ class DemoDataSeeder extends Seeder
         $users->push($admin);
 
         for ($i = 1; $i <= self::USER_COUNT; $i++) {
-            $email = "user{$i}@speakloud.test";
+            $email = "user{$i}@speakloudmate.test";
 
             $user = User::firstOrNew(['email' => $email]);
             if (! $user->exists) {
@@ -368,7 +368,7 @@ class DemoDataSeeder extends Seeder
     private function seedTickets(Collection $users): void
     {
         $categories = TicketCategory::pluck('id');
-        $adminId = User::where('email', 'admin@speakloud.test')->value('id');
+        $adminId = User::where('email', 'admin@speakloudmate.test')->value('id');
 
         foreach ($users->shuffle()->take(12) as $user) {
             $ticket = Ticket::create([

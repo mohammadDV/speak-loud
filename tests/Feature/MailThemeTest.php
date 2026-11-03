@@ -4,7 +4,7 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Notifications\VerifyEmail;
 
-test('verify email renders speakloud branded html', function () {
+test('verify email renders speakloudmate branded html', function () {
     $user = User::factory()->unverified()->create();
 
     UserProfile::create([
@@ -19,9 +19,9 @@ test('verify email renders speakloud branded html', function () {
     expect($html)
         ->toContain('#FF8C42')
         ->toContain('#FFF8F0')
-        ->toContain('SpeakLoud')
+        ->toContain('SpeakLoudMate')
         ->toContain('Instrument Sans')
         ->toContain('Hi Mail Theme,')
-        ->toContain('The SpeakLoud team')
+        ->toContain('The SpeakLoudMate team')
         ->toContain('brand-badge');
 });

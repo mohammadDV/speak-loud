@@ -33,7 +33,7 @@ test('send claim blocks a fourth claim within one hour', function () {
 
     $sender = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-limit@speakloud.test',
+        'email' => 'sender-limit@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -49,7 +49,7 @@ test('send claim blocks a fourth claim within one hour', function () {
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
             'uuid' => (string) Str::uuid(),
-            'email' => "host-limit-{$index}@speakloud.test",
+            'email' => "host-limit-{$index}@speakloudmate.test",
             'password' => '123456789',
             'role' => 'user',
             'status' => 'active',
@@ -110,7 +110,7 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-limit@speakloud.test',
+        'email' => 'viewer-limit@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -126,7 +126,7 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
     $schedules = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
             'uuid' => (string) Str::uuid(),
-            'email' => "host-discover-limit-{$index}@speakloud.test",
+            'email' => "host-discover-limit-{$index}@speakloudmate.test",
             'password' => '123456789',
             'role' => 'user',
             'status' => 'active',
@@ -185,7 +185,7 @@ test('send claim allows another claim after the hourly window expires', function
 
     $sender = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-reset@speakloud.test',
+        'email' => 'sender-reset@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -201,7 +201,7 @@ test('send claim allows another claim after the hourly window expires', function
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
         $host = User::create([
             'uuid' => (string) Str::uuid(),
-            'email' => "host-reset-{$index}@speakloud.test",
+            'email' => "host-reset-{$index}@speakloudmate.test",
             'password' => '123456789',
             'role' => 'user',
             'status' => 'active',

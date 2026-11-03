@@ -1,6 +1,6 @@
-# SpeakLoud — Backend
+# SpeakLoudMate — Backend
 
-[Laravel](https://laravel.com) API and web application for **SpeakLoud** ([speakloud.app](https://speakloud.app)): a language-exchange platform where learners find partners, publish practice slots, send claims, and chat after a match is accepted.
+[Laravel](https://laravel.com) API and web application for **SpeakLoudMate** ([speakloudmate.app](https://speakloudmate.app)): a language-exchange platform where learners find partners, publish practice slots, send claims, and chat after a match is accepted.
 
 ## Stack
 
@@ -69,8 +69,8 @@ Local demo credentials only (`DemoDataSeeder` refuses non-local/testing environm
 
 | Role | Email | Password |
 |------|--------|----------|
-| Admin | `admin@speakloud.test` | `123456789` |
-| Users | `user1@speakloud.test` … `user100@speakloud.test` | `123456789` |
+| Admin | `admin@speakloudmate.test` | `123456789` |
+| Users | `user1@speakloudmate.test` … `user100@speakloudmate.test` | `123456789` |
 
 Reset and reseed (local only — **wipes all data**):
 
@@ -189,7 +189,7 @@ MySQL is exposed on the host via `FORWARD_DB_PORT` in `.env` (default **3309** �
 |---------|---------------------|
 | Host (from Mac) | `127.0.0.1` |
 | Port | `3309` |
-| Database | `speakloud` |
+| Database | `speakloudmate` |
 | User / password | `sail` / `password` |
 
 CLI:
@@ -222,4 +222,4 @@ Feature tests use `RefreshDatabase` (see `tests/Pest.php`). GitHub Actions runs 
 
 ## License
 
-MIT (Laravel application skeleton). SpeakLoud application code is part of the SpeakLoud project.
+MIT (Laravel application skeleton). SpeakLoudMate application code is part of the SpeakLoudMate project.

@@ -16,7 +16,7 @@ test('rejecting a claim creates a conversation with optional decline message', f
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-reject@speakloud.test',
+        'email' => 'host-reject@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -31,7 +31,7 @@ test('rejecting a claim creates a conversation with optional decline message', f
 
     $sender = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-reject@speakloud.test',
+        'email' => 'sender-reject@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

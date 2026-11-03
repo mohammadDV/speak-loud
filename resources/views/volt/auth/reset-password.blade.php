@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 mount(function (string $token) {
     Seo::share([
         'seoTitle'       => 'Reset password',
-        'seoDescription' => 'Choose a new password for your SpeakLoud account.',
+        'seoDescription' => 'Choose a new password for your SpeakLoudMate account.',
         'seoUrl'         => route('password.reset', ['token' => $token]),
         'seoRobots'      => 'noindex, nofollow',
     ]);
@@ -68,7 +68,7 @@ $resetPassword = function () {
 <div class="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoud</h1>
+            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoudMate</h1>
             <p class="text-[#3D2B1F]/60 mt-1">Choose a new password</p>
         </div>
 

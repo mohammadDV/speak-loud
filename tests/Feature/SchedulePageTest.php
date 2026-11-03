@@ -49,7 +49,7 @@ test('schedule page can open and close new slot modal', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-test@speakloud.test',
+        'email' => 'schedule-test@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -77,7 +77,7 @@ test('schedule page can save a recurring slot', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-save@speakloud.test',
+        'email' => 'schedule-save@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -119,7 +119,7 @@ test('schedule page can edit a recurring slot', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-edit@speakloud.test',
+        'email' => 'schedule-edit@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -169,7 +169,7 @@ test('schedule page can save a one-off slot starting tomorrow or later', functio
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-onetime@speakloud.test',
+        'email' => 'schedule-onetime@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -211,7 +211,7 @@ test('schedule page rejects one-off slot starting before tomorrow', function () 
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-onetime-past@speakloud.test',
+        'email' => 'schedule-onetime-past@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -247,7 +247,7 @@ test('schedule page rejects one-off slot on a different day than start', functio
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-onetime-day@speakloud.test',
+        'email' => 'schedule-onetime-day@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -283,7 +283,7 @@ test('schedule page rejects one-off slot shorter than 15 minutes', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-onetime-short@speakloud.test',
+        'email' => 'schedule-onetime-short@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -320,7 +320,7 @@ test('schedule page accepts one-off slot that is exactly 15 minutes', function (
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-onetime-15@speakloud.test',
+        'email' => 'schedule-onetime-15@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -359,7 +359,7 @@ test('schedule page requires a title when saving a slot', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-title@speakloud.test',
+        'email' => 'schedule-title@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -392,7 +392,7 @@ test('schedule page can delete a slot', function () {
 
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'schedule-delete@speakloud.test',
+        'email' => 'schedule-delete@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -430,7 +430,7 @@ test('schedule page allows up to the configured slot limit', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $user = createScheduleTestUser('schedule-limit@speakloud.test', 'schedulelimit');
+    $user = createScheduleTestUser('schedule-limit@speakloudmate.test', 'schedulelimit');
 
     foreach (['First slot', 'Second slot', 'Third slot'] as $title) {
         saveRecurringSlotViaSchedulePage($user, $language, $title);
@@ -449,7 +449,7 @@ test('schedule page rejects creating a slot beyond the limit', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $user = createScheduleTestUser('schedule-limit-block@speakloud.test', 'schedulelimitblock');
+    $user = createScheduleTestUser('schedule-limit-block@speakloudmate.test', 'schedulelimitblock');
 
     foreach (['Slot A', 'Slot B', 'Slot C'] as $title) {
         saveRecurringSlotViaSchedulePage($user, $language, $title);
@@ -474,11 +474,11 @@ test('schedule page rejects lowering max claims below accepted count', function 
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $host = createScheduleTestUser('schedule-max-claims@speakloud.test', 'schedulemaxclaims');
+    $host = createScheduleTestUser('schedule-max-claims@speakloudmate.test', 'schedulemaxclaims');
 
     $senderOne = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-max-one@speakloud.test',
+        'email' => 'sender-max-one@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -487,7 +487,7 @@ test('schedule page rejects lowering max claims below accepted count', function 
 
     $senderTwo = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'sender-max-two@speakloud.test',
+        'email' => 'sender-max-two@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -544,7 +544,7 @@ test('schedule page allows creating a slot after deleting one at the limit', fun
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $user = createScheduleTestUser('schedule-limit-delete@speakloud.test', 'schedulelimitdelete');
+    $user = createScheduleTestUser('schedule-limit-delete@speakloudmate.test', 'schedulelimitdelete');
 
     foreach (['Slot A', 'Slot B', 'Slot C'] as $title) {
         saveRecurringSlotViaSchedulePage($user, $language, $title);

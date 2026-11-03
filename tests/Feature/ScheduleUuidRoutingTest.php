@@ -11,7 +11,7 @@ test('schedule show routes use uuid instead of numeric id', function () {
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
     $host = User::factory()->create([
-        'email' => 'host-uuid-route@speakloud.test',
+        'email' => 'host-uuid-route@speakloudmate.test',
         'email_verified_at' => now(),
     ]);
 

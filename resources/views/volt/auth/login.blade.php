@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 mount(function () {
     Seo::share([
         'seoTitle'       => 'Sign in',
-        'seoDescription' => 'Sign in to your SpeakLoud account to manage schedules, claims, and messages.',
+        'seoDescription' => 'Sign in to your SpeakLoudMate account to manage schedules, claims, and messages.',
         'seoUrl'         => route('login'),
         'seoRobots'      => 'noindex, nofollow',
     ]);
@@ -78,7 +78,7 @@ $login = function () {
 <div class="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoud</h1>
+            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoudMate</h1>
             <p class="text-[#3D2B1F]/60 mt-1">Sign in to your account</p>
         </div>
 

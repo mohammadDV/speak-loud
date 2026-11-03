@@ -13,7 +13,7 @@ beforeEach(function () {
 function makeUserWithProfile(string $suffix): User
 {
     $user = User::factory()->create([
-        'email' => "user-{$suffix}@speakloud.test",
+        'email' => "user-{$suffix}@speakloudmate.test",
     ]);
 
     UserProfile::create([

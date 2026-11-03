@@ -17,7 +17,7 @@ test('public user profile page shows profile details and open schedules', functi
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-profile@speakloud.test',
+        'email' => 'host-profile@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -70,7 +70,7 @@ test('profile page shows open chat when conversation exists', function () {
 
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-chat@speakloud.test',
+        'email' => 'host-chat@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -87,7 +87,7 @@ test('profile page shows open chat when conversation exists', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-chat@speakloud.test',
+        'email' => 'viewer-chat@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -114,7 +114,7 @@ test('profile page shows open chat when conversation exists', function () {
 test('profile page can send a direct claim when no conversation exists', function () {
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-direct@speakloud.test',
+        'email' => 'host-direct@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -130,7 +130,7 @@ test('profile page can send a direct claim when no conversation exists', functio
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'viewer-direct@speakloud.test',
+        'email' => 'viewer-direct@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -160,7 +160,7 @@ test('profile page can send a direct claim when no conversation exists', functio
 test('guest is redirected to login when trying to claim from profile', function () {
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-guest-claim@speakloud.test',
+        'email' => 'host-guest-claim@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -187,7 +187,7 @@ test('guest is redirected to login when trying to claim from profile', function 
 test('private profile only shows display name to visitors', function () {
     $host = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'host-private@speakloud.test',
+        'email' => 'host-private@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -216,7 +216,7 @@ test('private profile only shows display name to visitors', function () {
 test('user can toggle private profile on edit page', function () {
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'private-toggle@speakloud.test',
+        'email' => 'private-toggle@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -243,7 +243,7 @@ test('user can toggle private profile on edit page', function () {
 test('user can change profile slug when unique', function () {
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'slug-edit@speakloud.test',
+        'email' => 'slug-edit@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -266,7 +266,7 @@ test('user can change profile slug when unique', function () {
 
     $viewer = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'slug-viewer@speakloud.test',
+        'email' => 'slug-viewer@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -290,7 +290,7 @@ test('user can change profile slug when unique', function () {
 test('user can save profile without changing a reserved profile link', function () {
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'reserved-keep@speakloud.test',
+        'email' => 'reserved-keep@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -319,7 +319,7 @@ test('user can save profile without changing a reserved profile link', function 
 test('user can replace a reserved profile link with an available one', function () {
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'reserved-change@speakloud.test',
+        'email' => 'reserved-change@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',
@@ -344,7 +344,7 @@ test('user can replace a reserved profile link with an available one', function 
 test('user cannot change profile link to a reserved word', function () {
     $user = User::create([
         'uuid' => (string) Str::uuid(),
-        'email' => 'reserved-block@speakloud.test',
+        'email' => 'reserved-block@speakloudmate.test',
         'password' => '123456789',
         'role' => 'user',
         'status' => 'active',

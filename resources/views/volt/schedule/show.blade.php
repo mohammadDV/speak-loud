@@ -62,7 +62,7 @@ mount(function (Schedule $schedule, SyncScheduleGroupChat $syncGroupChat) {
         'seoTitle' => $schedule->isHost($userId) && $schedule->title
             ? $schedule->title
             : 'Schedule',
-        'seoDescription' => 'SpeakLoud practice schedule details.',
+        'seoDescription' => 'SpeakLoudMate practice schedule details.',
         'seoUrl' => route('schedules.show', $schedule),
         'seoRobots' => 'noindex, nofollow',
     ]);

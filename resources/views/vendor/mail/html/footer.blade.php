@@ -4,11 +4,11 @@
 <tr>
 <td class="content-cell" align="center">
 <p>
-SpeakLoud · practice speaking out loud
+SpeakLoudMate · practice speaking out loud
 <br>
 <a href="{{ config('app.url') }}">{{ parse_url((string) config('app.url'), PHP_URL_HOST) ?: config('app.url') }}</a>
 <br>
-© {{ date('Y') }} SpeakLoud
+© {{ date('Y') }} SpeakLoudMate
 </p>
 </td>
 </tr>

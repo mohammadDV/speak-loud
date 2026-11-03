@@ -120,13 +120,13 @@ return [
     | Markdown Mail Settings
     |--------------------------------------------------------------------------
     |
-    | SpeakLoud uses a custom markdown theme so notification emails match the
+    | SpeakLoudMate uses a custom markdown theme so notification emails match the
     | product palette (cream background, orange CTAs, Instrument Sans).
     |
     */
 
     'markdown' => [
-        'theme' => 'speakloud',
+        'theme' => 'speakloudmate',
         'paths' => [
             resource_path('views/vendor/mail'),
         ],

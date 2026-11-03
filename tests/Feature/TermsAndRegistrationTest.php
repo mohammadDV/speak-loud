@@ -9,7 +9,7 @@ test('terms page is publicly accessible', function () {
         ->assertOk()
         ->assertSee('Terms of Service', false)
         ->assertSee('User Agreement', false)
-        ->assertSee('SpeakLoud is not involved in payments between users', false)
+        ->assertSee('SpeakLoudMate is not involved in payments between users', false)
         ->assertSee('six (6) months', false);
 });
 

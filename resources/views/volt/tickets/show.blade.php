@@ -24,7 +24,7 @@ mount(function (Ticket $ticket) {
 
     Seo::share([
         'seoTitle'       => $record->subject,
-        'seoDescription' => 'Support ticket conversation on SpeakLoud.',
+        'seoDescription' => 'Support ticket conversation on SpeakLoudMate.',
         'seoUrl'         => route('tickets.show', $record),
         'seoRobots'      => 'noindex, nofollow',
     ]);
