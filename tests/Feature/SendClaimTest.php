@@ -9,7 +9,6 @@ use App\Models\UserProfile;
 use App\Support\ClaimLimits;
 use App\Support\ScheduleDescription;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Volt;
 
@@ -31,13 +30,8 @@ test('send claim blocks a fourth claim within one hour', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $sender = User::create([
-        'uuid' => (string) Str::uuid(),
+    $sender = User::factory()->create([
         'email' => 'sender-limit@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -47,13 +41,8 @@ test('send claim blocks a fourth claim within one hour', function () {
     ]);
 
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
-        $host = User::create([
-            'uuid' => (string) Str::uuid(),
+        $host = User::factory()->create([
             'email' => "host-limit-{$index}@speakloudmate.test",
-            'password' => '123456789',
-            'role' => 'user',
-            'status' => 'active',
-            'email_verified_at' => now(),
         ]);
 
         UserProfile::create([
@@ -108,13 +97,8 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $viewer = User::create([
-        'uuid' => (string) Str::uuid(),
+    $viewer = User::factory()->create([
         'email' => 'viewer-limit@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -124,13 +108,8 @@ test('discover page shows hourly claim limit message on fourth attempt', functio
     ]);
 
     $schedules = collect(range(1, 4))->map(function (int $index) use ($language) {
-        $host = User::create([
-            'uuid' => (string) Str::uuid(),
+        $host = User::factory()->create([
             'email' => "host-discover-limit-{$index}@speakloudmate.test",
-            'password' => '123456789',
-            'role' => 'user',
-            'status' => 'active',
-            'email_verified_at' => now(),
         ]);
 
         UserProfile::create([
@@ -183,13 +162,8 @@ test('send claim allows another claim after the hourly window expires', function
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $sender = User::create([
-        'uuid' => (string) Str::uuid(),
+    $sender = User::factory()->create([
         'email' => 'sender-reset@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -199,13 +173,8 @@ test('send claim allows another claim after the hourly window expires', function
     ]);
 
     $hosts = collect(range(1, 4))->map(function (int $index) use ($language) {
-        $host = User::create([
-            'uuid' => (string) Str::uuid(),
+        $host = User::factory()->create([
             'email' => "host-reset-{$index}@speakloudmate.test",
-            'password' => '123456789',
-            'role' => 'user',
-            'status' => 'active',
-            'email_verified_at' => now(),
         ]);
 
         UserProfile::create([

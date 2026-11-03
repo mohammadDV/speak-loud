@@ -47,6 +47,8 @@ return [
             'report' => false,
         ],
 
+        // Default public visibility is for profile/blog assets only. Sensitive
+        // files should use a private disk (or override visibility) + signed URLs.
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

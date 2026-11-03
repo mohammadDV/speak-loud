@@ -75,6 +75,10 @@ $sendMessage = function () {
         return;
     }
 
+    $this->validate([
+        'newMessage' => 'required|string|max:5000',
+    ]);
+
     app(IMessageRepository::class)->create([
         'conversation_id' => $this->activeConversation,
         'sender_id'       => auth()->id(),

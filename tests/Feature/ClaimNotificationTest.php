@@ -23,20 +23,14 @@ use App\Support\ScheduleDescription;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Str;
 
 function createClaimPair(string $suffix): array
 {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $host = User::create([
-        'uuid' => (string) Str::uuid(),
+    $host = User::factory()->create([
         'email' => "host-{$suffix}@speakloudmate.test",
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -45,13 +39,8 @@ function createClaimPair(string $suffix): array
         'display_name' => "Host {$suffix}",
     ]);
 
-    $sender = User::create([
-        'uuid' => (string) Str::uuid(),
+    $sender = User::factory()->create([
         'email' => "sender-{$suffix}@speakloudmate.test",
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([

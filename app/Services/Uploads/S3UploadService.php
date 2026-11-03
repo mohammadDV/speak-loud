@@ -10,6 +10,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 class S3UploadService
 {
     /**
+     * Public visibility is intentional for profile avatars and blog covers only.
+     * Do not use this service for tickets, messages, or other sensitive/PII files —
+     * store those on a private disk and serve via signed URLs.
+     *
      * @return array{visibility: string, CacheControl: string}
      */
     private function uploadOptions(): array

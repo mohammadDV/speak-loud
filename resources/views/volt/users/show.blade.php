@@ -39,6 +39,17 @@ mount(function (string $profileSlug) {
 
     Seo::forProfile($user);
 
+    if (auth()->check() && (
+        session()->has('pending_claim_schedule_id')
+        || session()->has('pending_direct_claim')
+    )) {
+        if (! auth()->user()->hasVerifiedEmail()) {
+            $this->redirect(route('verification.notice'), navigate: true);
+
+            return;
+        }
+    }
+
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
         $this->claimScheduleId        = session()->pull('pending_claim_schedule_id');
         $this->showScheduleClaimModal = true;
@@ -137,6 +148,10 @@ $openDirectClaimModal = function () {
         return $this->redirect(route('login'), navigate: true);
     }
 
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
+    }
+
     $this->claimMessage         = '';
     $this->showDirectClaimModal = true;
     $this->resetValidation();
@@ -157,6 +172,10 @@ $openScheduleClaimModal = function (int $scheduleId) {
         return $this->redirect(route('login'), navigate: true);
     }
 
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
+    }
+
     $this->claimScheduleId        = $scheduleId;
     $this->claimMessage           = '';
     $this->showScheduleClaimModal = true;
@@ -172,6 +191,10 @@ $closeScheduleClaimModal = function () {
 $sendDirectClaim = function (SendClaim $action) {
     if (! auth()->check()) {
         return $this->redirect(route('login'), navigate: true);
+    }
+
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
     }
 
     $user = $this->profileUser;
@@ -200,6 +223,10 @@ $sendDirectClaim = function (SendClaim $action) {
 $sendScheduleClaim = function (SendClaim $action) {
     if (! auth()->check()) {
         return $this->redirect(route('login'), navigate: true);
+    }
+
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
     }
 
     $schedule = Schedule::query()

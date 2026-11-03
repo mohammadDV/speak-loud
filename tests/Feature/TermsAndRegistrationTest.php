@@ -56,3 +56,16 @@ test('registration stores terms acceptance when checkbox is checked', function (
         ->and($user->terms_accepted_at)->not->toBeNull()
         ->and($user->terms_version)->toBe(Legal::termsVersion());
 });
+
+test('registration rejects reserved usernames', function () {
+    Volt::test('auth.register')
+        ->set('username', 'admin')
+        ->set('email', 'reservedadmin@example.com')
+        ->set('password', 'Password1!')
+        ->set('password_confirmation', 'Password1!')
+        ->set('accepted_terms', true)
+        ->call('register')
+        ->assertHasErrors(['username']);
+
+    expect(User::where('email', 'reservedadmin@example.com')->exists())->toBeFalse();
+});

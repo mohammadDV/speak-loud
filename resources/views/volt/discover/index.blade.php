@@ -80,6 +80,12 @@ mount(function () {
     $this->loadSchedules();
 
     if (auth()->check() && session()->has('pending_claim_schedule_id')) {
+        if (! auth()->user()->hasVerifiedEmail()) {
+            $this->redirect(route('verification.notice'), navigate: true);
+
+            return;
+        }
+
         $this->claimScheduleId = session()->pull('pending_claim_schedule_id');
         $this->showClaimModal  = true;
     }
@@ -183,6 +189,10 @@ $openClaimModal = function (int $scheduleId) {
         return $this->redirect(route('login'), navigate: true);
     }
 
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
+    }
+
     $this->claimScheduleId = $scheduleId;
     $this->claimMessage    = '';
     $this->resetValidation();
@@ -198,6 +208,10 @@ $closeClaimModal = function () {
 $sendClaim = function (SendClaim $action) {
     if (! auth()->check()) {
         return $this->redirect(route('login'), navigate: true);
+    }
+
+    if (! auth()->user()->hasVerifiedEmail()) {
+        return $this->redirect(route('verification.notice'), navigate: true);
     }
 
     $schedule = Schedule::query()

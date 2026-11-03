@@ -316,13 +316,8 @@ test('discover page can send a claim for a schedule', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
-    $host = User::create([
-        'uuid' => (string) Str::uuid(),
+    $host = User::factory()->create([
         'email' => 'host-claim@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -331,13 +326,8 @@ test('discover page can send a claim for a schedule', function () {
         'display_name' => 'Host Claim',
     ]);
 
-    $viewer = User::create([
-        'uuid' => (string) Str::uuid(),
+    $viewer = User::factory()->create([
         'email' => 'viewer-claim@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([

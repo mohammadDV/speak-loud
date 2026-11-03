@@ -1,6 +1,7 @@
 <?php
 
 use App\Support\PasswordRules;
+use App\Support\ProfileSlug;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use App\Actions\RegisterUser;
@@ -27,7 +28,19 @@ state([
 ]);
 
 rules([
-    'username'              => 'required|string|min:3|max:50|unique:user_profiles,username',
+    'username' => [
+        'required',
+        'string',
+        'min:3',
+        'max:50',
+        'regex:/^[a-zA-Z0-9]+$/',
+        'unique:user_profiles,username',
+        function (string $attribute, mixed $value, \Closure $fail): void {
+            if (is_string($value) && ProfileSlug::isReserved($value)) {
+                $fail('This profile link is reserved. Please choose another.');
+            }
+        },
+    ],
     'email'                 => 'required|email|unique:users,email',
     'password'              => PasswordRules::validationRules(),
     'password_confirmation' => 'required',

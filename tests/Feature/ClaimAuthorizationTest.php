@@ -178,3 +178,12 @@ test('non admin cannot access filament admin panel', function () {
         ->get('/admin')
         ->assertForbidden();
 });
+
+test('guests are redirected from admin to app login', function () {
+    $this->get('/admin')
+        ->assertRedirect(route('login'));
+});
+
+test('filament admin login route is disabled', function () {
+    $this->get('/admin/login')->assertNotFound();
+});

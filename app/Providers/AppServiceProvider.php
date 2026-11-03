@@ -44,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
 
         Seo::share();
 
+        // Public S3 is for intentional CDN assets (avatars, blog covers). Sensitive
+        // uploads must use a private disk with signed URLs instead.
         FileUpload::configureUsing(function (FileUpload $component): void {
             $component
                 ->disk('s3')

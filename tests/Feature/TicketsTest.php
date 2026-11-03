@@ -7,6 +7,7 @@ use App\Models\TicketCategory;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Models\UserProfile;
+use App\Repositories\Contracts\ITicketRepository;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Volt;
 
@@ -103,6 +104,35 @@ test('user cannot view another users ticket', function () {
     ]);
 
     $this->get(route('tickets.show', $ticket))->assertNotFound();
+});
+
+test('ticket repository findForUser rejects another users ticket', function () {
+    $owner = User::factory()->create();
+    $viewer = actingAsUser();
+
+    $ownTicket = Ticket::create([
+        'user_id' => $viewer->id,
+        'subject' => 'My ticket',
+        'status' => 'open',
+        'priority' => 'normal',
+    ]);
+
+    $foreignTicket = Ticket::create([
+        'user_id' => $owner->id,
+        'subject' => 'Secret foreign ticket',
+        'status' => 'open',
+        'priority' => 'normal',
+    ]);
+
+    $tickets = app(ITicketRepository::class);
+
+    expect($tickets->findForUser($foreignTicket->id, $viewer->id))->toBeNull()
+        ->and($tickets->findForUser($ownTicket->id, $viewer->id)?->id)->toBe($ownTicket->id);
+
+    Volt::actingAs($viewer)
+        ->test('tickets.show', ['ticket' => $ownTicket])
+        ->assertSee('My ticket')
+        ->assertDontSee('Secret foreign ticket');
 });
 
 test('admin reply is visible to the ticket owner', function () {

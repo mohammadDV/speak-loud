@@ -4,7 +4,7 @@ use App\Actions\ReplyToTicket;
 use App\Models\Ticket;
 use App\Repositories\Contracts\ITicketRepository;
 use App\Support\Seo;
-use function Livewire\Volt\{state, mount, title, hydrate};
+use function Livewire\Volt\{state, mount, title, hydrate, updated};
 
 state([
     'ticket'         => null,
@@ -36,7 +36,19 @@ hydrate([
             return null;
         }
 
-        return app(ITicketRepository::class)->findForUser($ticket->id, auth()->id()) ?? $ticket;
+        return app(ITicketRepository::class)->findForUser($ticket->id, auth()->id());
+    },
+]);
+
+updated([
+    'ticket' => function (?Ticket $ticket): void {
+        if ($ticket === null) {
+            return;
+        }
+
+        if (! app(ITicketRepository::class)->findForUser($ticket->id, auth()->id())) {
+            $this->ticket = null;
+        }
     },
 ]);
 

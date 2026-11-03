@@ -4,6 +4,7 @@ use App\Actions\ChangePassword;
 use App\Support\PasswordRules;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
+use Illuminate\Support\Facades\RateLimiter;
 
 mount(function () {
     Seo::share([
@@ -36,6 +37,17 @@ rules([
 $updatePassword = function (ChangePassword $action) {
     $this->validate();
 
+    $throttleKey = 'password-change|'.auth()->id();
+
+    if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->addError('current_password', 'Too many password change attempts. Please try again in '.$seconds.' seconds.');
+
+        return;
+    }
+
+    RateLimiter::hit($throttleKey, 60);
+
     try {
         $action->execute(auth()->user(), $this->current_password, $this->password);
     } catch (\Illuminate\Validation\ValidationException $e) {
@@ -44,6 +56,7 @@ $updatePassword = function (ChangePassword $action) {
         return;
     }
 
+    RateLimiter::clear($throttleKey);
     $this->reset(['current_password', 'password', 'password_confirmation']);
     $this->status = 'password-changed';
 };

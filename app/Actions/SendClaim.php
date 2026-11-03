@@ -90,6 +90,12 @@ class SendClaim
             throw new AuthorizationException('You cannot send a claim to yourself.');
         }
 
+        $sender = User::query()->find($senderId);
+
+        if ($sender === null || ! $sender->hasVerifiedEmail()) {
+            throw new AuthorizationException('You must verify your email before sending a claim.');
+        }
+
         if ($this->users->areBlocked($senderId, $receiverId)) {
             throw new AuthorizationException('You cannot send a claim to this user.');
         }

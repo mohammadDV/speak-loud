@@ -5,6 +5,7 @@ use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 mount(function (string $token) {
@@ -37,6 +38,17 @@ rules([
 
 $resetPassword = function () {
     $this->validate();
+
+    $throttleKey = 'password-reset-submit|'.request()->ip();
+
+    if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->addError('email', 'Too many reset attempts. Please try again in '.$seconds.' seconds.');
+
+        return;
+    }
+
+    RateLimiter::hit($throttleKey, 60);
 
     $status = Password::reset(
         [

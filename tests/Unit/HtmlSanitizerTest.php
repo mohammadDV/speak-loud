@@ -22,6 +22,17 @@ test('html sanitizer strips event handlers and javascript urls', function () {
         ->toContain('<p>Hi</p>');
 });
 
+test('html sanitizer strips style and iframe tags', function () {
+    $html = '<p>Safe</p><style>body{display:none}</style><iframe src="https://evil.test"></iframe>';
+
+    $clean = HtmlSanitizer::sanitize($html);
+
+    expect($clean)
+        ->toContain('<p>Safe</p>')
+        ->not->toContain('<style')
+        ->not->toContain('<iframe');
+});
+
 test('html sanitizer keeps safe links and formatting', function () {
     $html = '<p><strong>Bold</strong> <a href="https://example.com">link</a></p>';
 

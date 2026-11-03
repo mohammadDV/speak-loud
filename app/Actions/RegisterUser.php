@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\UserProfile;
 use App\Repositories\Contracts\IUserRepository;
 use App\Support\Legal;
+use App\Support\ProfileSlug;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class RegisterUser
 {
@@ -15,6 +17,14 @@ class RegisterUser
 
     public function execute(array $data): User
     {
+        $username = $data['username'];
+
+        if (ProfileSlug::isReserved($username)) {
+            throw ValidationException::withMessages([
+                'username' => 'This profile link is reserved. Please choose another.',
+            ]);
+        }
+
         $user = $this->users->create([
             'uuid' => Str::uuid(),
             'email' => $data['email'],
@@ -25,9 +35,9 @@ class RegisterUser
 
         UserProfile::create([
             'user_id' => $user->id,
-            'username' => $data['username'],
-            'profile_slug' => $data['username'],
-            'display_name' => $data['display_name'] ?? $data['username'],
+            'username' => $username,
+            'profile_slug' => $username,
+            'display_name' => $data['display_name'] ?? $username,
         ]);
 
         return $user;

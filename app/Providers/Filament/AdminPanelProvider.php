@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->login()
+            // Use the app login (/login) with its rate limits; admins then open /admin.
             ->brandName('SpeakLoudMate Admin')
             ->colors([
                 'primary' => Color::Amber,

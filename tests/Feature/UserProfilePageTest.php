@@ -112,13 +112,8 @@ test('profile page shows open chat when conversation exists', function () {
 });
 
 test('profile page can send a direct claim when no conversation exists', function () {
-    $host = User::create([
-        'uuid' => (string) Str::uuid(),
+    $host = User::factory()->create([
         'email' => 'host-direct@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([
@@ -128,13 +123,8 @@ test('profile page can send a direct claim when no conversation exists', functio
         'display_name' => 'Host Direct',
     ]);
 
-    $viewer = User::create([
-        'uuid' => (string) Str::uuid(),
+    $viewer = User::factory()->create([
         'email' => 'viewer-direct@speakloudmate.test',
-        'password' => '123456789',
-        'role' => 'user',
-        'status' => 'active',
-        'email_verified_at' => now(),
     ]);
 
     UserProfile::create([

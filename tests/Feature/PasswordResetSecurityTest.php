@@ -44,3 +44,18 @@ test('forgot password is rate limited by ip', function () {
         ->call('sendResetLink')
         ->assertHasErrors('email');
 });
+
+test('password reset submit is rate limited by ip', function () {
+    RateLimiter::clear('password-reset-submit|'.request()->ip());
+
+    for ($i = 0; $i < 5; $i++) {
+        RateLimiter::hit('password-reset-submit|'.request()->ip(), 60);
+    }
+
+    Volt::test('auth.reset-password', ['token' => 'test-token'])
+        ->set('email', 'anyone@example.com')
+        ->set('password', 'Password1!')
+        ->set('password_confirmation', 'Password1!')
+        ->call('resetPassword')
+        ->assertHasErrors('email');
+});
