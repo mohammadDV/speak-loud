@@ -241,7 +241,7 @@ test('schedule page rejects one-off slot starting before tomorrow', function () 
     expect($user->schedules()->count())->toBe(0);
 });
 
-test('schedule page rejects one-off slot on a different day than start', function () {
+test('schedule page one-off end time stays on the selected slot date', function () {
     $language = Language::where('code', 'en')->first()
         ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
 
@@ -260,21 +260,29 @@ test('schedule page rejects one-off slot on a different day than start', functio
         'display_name' => 'Schedule One Day',
     ]);
 
-    $start = now('UTC')->addDay()->setTime(18, 0)->format('Y-m-d\TH:i');
-    $end = now('UTC')->addDays(2)->setTime(19, 0)->format('Y-m-d\TH:i');
+    $day = now('UTC')->addDay();
+    $start = $day->copy()->setTime(18, 0)->format('Y-m-d\TH:i');
+    $endOnOtherDay = now('UTC')->addDays(2)->setTime(19, 0)->format('Y-m-d\TH:i');
 
     Volt::actingAs($user)->test('schedule.index')
         ->set('showModal', true)
         ->set('type', 'one_time')
         ->set('language_id', (string) $language->id)
-        ->set('title', 'Cross-day slot')
+        ->set('title', 'Same-day slot')
         ->set('start_datetime', $start)
-        ->set('end_datetime', $end)
+        ->set('end_datetime', $endOnOtherDay)
         ->set('description', 'One-off video call. Camera on.')
         ->call('saveSlot')
-        ->assertHasErrors(['end_datetime']);
+        ->assertHasNoErrors();
 
-    expect($user->schedules()->count())->toBe(0);
+    $schedule = $user->schedules()->with('oneTimeSlot')->first();
+
+    expect($schedule->oneTimeSlot->start_datetime->timezone('UTC')->toDateString())
+        ->toBe($day->toDateString())
+        ->and($schedule->oneTimeSlot->end_datetime->timezone('UTC')->toDateString())
+        ->toBe($day->toDateString())
+        ->and($schedule->oneTimeSlot->end_datetime->timezone('UTC')->format('H:i'))
+        ->toBe('19:00');
 });
 
 test('schedule page rejects one-off slot shorter than 15 minutes', function () {
@@ -559,4 +567,81 @@ test('schedule page allows creating a slot after deleting one at the limit', fun
 
     expect($user->schedules()->count())->toBe(3)
         ->and($user->schedules()->where('title', 'Replacement slot')->exists())->toBeTrue();
+});
+
+test('schedule modal uses twenty four hour selects without am pm labels', function () {
+    $user = createScheduleTestUser('schedule-24h-ui@speakloudmate.test', 'schedule24hui');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->call('openModal')
+        ->assertSee('Your timezone:')
+        ->assertSee('Start')
+        ->assertSee('End')
+        ->assertDontSee('Start (UTC)')
+        ->assertSeeHtml('value="00"')
+        ->assertSeeHtml('value="13"')
+        ->assertSeeHtml('value="23"')
+        ->assertDontSee('AM')
+        ->assertDontSee('PM')
+        ->assertDontSee('type="time"', false)
+        ->assertDontSee('datetime-local', false);
+});
+
+test('schedule page saves recurring slot from hour and minute selects', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-24h-save@speakloudmate.test', 'schedule24hsave');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->call('openModal')
+        ->set('type', 'recurring')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'Afternoon practice')
+        ->set('selected_days', ['Mon'])
+        ->set('start_hour', '13')
+        ->set('start_minute', '15')
+        ->set('end_hour', '14')
+        ->set('end_minute', '45')
+        ->set('description', 'Video call on Google Meet. 50/50 language split.')
+        ->set('max_participants', 1)
+        ->call('saveSlot')
+        ->assertHasNoErrors()
+        ->assertSet('showModal', false);
+
+    $schedule = $user->schedules()->with('recurringRule')->first();
+
+    expect(substr((string) $schedule->recurringRule->start_time, 0, 5))->toBe('13:15')
+        ->and(substr((string) $schedule->recurringRule->end_time, 0, 5))->toBe('14:45');
+});
+
+test('schedule page saves one-off slot from date and twenty four hour selects', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-24h-onetime@speakloudmate.test', 'schedule24honetime');
+    $day = now('UTC')->addDay()->toDateString();
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->call('openModal')
+        ->set('type', 'one_time')
+        ->set('language_id', (string) $language->id)
+        ->set('title', 'One-off evening')
+        ->set('slot_date', $day)
+        ->set('start_hour', '20')
+        ->set('start_minute', '00')
+        ->set('end_hour', '21')
+        ->set('end_minute', '00')
+        ->set('description', 'Video call on Google Meet. 50/50 language split.')
+        ->set('max_participants', 1)
+        ->call('saveSlot')
+        ->assertHasNoErrors()
+        ->assertSet('showModal', false);
+
+    $schedule = $user->schedules()->with('oneTimeSlot')->first();
+
+    expect($schedule->oneTimeSlot->start_datetime->timezone('UTC')->format('Y-m-d H:i'))
+        ->toBe($day.' 20:00')
+        ->and($schedule->oneTimeSlot->end_datetime->timezone('UTC')->format('Y-m-d H:i'))
+        ->toBe($day.' 21:00');
 });

@@ -147,12 +147,7 @@ mount(function () {
                         $loc     = $profile?->country_code ?? '';
                         $cnt     = $slot->claims->count();
                         $g       = $gradients[$i % count($gradients)];
-                        if ($slot->oneTimeSlot) {
-                            $time = \App\Support\UtcTime::format($slot->oneTimeSlot->start_datetime, 'D H:i').' UTC';
-                        } elseif ($slot->recurringRule) {
-                            $day  = Str::title(strtok($slot->recurringRule->day_of_week ?? 'Mon', ','));
-                            $time = substr($day,0,3).' '.substr($slot->recurringRule->start_time??'',0,5).' UTC';
-                        } else { $time = '—'; }
+                        $time = \App\Support\ScheduleTime::scheduleWhen($slot) ?? '—';
                     @endphp
                     <div class="rounded-xl overflow-hidden border border-black/[0.06]">
                         <div class="h-20 flex items-end px-3 pb-2.5 relative" style="background: linear-gradient(135deg, {{ $g['from'] }}, {{ $g['to'] }})">

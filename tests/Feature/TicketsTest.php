@@ -230,3 +230,40 @@ test('user can create a ticket from the support page form', function () {
     expect($ticket)->not->toBeNull()
         ->and($ticket->subject)->toBe('App crashes on login');
 });
+
+test('ticket message timestamps use twenty four hour format', function () {
+    $user = actingAsUser();
+    $admin = User::factory()->admin()->create();
+
+    UserProfile::create([
+        'user_id' => $user->id,
+        'username' => 'tickettwentyfour',
+        'display_name' => 'Ticket Twenty Four',
+    ]);
+
+    $ticket = Ticket::create([
+        'user_id' => $user->id,
+        'subject' => 'Time format check',
+        'status' => 'waiting_user',
+        'priority' => 'normal',
+        'assigned_to' => $admin->id,
+    ]);
+
+    $message = TicketMessage::create([
+        'ticket_id' => $ticket->id,
+        'sender_id' => $admin->id,
+        'body' => 'Please reply when you can.',
+        'is_internal' => false,
+        'created_at' => now('UTC')->setTime(14, 30),
+        'updated_at' => now('UTC')->setTime(14, 30),
+    ]);
+
+    $expected = $message->created_at->format('M j, H:i');
+
+    $this->actingAs($user)
+        ->get(route('tickets.show', $ticket))
+        ->assertOk()
+        ->assertSee($expected)
+        ->assertDontSee($message->created_at->format('g:i A'))
+        ->assertDontSee('PM');
+});

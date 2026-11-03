@@ -53,6 +53,7 @@ class UpdateSchedule
                     'day_of_week' => ScheduleDayOfWeek::normalize($data['day_of_week'] ?? ''),
                     'start_time' => $data['start_time'],
                     'end_time' => $data['end_time'],
+                    'timezone' => $data['timezone'] ?? $schedule->recurringRule()->value('timezone') ?? 'UTC',
                 ]
             );
         } else {

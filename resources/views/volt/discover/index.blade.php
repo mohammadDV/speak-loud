@@ -328,7 +328,7 @@ $sendClaim = function (SendClaim $action) {
                     @else
                         Browse open practice slots and filter by what hosts like to talk about.
                     @endauth
-                    <span class="block mt-1 text-xs text-[#3D2B1F]/45">All times are shown in UTC.</span>
+                    <span class="block mt-1 text-xs text-[#3D2B1F]/45">Times shown in your local timezone ({{ \App\Support\ViewerTimezone::current() }}).</span>
                 </p>
             </div>
 

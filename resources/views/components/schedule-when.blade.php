@@ -1,11 +1,11 @@
 @props(['schedule', 'long' => false])
 
 @php
-    use App\Support\UtcTime;
+    use App\Support\ScheduleTime;
 
     $when = $long
-        ? UtcTime::scheduleWhenLong($schedule)
-        : UtcTime::scheduleWhen($schedule);
+        ? ScheduleTime::scheduleWhenLong($schedule)
+        : ScheduleTime::scheduleWhen($schedule);
 @endphp
 
 @if ($when)

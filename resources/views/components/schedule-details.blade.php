@@ -2,7 +2,7 @@
 
 @php
     use App\Support\CountryCodes;
-    use App\Support\UtcTime;
+    use App\Support\ScheduleTime;
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
@@ -24,7 +24,7 @@
         'fluent' => 'C2 – Fluent',
     ];
 
-    $when = UtcTime::scheduleWhenLong($schedule) ?? '—';
+    $when = ScheduleTime::scheduleWhenLong($schedule) ?? '—';
 
     if ($schedule->recurringRule) {
         $typeLabel = 'Weekly';

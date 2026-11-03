@@ -6,7 +6,7 @@
 
 @php
     use App\Support\CountryCodes;
-    use App\Support\UtcTime;
+    use App\Support\ScheduleTime;
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
@@ -20,7 +20,7 @@
         : null;
     $isFull = $spotsLeft === 0;
 
-    $when = UtcTime::scheduleWhen($schedule) ?? '—';
+    $when = ScheduleTime::scheduleWhen($schedule) ?? '—';
 
     if ($schedule->recurringRule) {
         $badge = 'Weekly';

@@ -10,7 +10,7 @@ class ScheduleRecurringRule extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'schedule_id', 'day_of_week', 'start_time', 'end_time',
+        'schedule_id', 'day_of_week', 'start_time', 'end_time', 'timezone',
         'valid_from', 'valid_until',
     ];
 

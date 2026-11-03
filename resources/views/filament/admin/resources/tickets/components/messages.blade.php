@@ -21,7 +21,7 @@
                         <span class="text-amber-600 dark:text-amber-400">· Internal note</span>
                     @endif
                 </span>
-                <span class="shrink-0">{{ $message->created_at?->format('M j, Y g:i A') }}</span>
+                <span class="shrink-0">{{ $message->created_at?->format('M j, Y H:i') }}</span>
             </div>
             <p class="whitespace-pre-wrap text-sm leading-relaxed text-gray-800 dark:text-gray-100">
                 {{ $message->body }}

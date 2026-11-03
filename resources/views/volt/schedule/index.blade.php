@@ -1,6 +1,6 @@
 <?php
 
-use function Livewire\Volt\{state, computed, mount, title};
+use function Livewire\Volt\{state, computed, mount, title, updated};
 use App\Actions\CreateSchedule;
 use App\Actions\DeleteSchedule;
 use App\Actions\UpdateSchedule;
@@ -9,8 +9,10 @@ use App\Support\LookupCache;
 use App\Support\ScheduleDayOfWeek;
 use App\Support\ScheduleDescription;
 use App\Support\ScheduleLimits;
+use App\Support\ScheduleTime;
 use App\Support\Seo;
 use App\Support\UtcTime;
+use App\Support\ViewerTimezone;
 use Carbon\Carbon;
 
 state([
@@ -23,6 +25,11 @@ state([
     'selected_days'    => [],
     'start_time'       => '18:00',
     'end_time'         => '19:00',
+    'start_hour'       => '18',
+    'start_minute'     => '00',
+    'end_hour'         => '19',
+    'end_minute'       => '00',
+    'slot_date'        => '',
     'max_participants'     => 1,
     'min_max_participants' => 1,
     'start_datetime'   => '',
@@ -54,6 +61,70 @@ $maxSlots = computed(fn () => ScheduleLimits::maxSlotsForUser());
 
 $canCreateSlot = computed(fn () => $this->schedules->count() < $this->maxSlots);
 
+$viewerTimezone = computed(fn () => ViewerTimezone::current());
+
+$viewerTimezoneLabel = computed(fn () => ViewerTimezone::label($this->viewerTimezone));
+
+$syncPartsFromRecurringTimes = function () {
+    [$this->start_hour, $this->start_minute] = UtcTime::split($this->start_time);
+    [$this->end_hour, $this->end_minute] = UtcTime::split($this->end_time);
+};
+
+$syncPartsFromDatetimes = function () {
+    if ($this->start_datetime !== '') {
+        $this->slot_date = UtcTime::dateFromDatetimeLocal($this->start_datetime);
+        [$this->start_hour, $this->start_minute] = UtcTime::split(UtcTime::timeFromDatetimeLocal($this->start_datetime));
+    }
+
+    if ($this->end_datetime !== '') {
+        [$this->end_hour, $this->end_minute] = UtcTime::split(UtcTime::timeFromDatetimeLocal($this->end_datetime));
+
+        if ($this->slot_date === '') {
+            $this->slot_date = UtcTime::dateFromDatetimeLocal($this->end_datetime);
+        }
+    }
+};
+
+$composeTimesFromParts = function () {
+    $this->start_time = UtcTime::join($this->start_hour, $this->start_minute);
+    $this->end_time = UtcTime::join($this->end_hour, $this->end_minute);
+
+    if ($this->slot_date !== '') {
+        $this->start_datetime = UtcTime::composeDatetimeLocal($this->slot_date, $this->start_time);
+        $this->end_datetime = UtcTime::composeDatetimeLocal($this->slot_date, $this->end_time);
+    }
+};
+
+updated([
+    'start_time' => function () {
+        $this->syncPartsFromRecurringTimes();
+    },
+    'end_time' => function () {
+        $this->syncPartsFromRecurringTimes();
+    },
+    'start_datetime' => function () {
+        $this->syncPartsFromDatetimes();
+    },
+    'end_datetime' => function () {
+        $this->syncPartsFromDatetimes();
+    },
+    'start_hour' => function () {
+        $this->composeTimesFromParts();
+    },
+    'start_minute' => function () {
+        $this->composeTimesFromParts();
+    },
+    'end_hour' => function () {
+        $this->composeTimesFromParts();
+    },
+    'end_minute' => function () {
+        $this->composeTimesFromParts();
+    },
+    'slot_date' => function () {
+        $this->composeTimesFromParts();
+    },
+]);
+
 $resetForm = function () {
     $this->editingScheduleId = null;
     $this->type             = 'recurring';
@@ -61,6 +132,11 @@ $resetForm = function () {
     $this->selected_days    = [];
     $this->start_time       = '18:00';
     $this->end_time         = '19:00';
+    $this->start_hour       = '18';
+    $this->start_minute     = '00';
+    $this->end_hour         = '19';
+    $this->end_minute       = '00';
+    $this->slot_date        = '';
     $this->max_participants     = 1;
     $this->min_max_participants = 1;
     $this->title            = '';
@@ -95,13 +171,31 @@ $editSchedule = function (int $scheduleId) {
     $this->title             = $schedule->title ?? '';
     $this->description       = $schedule->description ?? '';
 
+    $viewerTz = ViewerTimezone::current();
+
     if ($schedule->type === 'recurring' && $schedule->recurringRule) {
-        $this->selected_days = explode(',', $schedule->recurringRule->day_of_week);
-        $this->start_time    = substr((string) $schedule->recurringRule->start_time, 0, 5);
-        $this->end_time      = substr((string) $schedule->recurringRule->end_time, 0, 5);
+        $converted = ScheduleTime::convertRecurringWallClock(
+            explode(',', $schedule->recurringRule->day_of_week),
+            substr((string) $schedule->recurringRule->start_time, 0, 5),
+            substr((string) $schedule->recurringRule->end_time, 0, 5),
+            $schedule->recurringRule->timezone ?: 'UTC',
+            $viewerTz,
+        );
+        $this->selected_days = $converted['days'];
+        $this->start_time = $converted['start'];
+        $this->end_time = $converted['end'];
+        $this->syncPartsFromRecurringTimes();
+        $this->slot_date = '';
+        $this->start_datetime = '';
+        $this->end_datetime = '';
     } elseif ($schedule->oneTimeSlot) {
-        $this->start_datetime = UtcTime::formatForInput($schedule->oneTimeSlot->start_datetime);
-        $this->end_datetime   = UtcTime::formatForInput($schedule->oneTimeSlot->end_datetime);
+        $localStart = $schedule->oneTimeSlot->start_datetime->copy()->timezone($viewerTz);
+        $localEnd = $schedule->oneTimeSlot->end_datetime->copy()->timezone($viewerTz);
+        $this->slot_date = $localStart->toDateString();
+        $this->start_time = $localStart->format('H:i');
+        $this->end_time = $localEnd->format('H:i');
+        $this->syncPartsFromRecurringTimes();
+        $this->composeTimesFromParts();
     }
 
     $this->resetValidation();
@@ -132,6 +226,13 @@ $closeModal = function () {
 };
 
 $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
+    $this->composeTimesFromParts();
+
+    if ($this->type === 'one_time' && $this->slot_date === '' && $this->start_datetime !== '') {
+        $this->syncPartsFromDatetimes();
+        $this->composeTimesFromParts();
+    }
+
     $rules = [
         'language_id'      => 'required|exists:languages,id',
         'type'             => 'required|in:recurring,one_time',
@@ -146,6 +247,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         $rules['start_time']      = 'required';
         $rules['end_time']        = 'required';
     } else {
+        $rules['slot_date']      = 'required|date';
         $rules['start_datetime'] = 'required|date';
         $rules['end_datetime']   = 'required|date';
     }
@@ -160,29 +262,47 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         'max_participants' => $this->max_participants,
     ];
 
-    if ($this->type === 'recurring') {
-        $payload['day_of_week'] = ScheduleDayOfWeek::normalize($this->selected_days);
-        $payload['start_time']  = $this->start_time;
-        $payload['end_time']    = $this->end_time;
-    } else {
-        $start = Carbon::parse($this->start_datetime, 'UTC');
-        $end   = Carbon::parse($this->end_datetime, 'UTC');
-        $minStart = now('UTC')->addDay()->startOfDay();
+    $viewerTz = ViewerTimezone::current();
 
-        if ($start->lt($minStart)) {
-            $this->addError('start_datetime', 'Start time must be tomorrow or later (UTC).');
+    if ($this->type === 'recurring') {
+        if ($this->start_time >= $this->end_time) {
+            $this->addError('end_time', 'End time must be after the start time.');
 
             return;
         }
 
-        if (! $start->isSameDay($end)) {
-            $this->addError('end_datetime', 'End must be on the same day as the start (UTC).');
+        $payload['day_of_week'] = ScheduleDayOfWeek::normalize($this->selected_days);
+        $payload['start_time']  = $this->start_time;
+        $payload['end_time']    = $this->end_time;
+        $payload['timezone']    = $viewerTz;
+    } else {
+        $start = Carbon::parse($this->slot_date.' '.$this->start_time, $viewerTz);
+        $end = Carbon::parse($this->slot_date.' '.$this->end_time, $viewerTz);
+
+        // Editing in another TZ can surface a slot that crosses local midnight
+        // (same wall times on one date). Treat end-before-start as next day.
+        if ($end->lte($start)) {
+            $end->addDay();
+        }
+
+        $minStart = Carbon::now($viewerTz)->addDay()->startOfDay();
+
+        if ($start->lt($minStart)) {
+            $this->addError('start_datetime', 'Start time must be tomorrow or later in your timezone.');
 
             return;
         }
 
         if ($end->lte($start)) {
-            $this->addError('end_datetime', 'End time must be after the start time (UTC).');
+            $this->addError('end_datetime', 'End time must be after the start time.');
+
+            return;
+        }
+
+        // New slots must stay on one local calendar day; edits may keep a
+        // cross-midnight range that only appears after timezone conversion.
+        if (! $this->editingScheduleId && ! $start->isSameDay($end)) {
+            $this->addError('end_datetime', 'End must be on the same day as the start in your timezone.');
 
             return;
         }
@@ -193,8 +313,8 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
             return;
         }
 
-        $payload['start_datetime'] = $start;
-        $payload['end_datetime']   = $end;
+        $payload['start_datetime'] = $start->utc();
+        $payload['end_datetime']   = $end->utc();
     }
 
     if ($this->editingScheduleId) {
@@ -224,7 +344,7 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">My Schedule</h1>
             <p class="text-sm text-[#3D2B1F]/50 mt-1">
-                {{ $this->schedules->count() }} of {{ $this->maxSlots }} slots used · All times are in UTC.
+                {{ $this->schedules->count() }} of {{ $this->maxSlots }} slots used · Times shown in {{ $this->viewerTimezone }}.
             </p>
         </div>
         @if ($this->canCreateSlot)
@@ -281,7 +401,11 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
             <div class="relative w-full max-w-md rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <h2 class="text-lg font-semibold text-[#3D2B1F]">{{ $editingScheduleId ? 'Edit time slot' : 'New time slot' }}</h2>
-                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ $editingScheduleId ? 'Update your availability.' : "Set when you're free to chat." }} All times are UTC.</p>
+                    <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ $editingScheduleId ? 'Update your availability.' : "Set when you're free to chat." }}</p>
+                    <div class="mt-3 rounded-lg bg-[#FFF0E0] px-3 py-2 text-sm text-[#3D2B1F] ring-1 ring-[#FF8C42]/25">
+                        <p class="font-medium">Your timezone: {{ $this->viewerTimezoneLabel }}</p>
+                        <p class="mt-1 text-[#3D2B1F]/65">Times are saved for this timezone. Others see them converted to their local time.{{ $editingScheduleId ? ' Saving re-anchors this slot to your current timezone.' : '' }}</p>
+                    </div>
 
                     <form wire:submit="saveSlot" class="mt-6 space-y-5">
                         @if (! $editingScheduleId)
@@ -328,15 +452,45 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                                 </div>
                                 @error('selected_days') <p class="mt-1 text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                             </fieldset>
-                            <div class="flex gap-3">
-                                <flux:input wire:model="start_time" label="Start (UTC)" type="time" class="flex-1" />
-                                <flux:input wire:model="end_time" label="End (UTC)" type="time" class="flex-1" />
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <x-utc-time-fields
+                                    label="Start"
+                                    hour-model="start_hour"
+                                    minute-model="start_minute"
+                                />
+                                <x-utc-time-fields
+                                    label="End"
+                                    hour-model="end_hour"
+                                    minute-model="end_minute"
+                                />
                             </div>
+                            @error('end_time') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                         @else
-                            @php $minStart = now('UTC')->addDay()->startOfDay()->format('Y-m-d\TH:i'); @endphp
-                            <flux:input wire:model="start_datetime" label="Start (UTC)" type="datetime-local" min="{{ $minStart }}" description="Date and time in Coordinated Universal Time (UTC)." />
-                            <flux:input wire:model="end_datetime" label="End (UTC)" type="datetime-local" min="{{ $minStart }}" description="Same calendar day as start (UTC). Minimum 15 minutes long." />
+                            @php $minDate = now(ViewerTimezone::current())->addDay()->toDateString(); @endphp
+                            <flux:input
+                                wire:model.live="slot_date"
+                                label="Date"
+                                type="date"
+                                min="{{ $minDate }}"
+                                description="Calendar day in your local timezone."
+                            />
+                            @error('slot_date') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <x-utc-time-fields
+                                    label="Start"
+                                    hour-model="start_hour"
+                                    minute-model="start_minute"
+                                    description="Local time."
+                                />
+                                <x-utc-time-fields
+                                    label="End"
+                                    hour-model="end_hour"
+                                    minute-model="end_minute"
+                                    description="Same day as start. Minimum 15 minutes long."
+                                />
+                            </div>
                             @error('start_datetime') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
+                            @error('end_datetime') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
                         @endif
 
                         <flux:textarea

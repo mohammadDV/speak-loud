@@ -128,7 +128,7 @@ $sendReply = function (ReplyToTicket $action) {
                 <div class="flex w-full {{ $isMine ? 'justify-end' : 'justify-start' }}">
                     <div class="flex max-w-[85%] flex-col gap-1 sm:max-w-md {{ $isMine ? 'items-end' : 'items-start' }}">
                         <p class="text-xs text-[#3D2B1F]/45">
-                            {{ $senderName }} · {{ $message->created_at->format('M j, g:i A') }}
+                            {{ $senderName }} · {{ $message->created_at->format('M j, H:i') }}
                         </p>
                         <div
                             dir="ltr"
