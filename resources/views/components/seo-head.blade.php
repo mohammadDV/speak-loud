@@ -68,6 +68,7 @@
 <meta name="twitter:title" content="{{ $resolvedTitle }}">
 <meta name="twitter:description" content="{{ $resolvedDescription }}">
 <meta name="twitter:image" content="{{ $resolvedImage }}">
+<meta name="twitter:image:alt" content="{{ $resolvedImageAlt }}">
 @if ($twitterSite)
     <meta name="twitter:site" content="{{ $twitterSite }}">
 @endif

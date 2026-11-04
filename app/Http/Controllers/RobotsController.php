@@ -22,6 +22,8 @@ class RobotsController extends Controller
             'Disallow: /claims',
             'Disallow: /tickets',
             'Disallow: /logout',
+            'Disallow: /admin',
+            'Disallow: /horizon',
             '',
             'Sitemap: '.url('/sitemap.xml'),
             '',

@@ -44,6 +44,8 @@ test('home page includes seo meta tags and blog cover image alt', function () {
         ->assertSee('application/ld+json', false)
         ->assertSee('"@type":"Organization"', false)
         ->assertSee('images/og-default.png', false)
+        ->assertSee('images/apple-touch-icon.png', false)
+        ->assertSee('name="twitter:image:alt"', false)
         ->assertSee('Practice languages with real people | SpeakLoudMate', false)
         ->assertSee('alt="Cover image for SEO spotlight post"', false)
         ->assertSee('width="1200"', false)
@@ -81,7 +83,42 @@ test('blog post page includes article meta and cover image', function () {
         ->assertSee('alt="Cover image for Article for SEO"', false)
         ->assertSee('images/blog/welcome.svg', false)
         ->assertSee('"@type":"BlogPosting"', false)
-        ->assertSee('"headline":"Article for SEO"', false);
+        ->assertSee('"headline":"Article for SEO"', false)
+        ->assertSee('"@type":"BreadcrumbList"', false)
+        ->assertSee('name="twitter:image:alt"', false);
+});
+
+test('blog post meta title and description overrides are used', function () {
+    $author = User::factory()->create();
+
+    UserProfile::create([
+        'user_id' => $author->id,
+        'username' => 'metaauthor',
+        'display_name' => 'Meta Author',
+        'profile_slug' => 'metaauthor',
+    ]);
+
+    $post = BlogPost::create([
+        'author_id' => $author->id,
+        'title' => 'Visible article title',
+        'slug' => 'meta-override-post',
+        'excerpt' => 'Default excerpt should not appear in meta.',
+        'meta_title' => 'Custom SERP title',
+        'meta_description' => 'Custom meta description for search engines.',
+        'body' => '<p>Content</p>',
+        'status' => 'published',
+        'published_at' => now(),
+    ]);
+
+    $this->get(route('blog.show', $post->slug))
+        ->assertOk()
+        ->assertSee('Custom SERP title | SpeakLoudMate', false)
+        ->assertSee('Custom meta description for search engines.', false)
+        ->assertSee('property="og:title" content="Custom SERP title | SpeakLoudMate"', false)
+        ->assertSee('"headline":"Custom SERP title"', false)
+        ->assertSee('"description":"Custom meta description for search engines."', false)
+        ->assertDontSee('Default excerpt should not appear in meta.', false)
+        ->assertSee('Visible article title', false);
 });
 
 test('about page has unique title and description', function () {
@@ -179,6 +216,40 @@ test('json-ld escapes script breaking tags from user content', function () {
         ->and($html)->toContain('\\u003C\\/script\\u003E');
 });
 
+test('blog meta fields strip tags and escape json-ld payloads', function () {
+    $author = User::factory()->create();
+
+    UserProfile::create([
+        'user_id' => $author->id,
+        'username' => 'metaxss',
+        'display_name' => 'Meta XSS',
+        'profile_slug' => 'metaxss',
+    ]);
+
+    $post = BlogPost::create([
+        'author_id' => $author->id,
+        'title' => 'Safe visible title',
+        'slug' => 'meta-xss-post',
+        'excerpt' => 'Safe excerpt.',
+        'meta_title' => '<b>Injected</b> title </script><script>alert(1)</script>',
+        'meta_description' => '<i>Injected</i> description </script><script>alert(2)</script>',
+        'body' => '<p>Content</p>',
+        'status' => 'published',
+        'published_at' => now(),
+    ]);
+
+    $html = $this->get(route('blog.show', $post->slug))->assertOk()->getContent();
+
+    expect($html)
+        ->toContain('Injected title')
+        ->toContain('Injected description')
+        ->not->toContain('<b>Injected</b>')
+        ->not->toContain('<i>Injected</i>')
+        ->not->toContain('</script><script>alert(1)</script>')
+        ->not->toContain('</script><script>alert(2)</script>')
+        ->not->toContain('<script>alert');
+});
+
 test('sitemap excludes inactive users', function () {
     Cache::forget(SitemapBuilder::CACHE_KEY);
 
@@ -267,5 +338,7 @@ test('robots txt disallows private paths and links sitemap', function () {
         ->assertOk()
         ->assertSee('Disallow: /login', false)
         ->assertSee('Disallow: /schedule', false)
+        ->assertSee('Disallow: /admin', false)
+        ->assertSee('Disallow: /horizon', false)
         ->assertSee('Sitemap: '.url('/sitemap.xml'), false);
 });

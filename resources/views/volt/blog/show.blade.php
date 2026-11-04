@@ -26,7 +26,7 @@ hydrate([
     },
 ]);
 
-title(fn () => $this->post ? Seo::pageTitle($this->post->title) : Seo::pageTitle('Blog'));
+title(fn () => $this->post ? Seo::pageTitle(Seo::postTitle($this->post)) : Seo::pageTitle('Blog'));
 
 ?>
 

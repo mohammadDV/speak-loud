@@ -88,15 +88,17 @@ class Seo
         $authorName = $authorProfile instanceof UserProfile
             ? $authorProfile->display_name
             : null;
-        $description = self::descriptionFromText($post->excerpt ?: strip_tags($post->body));
+        $title = self::postTitle($post);
+        $description = self::postDescription($post);
         $image = $post->coverUrl();
+        $url = route('blog.show', $post->slug);
 
         self::share([
-            'seoTitle' => $post->title,
+            'seoTitle' => $title,
             'seoDescription' => $description,
             'seoImage' => $image,
             'seoImageAlt' => $post->coverAlt(),
-            'seoUrl' => route('blog.show', $post->slug),
+            'seoUrl' => $url,
             'seoType' => 'article',
             'seoPublishedTime' => $post->published_at?->toAtomString(),
             'seoModifiedTime' => $post->updated_at?->toAtomString(),
@@ -104,9 +106,32 @@ class Seo
             'seoJsonLd' => [
                 self::organizationSchema(),
                 self::websiteSchema(),
-                self::articleSchema($post, $description, $image, $authorName),
+                self::articleSchema($post, $title, $description, $image, $authorName),
+                self::breadcrumbSchema([
+                    ['name' => 'Home', 'url' => route('home')],
+                    ['name' => 'Blog', 'url' => route('blog.index')],
+                    ['name' => $title, 'url' => $url],
+                ]),
             ],
         ]);
+    }
+
+    public static function postTitle(BlogPost $post): string
+    {
+        $metaTitle = trim(strip_tags((string) $post->meta_title));
+
+        return $metaTitle !== '' ? $metaTitle : $post->title;
+    }
+
+    public static function postDescription(BlogPost $post): string
+    {
+        $metaDescription = trim((string) $post->meta_description);
+
+        if ($metaDescription !== '') {
+            return self::descriptionFromText($metaDescription);
+        }
+
+        return self::descriptionFromText($post->excerpt ?: strip_tags($post->body));
     }
 
     /**
@@ -203,6 +228,11 @@ class Seo
         ];
     }
 
+    public static function logoUrl(): string
+    {
+        return asset('images/apple-touch-icon.png');
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -213,7 +243,7 @@ class Seo
             '@type' => 'Organization',
             'name' => self::SITE_NAME,
             'url' => url('/'),
-            'logo' => self::defaultImage(),
+            'logo' => self::logoUrl(),
         ];
     }
 
@@ -234,12 +264,12 @@ class Seo
     /**
      * @return array<string, mixed>
      */
-    public static function articleSchema(BlogPost $post, string $description, string $image, ?string $authorName): array
+    public static function articleSchema(BlogPost $post, string $title, string $description, string $image, ?string $authorName): array
     {
         $schema = [
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
-            'headline' => $post->title,
+            'headline' => $title,
             'description' => $description,
             'image' => [$image],
             'mainEntityOfPage' => [
@@ -253,7 +283,7 @@ class Seo
                 'name' => self::SITE_NAME,
                 'logo' => [
                     '@type' => 'ImageObject',
-                    'url' => self::defaultImage(),
+                    'url' => self::logoUrl(),
                 ],
             ],
         ];
@@ -266,6 +296,24 @@ class Seo
         }
 
         return $schema;
+    }
+
+    /**
+     * @param  list<array{name: string, url: string}>  $items
+     * @return array<string, mixed>
+     */
+    public static function breadcrumbSchema(array $items): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => collect($items)->values()->map(fn (array $item, int $index) => [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'name' => $item['name'],
+                'item' => $item['url'],
+            ])->all(),
+        ];
     }
 
     /**
