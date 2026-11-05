@@ -249,7 +249,7 @@ mount(function () {
 {{-- ─── Footer ─────────────────────────────────────────────── --}}
 <footer class="border-t border-black/[0.06] py-6">
     <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-        <span>© {{ date('Y') }} SpeakLoudMate</span>
+        <span>© {{ date('Y') }} SpeakLoudMate · Built by <a href="https://mohammaddv.com" class="hover:text-[#3D2B1F] transition-colors" rel="noopener noreferrer" target="_blank">mohammaddv</a></span>
         <div class="flex gap-5">
             <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
             <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>
