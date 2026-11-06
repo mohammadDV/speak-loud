@@ -7,6 +7,7 @@ use App\Models\UserProfile;
 use App\Repositories\Contracts\IUserRepository;
 use App\Support\Legal;
 use App\Support\ProfileSlug;
+use App\Support\TelegramNotifier;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -39,6 +40,8 @@ class RegisterUser
             'profile_slug' => $username,
             'display_name' => $data['display_name'] ?? $username,
         ]);
+
+        TelegramNotifier::notify("New registration: #{$user->id} @{$username} ({$user->email})");
 
         return $user;
     }

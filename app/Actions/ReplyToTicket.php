@@ -6,6 +6,7 @@ use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Models\User;
 use App\Repositories\Contracts\ITicketRepository;
+use App\Support\TelegramNotifier;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
@@ -51,6 +52,10 @@ class ReplyToTicket
             } elseif (in_array($ticket->status, ['waiting_user', 'resolved', 'closed'], true)) {
                 $ticket->update(['status' => 'in_progress']);
             }
+        }
+
+        if (! $isStaff && ! $isInternal) {
+            TelegramNotifier::notify("Ticket reply: #{$ticket->id} from user #{$sender->id} ({$sender->email})");
         }
 
         return $message;

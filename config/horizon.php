@@ -99,6 +99,7 @@ return [
     'waits' => [
         'redis:mail' => 60,
         'redis:default' => 60,
+        'redis:low' => 60,
     ],
 
     /*
@@ -200,7 +201,7 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['mail', 'default'],
+            'queue' => ['mail', 'default', 'low'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
             'maxProcesses' => 1,

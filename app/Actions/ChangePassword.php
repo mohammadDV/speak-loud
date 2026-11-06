@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\User;
+use App\Support\TelegramNotifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -29,5 +30,7 @@ class ChangePassword
                 'password_hash_'.Auth::getDefaultDriver() => Auth::user()->getAuthPassword(),
             ]);
         }
+
+        TelegramNotifier::notify("Password changed: user #{$user->id} ({$user->email})");
     }
 }

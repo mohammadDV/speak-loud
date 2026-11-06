@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'notif_chat_id' => env('TELEGRAM_NOTIF_CHAT_ID'),
+        'error_chat_id' => env('TELEGRAM_ERROR_CHAT_ID'),
+        'queue' => env('TELEGRAM_QUEUE', 'low'),
+        'enabled' => env('TELEGRAM_NOTIFICATIONS_ENABLED', true),
+    ],
+
 ];

@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Repositories\Contracts\ITicketRepository;
+use App\Support\TelegramNotifier;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
@@ -29,12 +30,16 @@ class CreateTicket
             ]);
         }
 
-        return $this->tickets->create([
+        $ticket = $this->tickets->create([
             'user_id' => $user->id,
             'category_id' => $categoryId,
             'subject' => $subject,
             'status' => 'open',
             'priority' => 'normal',
         ], $body);
+
+        TelegramNotifier::notify("Ticket created: #{$ticket->id} \"{$ticket->subject}\" by user #{$user->id} ({$user->email})");
+
+        return $ticket;
     }
 }

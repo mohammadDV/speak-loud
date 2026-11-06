@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsActive;
+use App\Support\TelegramExceptionFilter;
+use App\Support\TelegramNotifier;
 use App\Support\ViewerTimezone;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -39,5 +41,15 @@ return Application::configure(basePath: dirname(__DIR__))
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->reportable(function (Throwable $e): void {
+            if (TelegramExceptionFilter::shouldSkip($e)) {
+                return;
+            }
+
+            try {
+                TelegramNotifier::error(TelegramNotifier::formatException($e));
+            } catch (Throwable) {
+                // Never let Telegram alerting break Laravel's exception reporter.
+            }
+        });
     })->create();
