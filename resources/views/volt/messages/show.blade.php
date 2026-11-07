@@ -43,7 +43,6 @@ mount(function (int $id) {
 hydrate(function () {
     if ($this->conversation) {
         $this->conversation->loadMissing(['userA.profile', 'userB.profile']);
-        $this->loadMessages();
     }
 });
 
@@ -85,7 +84,7 @@ $sendMessage = function () {
 
 ?>
 
-<div class="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto">
+<div class="flex flex-col h-[calc(100dvh-52px-3.5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-52px)] max-w-3xl mx-auto bg-[#FFF8F0]">
     @if ($conversation)
         @php
             $partnerUser = $conversation->user_a_id === auth()->id()
@@ -94,28 +93,28 @@ $sendMessage = function () {
             $partnerAvatarUrl = $partnerUser?->profile?->profileImageUrl();
         @endphp
 
-        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#3D2B1F]/10 bg-[#FFF8F0]">
-            <a href="{{ route('messages') }}" class="text-sm text-[#FF8C42] hover:underline shrink-0">← Messages</a>
+        <div class="flex items-center gap-3 px-4 py-3 border-b border-[#3D2B1F]/10 shrink-0">
+            <a href="{{ route('messages') }}" wire:navigate class="text-sm font-medium text-[#FF8C42] hover:underline shrink-0">← Chats</a>
             @if ($partnerAvatarUrl)
                 <img
                     src="{{ $partnerAvatarUrl }}"
                     alt="Profile picture of {{ $partnerUser?->profile?->display_name ?? 'User' }}"
-                    class="w-10 h-10 rounded-full object-cover ring-2 ring-[#FFF8F0] shrink-0"
+                    class="w-9 h-9 rounded-full object-cover ring-2 ring-[#FFF8F0] shrink-0"
                 >
             @else
-                <div class="w-10 h-10 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold shrink-0">
+                <div class="w-9 h-9 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {{ strtoupper(substr($partnerUser?->profile?->display_name ?? '?', 0, 1)) }}
                 </div>
             @endif
             <div class="min-w-0">
-                <p class="font-semibold text-[#3D2B1F] truncate">{{ $partnerUser?->profile?->display_name ?? 'User' }}</p>
+                <p class="font-semibold text-[#3D2B1F] text-sm truncate">{{ $partnerUser?->profile?->display_name ?? 'User' }}</p>
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
             @forelse ($messages as $msg)
                 <div class="flex {{ $msg->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
-                    <div class="max-w-sm px-4 py-2 rounded-2xl text-sm {{ $msg->sender_id === auth()->id() ? 'bg-[#FF8C42] text-white' : 'bg-[#FFF0E0] text-[#3D2B1F]' }}">
+                    <div class="max-w-[85%] sm:max-w-sm px-4 py-2 rounded-2xl text-sm break-words {{ $msg->sender_id === auth()->id() ? 'bg-[#FF8C42] text-white' : 'bg-[#FFF0E0] text-[#3D2B1F]' }}">
                         {{ $msg->body }}
                     </div>
                 </div>
@@ -124,7 +123,7 @@ $sendMessage = function () {
             @endforelse
         </div>
 
-        <div class="p-4 border-t border-[#3D2B1F]/10 flex gap-3 bg-[#FFF8F0]">
+        <div class="p-3 md:p-4 border-t border-[#3D2B1F]/10 flex gap-2 md:gap-3 shrink-0">
             <flux:textarea wire:model="newMessage" placeholder="Type a message..." rows="1" class="flex-1" />
             <flux:button wire:click="sendMessage" variant="primary">Send</flux:button>
         </div>

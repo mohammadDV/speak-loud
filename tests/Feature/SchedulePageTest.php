@@ -67,8 +67,26 @@ test('schedule page can open and close new slot modal', function () {
         ->call('openModal')
         ->assertSet('showModal', true)
         ->assertSee('New time slot')
+        ->assertSeeHtml('items-end sm:items-center')
+        ->assertSeeHtml('rounded-t-2xl sm:rounded-xl')
         ->call('closeModal')
         ->assertSet('showModal', false);
+});
+
+test('schedule page stacks slot cards for mobile layout', function () {
+    $language = Language::where('code', 'en')->first()
+        ?? Language::create(['code' => 'en', 'name_en' => 'English', 'name_native' => 'English', 'is_active' => true]);
+
+    $user = createScheduleTestUser('schedule-mobile@speakloudmate.test', 'schedulemobile');
+    saveRecurringSlotViaSchedulePage($user, $language, 'Mobile friendly slot');
+
+    Volt::actingAs($user)->test('schedule.index')
+        ->assertSee('Mobile friendly slot')
+        ->assertSee('View')
+        ->assertSee('Edit')
+        ->assertSee('Delete')
+        ->assertSeeHtml('flex flex-col gap-3')
+        ->assertSeeHtml('flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6');
 });
 
 test('schedule page can save a recurring slot', function () {

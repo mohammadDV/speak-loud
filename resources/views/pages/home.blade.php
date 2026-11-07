@@ -4,38 +4,50 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <x-seo-head />
+    <x-viewer-timezone />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased">
+<body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased pb-20 md:pb-0">
 
 <x-app-navbar />
 
 {{-- ─── Hero ───────────────────────────────────────────────── --}}
-<section class="max-w-6xl mx-auto px-5 pt-16 pb-20 grid md:grid-cols-[1fr_420px] gap-10 items-start">
+<section class="max-w-6xl mx-auto px-5 pt-8 sm:pt-12 md:pt-16 pb-10 sm:pb-16 md:pb-20 grid md:grid-cols-[1fr_420px] gap-8 md:gap-10 items-start">
 
-    <div class="pt-2">
-        <div class="inline-flex items-center gap-1.5 bg-[#FF8C42]/10 text-[#FF8C42] text-[11px] font-semibold px-3 py-1 rounded-full mb-6 tracking-wide uppercase">
+    <div class="pt-0 md:pt-2">
+        <div class="inline-flex items-center gap-1.5 bg-[#FF8C42]/10 text-[#FF8C42] text-[10px] sm:text-[11px] font-semibold px-2.5 sm:px-3 py-1 rounded-full mb-4 sm:mb-6 tracking-wide uppercase">
             <span class="w-1.5 h-1.5 rounded-full bg-[#FF8C42]"></span>
             40+ languages
         </div>
 
-        <h1 class="text-[3.25rem] font-black text-[#3D2B1F] leading-[1.05] tracking-tight mb-5">
-            Speak any language<br>with <span class="text-[#FF8C42]">real people.</span>
+        <h1 class="text-[2rem] sm:text-[2.75rem] md:text-[3.25rem] font-black text-[#3D2B1F] leading-[1.1] sm:leading-[1.05] tracking-tight mb-3 sm:mb-5">
+            Speak any language with <span class="text-[#FF8C42]">real people.</span>
         </h1>
 
-        <p class="text-[#3D2B1F]/55 text-[15px] leading-relaxed max-w-sm mb-8">
-            Drop your weekly times. Pick who joins. One-on-one conversations with patient partners — every Saturday at six, or one-off next Tuesday.
+        <p class="text-[#3D2B1F]/55 text-[14px] sm:text-[15px] leading-relaxed max-w-sm mb-6 sm:mb-8">
+            Drop your weekly times. Pick who joins. One-on-one conversations with patient partners.
         </p>
 
-        <div class="flex flex-wrap items-center gap-3 mb-10">
-            <a href="{{ route('register') }}"
-               class="bg-[#FF8C42] text-white text-[14px] font-semibold px-6 py-2.5 rounded-full hover:bg-[#e67a35] transition-colors shadow-[0_2px_12px_rgba(255,140,66,.35)]">
-                Start free
-            </a>
-            <a href="{{ route('discover') }}"
-               class="text-[14px] font-semibold text-[#3D2B1F]/70 px-6 py-2.5 rounded-full border border-[#3D2B1F]/15 hover:border-[#3D2B1F]/30 hover:text-[#3D2B1F] transition-all">
-                Browse partners
-            </a>
+        <div class="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 mb-7 sm:mb-10">
+            @auth
+                <a href="{{ route('discover') }}"
+                   class="inline-flex items-center justify-center bg-[#FF8C42] text-white text-[14px] font-semibold px-6 py-3 sm:py-2.5 rounded-full hover:bg-[#e67a35] transition-colors shadow-[0_2px_12px_rgba(255,140,66,.35)]">
+                    Claim a slot
+                </a>
+                <a href="{{ route('schedule') }}"
+                   class="inline-flex items-center justify-center text-[14px] font-semibold text-[#3D2B1F]/70 px-6 py-3 sm:py-2.5 rounded-full border border-[#3D2B1F]/15 hover:border-[#3D2B1F]/30 hover:text-[#3D2B1F] transition-all">
+                    My schedule
+                </a>
+            @else
+                <a href="{{ route('register') }}"
+                   class="inline-flex items-center justify-center bg-[#FF8C42] text-white text-[14px] font-semibold px-6 py-3 sm:py-2.5 rounded-full hover:bg-[#e67a35] transition-colors shadow-[0_2px_12px_rgba(255,140,66,.35)]">
+                    Start free
+                </a>
+                <a href="{{ route('discover') }}"
+                   class="inline-flex items-center justify-center text-[14px] font-semibold text-[#3D2B1F]/70 px-6 py-3 sm:py-2.5 rounded-full border border-[#3D2B1F]/15 hover:border-[#3D2B1F]/30 hover:text-[#3D2B1F] transition-all">
+                    Browse partners
+                </a>
+            @endauth
         </div>
 
         <div class="flex items-center gap-2.5">
@@ -44,17 +56,17 @@
                     <div class="w-7 h-7 rounded-full border-2 border-[#FFF8F0] text-white text-[11px] font-bold flex items-center justify-center" style="background:{{ $c }}">{{ $l }}</div>
                 @endforeach
             </div>
-            <p class="text-[13px] text-[#3D2B1F]/50">
-                <span class="font-semibold text-[#3D2B1F]">12,400 speakers</span> · joined this week
+            <p class="text-[12px] sm:text-[13px] text-[#3D2B1F]/50">
+                <span class="font-semibold text-[#3D2B1F]">12,400 speakers</span>
             </p>
         </div>
     </div>
 
     {{-- Open slots panel --}}
     <div class="bg-white rounded-2xl border border-black/[0.07] shadow-[0_4px_24px_rgba(0,0,0,.07)] overflow-hidden">
-        <div class="px-5 pt-5 pb-3 flex items-center justify-between">
+        <div class="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 flex items-center justify-between gap-3">
             <span class="text-[11px] font-semibold text-[#3D2B1F]/40 uppercase tracking-widest">Open slots this week</span>
-            <span class="text-[10px] font-semibold bg-[#FF8C42]/10 text-[#FF8C42] px-2 py-0.5 rounded-full">#Filter / search?</span>
+            <a href="{{ route('discover') }}" class="text-[11px] font-semibold text-[#FF8C42] hover:underline shrink-0">See all</a>
         </div>
 
         @php
@@ -67,7 +79,7 @@
             $openSlots = \App\Support\LookupCache::homeOpenSlots(4);
         @endphp
 
-        <div class="grid grid-cols-2 gap-3 px-3 pb-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 px-3 pb-4">
             @if($openSlots->isNotEmpty())
                 @foreach($openSlots as $i => $slot)
                     @php
@@ -79,17 +91,17 @@
                         $g       = \App\Support\ScheduleCardGradients::forIndex($i);
                         $time = \App\Support\ScheduleTime::scheduleWhen($slot) ?? '—';
                     @endphp
-                    <div class="rounded-xl overflow-hidden border border-black/[0.06]">
-                        <div class="h-20 flex items-end px-3 pb-2.5 relative" style="background:linear-gradient(135deg,{{ $g['from'] }},{{ $g['to'] }})">
-                            <div class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center font-black text-sm" style="color:{{ $g['from'] }}">
+                    <div @class(['rounded-xl overflow-hidden border border-black/[0.06] flex sm:block', 'hidden sm:block' => $i >= 2])>
+                        <div class="w-16 sm:w-auto sm:h-20 shrink-0 flex items-end px-2.5 sm:px-3 py-2.5 sm:pb-2.5 relative" style="background:linear-gradient(135deg,{{ $g['from'] }},{{ $g['to'] }})">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center font-black text-sm" style="color:{{ $g['from'] }}">
                                 {{ strtoupper(substr($name,0,1)) }}
                             </div>
-                            <span class="absolute top-2 right-2 text-[10px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded-full">{{ $lang }}</span>
+                            <span class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 text-[10px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded-full">{{ $lang }}</span>
                         </div>
-                        <div class="px-3 py-2.5">
-                            <div class="font-semibold text-[13px] text-[#3D2B1F]">{{ $name }}</div>
-                            <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5">{{ $time }}{{ $loc ? ' · '.$loc : '' }}</div>
-                            <div class="flex items-center justify-between mt-2.5">
+                        <div class="px-3 py-2.5 min-w-0 flex-1">
+                            <div class="font-semibold text-[13px] text-[#3D2B1F] truncate">{{ $name }}</div>
+                            <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5 truncate">{{ $time }}{{ $loc ? ' · '.$loc : '' }}</div>
+                            <div class="flex items-center justify-between mt-2">
                                 <span class="text-[11px] text-[#3D2B1F]/35">{{ $cnt }} claims</span>
                                 <a href="{{ route('login') }}" class="text-[11px] font-bold text-white px-2.5 py-1 rounded-full transition-colors hover:opacity-90" style="background-color: {{ $g['from'] }};">Claim</a>
                             </div>
@@ -99,17 +111,17 @@
             @else
                 @foreach($demo as $i => $s)
                     @php $g = \App\Support\ScheduleCardGradients::forIndex($i); @endphp
-                    <div class="rounded-xl overflow-hidden border border-black/[0.06]">
-                        <div class="h-20 flex items-end px-3 pb-2.5 relative" style="background:linear-gradient(135deg,{{ $g['from'] }},{{ $g['to'] }})">
-                            <div class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center font-black text-sm" style="color:{{ $g['from'] }}">
+                    <div @class(['rounded-xl overflow-hidden border border-black/[0.06] flex sm:block', 'hidden sm:block' => $i >= 2])>
+                        <div class="w-16 sm:w-auto sm:h-20 shrink-0 flex items-end px-2.5 sm:px-3 py-2.5 sm:pb-2.5 relative" style="background:linear-gradient(135deg,{{ $g['from'] }},{{ $g['to'] }})">
+                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/90 flex items-center justify-center font-black text-sm" style="color:{{ $g['from'] }}">
                                 {{ strtoupper(substr($s['name'],0,1)) }}
                             </div>
-                            <span class="absolute top-2 right-2 text-[10px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded-full">{{ $s['lang'] }}</span>
+                            <span class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 text-[10px] font-bold bg-black/20 text-white px-1.5 py-0.5 rounded-full">{{ $s['lang'] }}</span>
                         </div>
-                        <div class="px-3 py-2.5">
-                            <div class="font-semibold text-[13px] text-[#3D2B1F]">{{ $s['name'] }} {{ $s['flag'] }}</div>
-                            <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5">{{ $s['time'] }} · {{ $s['loc'] }}</div>
-                            <div class="flex items-center justify-between mt-2.5">
+                        <div class="px-3 py-2.5 min-w-0 flex-1">
+                            <div class="font-semibold text-[13px] text-[#3D2B1F] truncate">{{ $s['name'] }}</div>
+                            <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5 truncate">{{ $s['time'] }} · {{ $s['loc'] }}</div>
+                            <div class="flex items-center justify-between mt-2">
                                 <span class="text-[11px] text-[#3D2B1F]/35">{{ $s['claims'] }} claims</span>
                                 <a href="{{ route('register') }}" class="text-[11px] font-bold text-white px-2.5 py-1 rounded-full transition-colors hover:opacity-90" style="background-color: {{ $g['from'] }};">Claim</a>
                             </div>
@@ -158,32 +170,36 @@
 @endphp
 
 @if ($recentPosts->isNotEmpty())
-<section class="border-t border-black/[0.06] py-16">
+<section class="border-t border-black/[0.06] py-10 sm:py-16">
     <div class="max-w-6xl mx-auto px-5">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div>
-                <span class="text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">From the blog</span>
-                <h2 class="text-[1.75rem] font-black text-[#3D2B1F] tracking-tight mt-2">Tips for better practice</h2>
-                <p class="text-sm text-[#3D2B1F]/50 mt-1 max-w-md">Guides on finding partners, running sessions, and getting the most from SpeakLoudMate.</p>
+                <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">From the blog</span>
+                <h2 class="text-xl sm:text-[1.75rem] font-black text-[#3D2B1F] tracking-tight mt-1.5 sm:mt-2">Tips for better practice</h2>
+                <p class="text-xs sm:text-sm text-[#3D2B1F]/50 mt-1 max-w-md">Guides on finding partners, running sessions, and getting the most from SpeakLoudMate.</p>
             </div>
             <a href="{{ route('blog.index') }}" class="text-sm font-semibold text-[#FF8C42] hover:underline shrink-0">
                 View all posts →
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
             @foreach ($recentPosts as $post)
                 <a href="{{ route('blog.show', $post->slug) }}" class="group block rounded-xl border border-black/[0.06] bg-white overflow-hidden hover:shadow-[0_4px_20px_rgba(0,0,0,.08)] transition-shadow">
-                    <x-blog-cover :post="$post" class="rounded-none" />
-                    <div class="p-5">
+                    <x-blog-cover
+                        :post="$post"
+                        aspect="aspect-[2/1] md:aspect-[16/9]"
+                        class="rounded-none"
+                    />
+                    <div class="p-4 md:p-5">
                         @if ($post->category)
                             <span class="text-[10px] font-semibold uppercase tracking-wide text-[#FF8C42]">{{ $post->category->name }}</span>
                         @endif
-                        <h3 class="font-semibold text-[#3D2B1F] mt-2 group-hover:text-[#FF8C42] transition-colors leading-snug">{{ $post->title }}</h3>
+                        <h3 class="text-[15px] md:text-base font-semibold text-[#3D2B1F] mt-1.5 group-hover:text-[#FF8C42] transition-colors leading-snug line-clamp-2">{{ $post->title }}</h3>
                         @if ($post->excerpt)
-                            <p class="text-sm text-[#3D2B1F]/55 mt-2 line-clamp-3">{{ strip_tags($post->excerpt) }}</p>
+                            <p class="text-sm text-[#3D2B1F]/55 mt-1.5 line-clamp-2">{{ strip_tags($post->excerpt) }}</p>
                         @endif
-                        <p class="text-xs text-[#3D2B1F]/40 mt-4">
+                        <p class="text-xs text-[#3D2B1F]/40 mt-3">
                             {{ $post->author?->profile?->display_name ?? 'SpeakLoudMate' }}
                             · {{ $post->published_at?->format('M j, Y') }}
                         </p>
@@ -213,20 +229,7 @@
     </div>
 </section>
 
-{{-- ─── Footer ─────────────────────────────────────────────── --}}
-<footer class="border-t border-black/[0.06] py-6">
-    <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-        <span>© {{ date('Y') }} SpeakLoudMate · Built by <a href="https://mohammaddv.com" class="hover:text-[#3D2B1F] transition-colors" rel="noopener noreferrer" target="_blank">mohammaddv</a></span>
-        <div class="flex gap-5">
-            <a href="{{ route('blog.index') }}" class="hover:text-[#3D2B1F] transition-colors">Blog</a>
-            <a href="{{ route('faq.index') }}" class="hover:text-[#3D2B1F] transition-colors">FAQ</a>
-            <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
-            <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>
-            <a href="{{ route('support') }}" class="hover:text-[#3D2B1F] transition-colors">Support</a>
-            <a href="{{ route('terms') }}" class="hover:text-[#3D2B1F] transition-colors">Terms</a>
-        </div>
-    </div>
-</footer>
+<x-site-footer />
 
 </body>
 </html>

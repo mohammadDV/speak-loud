@@ -29,6 +29,7 @@ mount(function () {
 });
 
 hydrate(function () {
+    // Eloquent relations are dropped on rehydration; refresh once per request.
     $this->refreshConversations();
 
     if ($this->activeConversation) {
@@ -55,6 +56,12 @@ $selectConversation = function (int $conversationId) {
     $this->activeConversation = $conversationId;
     $this->messages           = app(IMessageRepository::class)->forConversation($conversationId);
     app(IMessageRepository::class)->markRead($conversationId, auth()->id());
+};
+
+$clearConversation = function () {
+    $this->activeConversation = null;
+    $this->messages = [];
+    $this->newMessage = '';
 };
 
 $sendMessage = function () {
@@ -92,12 +99,39 @@ $sendMessage = function () {
 
 ?>
 
-<div class="flex h-[calc(100vh-4rem)] max-w-6xl mx-auto">
-    <aside class="w-72 border-r border-[#3D2B1F]/10 overflow-y-auto">
+@php
+    $activeConv = null;
+    $activeLabel = null;
+    $activeInitial = '?';
+    $activeAvatarUrl = null;
+
+    if ($activeConversation) {
+        $activeConv = collect($conversations)->firstWhere('id', $activeConversation);
+
+        if ($activeConv && ! $activeConv->isScheduleGroup()) {
+            $partner = $activeConv->user_a_id === auth()->id() ? $activeConv->userB : $activeConv->userA;
+            $activeLabel = $partner->profile->display_name ?? 'User';
+            $activeInitial = strtoupper(substr($activeLabel, 0, 1));
+            $activeAvatarUrl = $partner->profile?->profileImageUrl();
+        }
+    }
+@endphp
+
+<div
+    class="flex h-[calc(100dvh-52px-3.5rem-env(safe-area-inset-bottom,0px))] md:h-[calc(100dvh-52px)] max-w-6xl mx-auto"
+    x-data="{ chatOpen: @js((bool) $activeConversation) }"
+    x-on:conversation-opened.window="chatOpen = true"
+>
+    <aside
+        class="border-[#3D2B1F]/10 overflow-y-auto bg-[#FFF8F0] w-full md:w-72 md:border-r"
+        x-bind:class="chatOpen ? 'hidden md:block' : 'block'"
+    >
         <div class="p-4">
+            <h1 class="text-lg font-bold text-[#3D2B1F] mb-3 md:sr-only">Messages</h1>
             <flux:input placeholder="Search chats..." />
         </div>
-        @foreach ($conversations as $conv)
+
+        @forelse ($conversations as $conv)
             @php
                 if ($conv->isScheduleGroup()) {
                     $label = ($conv->schedule?->language?->name_en ?? 'Schedule').' group';
@@ -136,8 +170,12 @@ $sendMessage = function () {
                     </div>
                 </a>
             @else
-                <button wire:click="selectConversation({{ $conv->id }})"
-                    class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}">
+                <button
+                    wire:click="selectConversation({{ $conv->id }})"
+                    x-on:click="chatOpen = true"
+                    type="button"
+                    class="w-full text-left p-4 hover:bg-[#FFF0E0] transition-colors {{ $activeConversation === $conv->id ? 'bg-[#FFF0E0]' : '' }}"
+                >
                     <div class="flex items-center gap-3">
                         @if ($avatarUrl)
                             <img
@@ -156,26 +194,56 @@ $sendMessage = function () {
                     </div>
                 </button>
             @endif
-        @endforeach
+        @empty
+            <p class="p-6 text-sm text-[#3D2B1F]/45 text-center">No conversations yet.</p>
+        @endforelse
     </aside>
 
-    <main class="flex-1 flex flex-col">
+    <main
+        class="flex-1 flex-col min-w-0 bg-[#FFF8F0]"
+        x-bind:class="chatOpen ? 'flex' : 'hidden md:flex'"
+    >
         @if ($activeConversation)
-            <div class="flex-1 overflow-y-auto p-6 space-y-4">
-                @foreach ($messages as $msg)
+            <div class="flex items-center gap-3 px-4 py-3 border-b border-[#3D2B1F]/10 shrink-0">
+                <button
+                    type="button"
+                    x-on:click="chatOpen = false"
+                    class="md:hidden text-sm font-medium text-[#FF8C42] hover:underline shrink-0"
+                >
+                    ← Chats
+                </button>
+                @if ($activeAvatarUrl)
+                    <img
+                        src="{{ $activeAvatarUrl }}"
+                        alt="Profile picture of {{ $activeLabel }}"
+                        class="w-9 h-9 rounded-full object-cover ring-2 ring-[#FFF8F0] shrink-0"
+                    >
+                @else
+                    <div class="w-9 h-9 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                        {{ $activeInitial }}
+                    </div>
+                @endif
+                <p class="font-semibold text-[#3D2B1F] text-sm truncate">{{ $activeLabel ?? 'Conversation' }}</p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+                @forelse ($messages as $msg)
                     <div class="flex {{ $msg->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
-                        <div class="max-w-sm px-4 py-2 rounded-2xl text-sm {{ $msg->sender_id === auth()->id() ? 'bg-[#FF8C42] text-white' : 'bg-[#FFF0E0] text-[#3D2B1F]' }}">
+                        <div class="max-w-[85%] sm:max-w-sm px-4 py-2 rounded-2xl text-sm break-words {{ $msg->sender_id === auth()->id() ? 'bg-[#FF8C42] text-white' : 'bg-[#FFF0E0] text-[#3D2B1F]' }}">
                             {{ $msg->body }}
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-center text-[#3D2B1F]/40 text-sm py-8">No messages yet. Say hello.</p>
+                @endforelse
             </div>
-            <div class="p-4 border-t border-[#3D2B1F]/10 flex gap-3">
+
+            <div class="p-3 md:p-4 border-t border-[#3D2B1F]/10 flex gap-2 md:gap-3 shrink-0">
                 <flux:textarea wire:model="newMessage" placeholder="Type a message..." rows="1" class="flex-1" />
                 <flux:button wire:click="sendMessage" variant="primary">Send</flux:button>
             </div>
         @else
-            <div class="flex-1 flex items-center justify-center text-[#3D2B1F]/40">
+            <div class="flex-1 flex items-center justify-center text-[#3D2B1F]/40 text-sm px-6 text-center">
                 Select a conversation to start chatting
             </div>
         @endif

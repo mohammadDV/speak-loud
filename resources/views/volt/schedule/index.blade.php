@@ -340,50 +340,53 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
 ?>
 
 <div class="max-w-4xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <div>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
+        <div class="min-w-0">
             <h1 class="text-2xl font-bold text-[#3D2B1F]">My Schedule</h1>
             <p class="text-sm text-[#3D2B1F]/50 mt-1">
                 {{ $this->schedules->count() }} of {{ $this->maxSlots }} slots used · Times shown in {{ $this->viewerTimezone }}.
             </p>
         </div>
         @if ($this->canCreateSlot)
-            <flux:button type="button" variant="primary" wire:click="openModal">+ New slot</flux:button>
+            <flux:button type="button" variant="primary" wire:click="openModal" class="w-full sm:w-auto shrink-0">+ New slot</flux:button>
         @else
-            <flux:button type="button" variant="primary" disabled title="{{ ScheduleLimits::limitReachedMessage() }}">+ New slot</flux:button>
+            <flux:button type="button" variant="primary" disabled title="{{ ScheduleLimits::limitReachedMessage() }}" class="w-full sm:w-auto shrink-0">+ New slot</flux:button>
         @endif
     </div>
 
     <div class="space-y-4">
         @forelse ($this->schedules as $schedule)
             <flux:card wire:key="schedule-{{ $schedule->id }}" class="bg-[#FFF0E0] p-4">
-                <div class="flex items-center justify-between">
-                    <div>
+                <div class="flex flex-col gap-3">
+                    <div class="min-w-0">
                         @if ($schedule->title)
                             <p class="font-semibold text-[#3D2B1F]">{{ $schedule->title }}</p>
                         @endif
-                        <span class="font-medium text-[#3D2B1F] {{ $schedule->title ? 'text-sm' : '' }}">{{ $schedule->language->name_en }}</span>
-                        <span class="ml-2 text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">
-                            {{ $schedule->type === 'recurring' ? 'Weekly' : 'One-off' }}
-                        </span>
+                        <div class="flex flex-wrap items-center gap-2 {{ $schedule->title ? 'mt-1' : '' }}">
+                            <span class="font-medium text-[#3D2B1F] {{ $schedule->title ? 'text-sm' : '' }}">{{ $schedule->language->name_en }}</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">
+                                {{ $schedule->type === 'recurring' ? 'Weekly' : 'One-off' }}
+                            </span>
+                            <span class="text-xs text-[#3D2B1F]/50">Max {{ $schedule->max_participants }} {{ Str::plural('claim', $schedule->max_participants) }}</span>
+                        </div>
+                        <x-schedule-when :schedule="$schedule" class="text-sm text-[#3D2B1F]/60 mt-2 block" />
+                        @if ($schedule->description)
+                            <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-3">{{ $schedule->description }}</p>
+                        @endif
                     </div>
-                    <div class="flex items-center gap-3 shrink-0">
-                        <span class="text-sm text-[#3D2B1F]/50 hidden sm:inline">Max {{ $schedule->max_participants }} {{ Str::plural('claim', $schedule->max_participants) }}</span>
-                        <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate size="sm" variant="ghost">View</flux:button>
-                        <flux:button type="button" size="sm" variant="ghost" wire:click="editSchedule({{ $schedule->id }})">Edit</flux:button>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <flux:button href="{{ route('schedules.show', $schedule) }}" wire:navigate size="sm" variant="ghost" class="flex-1 sm:flex-none">View</flux:button>
+                        <flux:button type="button" size="sm" variant="ghost" wire:click="editSchedule({{ $schedule->id }})" class="flex-1 sm:flex-none">Edit</flux:button>
                         <flux:button
                             type="button"
                             size="sm"
                             variant="danger"
                             wire:click="deleteSchedule({{ $schedule->id }})"
                             wire:confirm="Delete this slot? It will be removed from your schedule."
+                            class="flex-1 sm:flex-none"
                         >Delete</flux:button>
                     </div>
                 </div>
-                <x-schedule-when :schedule="$schedule" class="text-sm text-[#3D2B1F]/60 mt-1 block" />
-                @if ($schedule->description)
-                    <p class="text-sm text-[#3D2B1F]/70 mt-2 line-clamp-3">{{ $schedule->description }}</p>
-                @endif
             </flux:card>
         @empty
             <p class="text-center text-[#3D2B1F]/40 py-16">No slots yet. Create your first one!</p>
@@ -395,11 +398,12 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
     @endif
 
     @if ($showModal)
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true">
             <div class="absolute inset-0 bg-[#3D2B1F]/40" wire:click="closeModal"></div>
 
-            <div class="relative w-full max-w-md rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[90vh] overflow-y-auto">
-                <div class="p-6">
+            <div class="relative w-full max-w-md rounded-t-2xl sm:rounded-xl bg-[#FFF8F0] shadow-xl ring-1 ring-black/10 max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+                <div class="p-5 sm:p-6">
+                    <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-[#3D2B1F]/15 sm:hidden" aria-hidden="true"></div>
                     <h2 class="text-lg font-semibold text-[#3D2B1F]">{{ $editingScheduleId ? 'Edit time slot' : 'New time slot' }}</h2>
                     <p class="text-sm text-[#3D2B1F]/60 mt-1">{{ $editingScheduleId ? 'Update your availability.' : "Set when you're free to chat." }}</p>
                     <div class="mt-3 rounded-lg bg-[#FFF0E0] px-3 py-2 text-sm text-[#3D2B1F] ring-1 ring-[#FF8C42]/25">
@@ -511,9 +515,9 @@ $saveSlot = function (CreateSchedule $create, UpdateSchedule $update) {
                         />
                         @error('max_participants') <p class="text-sm text-[#D94F3D]">{{ $message }}</p> @enderror
 
-                        <div class="flex justify-end gap-3 pt-2">
-                            <flux:button type="button" wire:click="closeModal" variant="ghost">Cancel</flux:button>
-                            <flux:button type="submit" variant="primary">{{ $editingScheduleId ? 'Update slot' : 'Save slot' }}</flux:button>
+                        <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3 pt-2">
+                            <flux:button type="button" wire:click="closeModal" variant="ghost" class="w-full sm:w-auto">Cancel</flux:button>
+                            <flux:button type="submit" variant="primary" class="w-full sm:w-auto">{{ $editingScheduleId ? 'Update slot' : 'Save slot' }}</flux:button>
                         </div>
                     </form>
                 </div>

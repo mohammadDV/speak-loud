@@ -17,6 +17,10 @@
 }
 
 @layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
     button:not(:disabled):not([disabled]),
     [type='button']:not(:disabled):not([disabled]),
     [type='submit']:not(:disabled):not([disabled]),

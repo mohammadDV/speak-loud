@@ -109,7 +109,7 @@ mount(function () {
                 @endforeach
             </div>
             <p class="text-[13px] text-[#3D2B1F]/50">
-                <span class="font-semibold text-[#3D2B1F]">12,400 speakers</span> · joined this week
+                <span class="font-semibold text-[#3D2B1F]">12,400 speakers</span>
             </p>
         </div>
     </div>
@@ -240,17 +240,7 @@ mount(function () {
     </div>
 </section>
 
-{{-- ─── Footer ─────────────────────────────────────────────── --}}
-<footer class="border-t border-black/[0.06] py-6">
-    <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-        <span>© {{ date('Y') }} SpeakLoudMate · Built by <a href="https://mohammaddv.com" class="hover:text-[#3D2B1F] transition-colors" rel="noopener noreferrer" target="_blank">mohammaddv</a></span>
-        <div class="flex gap-5">
-            <a href="{{ route('about') }}" class="hover:text-[#3D2B1F] transition-colors">About</a>
-            <a href="{{ route('contact') }}" class="hover:text-[#3D2B1F] transition-colors">Contact</a>
-            <a href="{{ route('support') }}" class="hover:text-[#3D2B1F] transition-colors">Support</a>
-        </div>
-    </div>
-</footer>
+<x-site-footer />
 
 </body>
 </html>

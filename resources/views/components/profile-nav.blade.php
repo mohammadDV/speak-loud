@@ -7,7 +7,7 @@
     ];
 @endphp
 
-<nav class="flex flex-wrap gap-2" aria-label="Profile menu">
+<nav class="hidden md:flex flex-wrap gap-2" aria-label="Profile menu">
     @foreach ($items as $item)
         <flux:button
             href="{{ route($item['route']) }}"

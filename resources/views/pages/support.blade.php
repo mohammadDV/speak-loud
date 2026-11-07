@@ -8,6 +8,6 @@
     @else
         <p><a href="{{ route('login') }}" class="text-[#FF8C42] font-semibold hover:underline">Sign in</a> to open a support ticket and get replies in the app.</p>
     @endauth
-    <p>You can also email <a href="mailto:support@speakloudmate.app" class="text-[#FF8C42] font-semibold hover:underline">support@speakloudmate.app</a> with your username and a short description of the issue.</p>
+    <p>You can also email <a href="mailto:info@speakloudmate.com" class="text-[#FF8C42] font-semibold hover:underline">info@speakloudmate.com</a> with your username and a short description of the issue.</p>
     <p>To report another member, open their profile or chat and use the report option—our team reviews reports promptly.</p>
 </x-marketing-page>

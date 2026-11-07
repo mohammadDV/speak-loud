@@ -93,7 +93,7 @@ $sendReply = function (ReplyToTicket $action) {
 ?>
 
 <div class="flex flex-col h-[calc(100vh-4rem)] max-w-3xl mx-auto">
-    <div class="px-4 pt-4">
+    <div class="px-4 pt-4 hidden md:block">
         <x-profile-nav />
     </div>
 

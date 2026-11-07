@@ -249,7 +249,7 @@ $sendMessage = function () {
             </div>
 
             <div class="lg:col-span-3">
-                <flux:card class="bg-[#FFF8F0] !flex !flex-col min-h-[420px] lg:min-h-[520px]">
+                <flux:card class="bg-[#FFF8F0] !flex !flex-col min-h-[320px] sm:min-h-[420px] lg:min-h-[520px]">
                     <div class="px-4 py-3 border-b border-[#3D2B1F]/10">
                         <h2 class="font-semibold text-[#3D2B1F]">Group chat</h2>
                         <p class="text-xs text-[#3D2B1F]/50 mt-0.5">Host and accepted members only</p>
@@ -277,9 +277,9 @@ $sendMessage = function () {
                             @endforelse
                         </div>
 
-                        <div class="p-4 border-t border-[#3D2B1F]/10 flex gap-3">
+                        <div class="p-3 sm:p-4 border-t border-[#3D2B1F]/10 flex gap-2 sm:gap-3">
                             <flux:textarea wire:model="newMessage" placeholder="Message the group..." rows="1" class="flex-1" />
-                            <flux:button wire:click="sendMessage" variant="primary">Send</flux:button>
+                            <flux:button wire:click="sendMessage" variant="primary" class="shrink-0">Send</flux:button>
                         </div>
                     @else
                         <div class="flex-1 flex items-center justify-center p-8 text-center text-sm text-[#3D2B1F]/50">

@@ -21,7 +21,7 @@ $profile = computed(fn () => auth()->user()?->load(['profile', 'languages.langua
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
-    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mb-6 hidden md:flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <x-profile-nav>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

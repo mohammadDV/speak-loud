@@ -254,6 +254,7 @@ test('discover page can filter slots by host interests', function () {
 
     Volt::actingAs($viewer)->test('discover.index')
         ->set('selected_interest_ids', [(string) $music->id])
+        ->call('applyFilters')
         ->assertSee('Host Music')
         ->assertSee('Music lovers conversation practice.')
         ->assertDontSee('Host Travel')
@@ -755,4 +756,20 @@ test('discover page load more appends additional open schedules', function () {
         ->call('loadMoreSchedules')
         ->assertSee('Discover load more slot 21')
         ->assertSet('hasMoreSchedules', false);
+});
+
+test('discover filter sheet is alpine-driven and applies filters on demand', function () {
+    Volt::test('discover.index')
+        ->assertSee('Filters')
+        ->assertSeeHtml('x-data="{ filtersOpen: false }"')
+        ->assertSeeHtml('x-on:click="filtersOpen = true"')
+        ->assertSeeHtml('aria-label="Filters"')
+        ->assertSeeHtml('rounded-t-2xl')
+        ->assertSeeHtml('items-end')
+        ->assertSee('Search slots')
+        ->assertSeeHtml('wire:click="applyFilters"')
+        ->set('language_id', '1')
+        ->assertSet('activeFilterCount', 1)
+        ->call('applyFilters')
+        ->assertSet('schedulesPage', 1);
 });

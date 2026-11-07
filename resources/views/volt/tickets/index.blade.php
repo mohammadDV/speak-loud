@@ -77,7 +77,7 @@ $createTicket = function (CreateTicket $action) {
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
-    <div class="mb-6">
+    <div class="mb-6 hidden md:block">
         <x-profile-nav />
     </div>
 

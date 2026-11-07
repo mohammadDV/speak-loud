@@ -38,5 +38,52 @@ test('home page shows recent published blog posts', function () {
         ->assertSee('Home page blog spotlight')
         ->assertSee('This post should appear on the landing page.')
         ->assertSee(route('blog.index'), false)
-        ->assertSee('alt="Cover image for Home page blog spotlight"', false);
+        ->assertSee('alt="Cover image for Home page blog spotlight"', false)
+        ->assertSee('aspect-[2/1] md:aspect-[16/9]', false)
+        ->assertSee('text-[2rem] sm:text-[2.75rem] md:text-[3.25rem]', false);
+});
+
+test('home page footer links are organized and present', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('aria-label="Footer"', false)
+        ->assertSee(route('about'), false)
+        ->assertSee(route('blog.index'), false)
+        ->assertSee(route('faq.index'), false)
+        ->assertSee(route('contact'), false)
+        ->assertSee(route('support'), false)
+        ->assertSee(route('terms'), false)
+        ->assertSee('mohammaddv', false);
+});
+
+test('home page includes mobile bottom quick access destinations', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('aria-label="Quick access"', false)
+        ->assertSee(route('home'), false)
+        ->assertSee(route('discover'), false)
+        ->assertSee(route('schedule'), false)
+        ->assertSee(route('messages'), false)
+        ->assertSee(route('profile'), false);
+});
+
+test('home page sets viewer timezone and exposes mobile menu controls without livewire', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('viewer_timezone=', false)
+        ->assertSee('aria-label="Open menu"', false)
+        ->assertSee('data-mobile-nav-toggle', false)
+        ->assertSee('data-mobile-nav-drawer', false)
+        ->assertDontSee('/livewire/livewire', false);
+});
+
+test('authenticated home page shows claim a slot instead of start free', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('home'))
+        ->assertOk()
+        ->assertSee('Claim a slot', false)
+        ->assertSee(route('discover'), false)
+        ->assertDontSee('Start free', false);
 });

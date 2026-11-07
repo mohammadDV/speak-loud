@@ -65,7 +65,9 @@ $updatePassword = function (ChangePassword $action) {
 
 <div class="max-w-3xl mx-auto px-4 py-8">
     <div class="mb-8 space-y-6">
-        <x-profile-nav />
+        <div class="hidden md:block">
+            <x-profile-nav />
+        </div>
 
         <div>
             <h1 class="text-2xl font-bold text-[#3D2B1F]">Security</h1>

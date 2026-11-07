@@ -21,9 +21,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <x-seo-head :title="$title" :description="$description" />
     @stack('seo-extra')
+    <x-viewer-timezone />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased min-h-screen flex flex-col">
+<body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased min-h-screen flex flex-col pb-20 md:pb-0">
     <x-app-navbar />
 
     <main class="flex-1 max-w-3xl mx-auto px-5 py-12 w-full">
@@ -33,16 +34,6 @@
         </div>
     </main>
 
-    <footer class="border-t border-black/[0.06] py-6 mt-12">
-        <div class="max-w-6xl mx-auto px-5 flex items-center justify-between text-[12px] text-[#3D2B1F]/30">
-            <span>© {{ date('Y') }} SpeakLoudMate · Built by <a href="https://mohammaddv.com" class="hover:text-[#3D2B1F] transition-colors" rel="noopener noreferrer" target="_blank">mohammaddv</a></span>
-            <div class="flex gap-5">
-                <a href="{{ route('blog.index') }}" class="hover:text-[#3D2B1F] transition-colors">Blog</a>
-                <a href="{{ route('faq.index') }}" class="hover:text-[#3D2B1F] transition-colors">FAQ</a>
-                <a href="{{ route('terms') }}" class="hover:text-[#3D2B1F] transition-colors">Terms</a>
-                <a href="{{ route('home') }}" class="hover:text-[#3D2B1F] transition-colors">Home</a>
-            </div>
-        </div>
-    </footer>
+    <x-site-footer class="mt-12" />
 </body>
 </html>

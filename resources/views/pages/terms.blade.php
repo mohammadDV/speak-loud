@@ -49,7 +49,7 @@
     <p>
         If you believe you are a victim of fraud, contact local authorities and your financial institution
         immediately. You can also report the user through SpeakLoudMate and email
-        <a href="mailto:support@speakloudmate.app" class="text-[#FF8C42] font-semibold hover:underline">support@speakloudmate.app</a>.
+        <a href="mailto:info@speakloudmate.com" class="text-[#FF8C42] font-semibold hover:underline">info@speakloudmate.com</a>.
     </p>
 
     <h2 class="font-bold text-[#3D2B1F]">5. Chat and message retention</h2>
@@ -119,7 +119,7 @@
     <h2 class="font-bold text-[#3D2B1F]">12. Contact</h2>
     <p>
         Questions about these Terms:
-        <a href="mailto:legal@speakloudmate.app" class="text-[#FF8C42] font-semibold hover:underline">legal@speakloudmate.app</a>.
+        <a href="mailto:info@speakloudmate.com" class="text-[#FF8C42] font-semibold hover:underline">info@speakloudmate.com</a>.
         General support:
         <a href="{{ route('support') }}" class="text-[#FF8C42] font-semibold hover:underline">Support</a>.
     </p>
