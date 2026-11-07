@@ -58,12 +58,6 @@
         </div>
 
         @php
-            $gradients = [
-                ['from' => '#FF8C42', 'to' => '#FFD166'],
-                ['from' => '#9B59B6', 'to' => '#6C3483'],
-                ['from' => '#1ABC9C', 'to' => '#16A085'],
-                ['from' => '#E67E22', 'to' => '#D35400'],
-            ];
             $demo = [
                 ['name'=>'Maya',  'lang'=>'EN→FA', 'flag'=>'🇪🇸', 'time'=>'Sat 18:00', 'loc'=>'Spain',  'claims'=>3],
                 ['name'=>'Kenji', 'lang'=>'EN→JA', 'flag'=>'🇯🇵', 'time'=>'Thu 19:00', 'loc'=>'Japan',  'claims'=>1],
@@ -82,7 +76,7 @@
                         $lang    = strtoupper($slot->language?->code ?? '??');
                         $loc     = $profile?->country_code ?? '';
                         $cnt     = $slot->claims_count ?? 0;
-                        $g       = $gradients[$i % 4];
+                        $g       = \App\Support\ScheduleCardGradients::forIndex($i);
                         $time = \App\Support\ScheduleTime::scheduleWhen($slot) ?? '—';
                     @endphp
                     <div class="rounded-xl overflow-hidden border border-black/[0.06]">
@@ -97,14 +91,14 @@
                             <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5">{{ $time }}{{ $loc ? ' · '.$loc : '' }}</div>
                             <div class="flex items-center justify-between mt-2.5">
                                 <span class="text-[11px] text-[#3D2B1F]/35">{{ $cnt }} claims</span>
-                                <a href="{{ route('login') }}" class="text-[11px] font-bold bg-[#FF8C42] text-white px-2.5 py-1 rounded-full hover:bg-[#e67a35] transition-colors">Claim</a>
+                                <a href="{{ route('login') }}" class="text-[11px] font-bold text-white px-2.5 py-1 rounded-full transition-colors hover:opacity-90" style="background-color: {{ $g['from'] }};">Claim</a>
                             </div>
                         </div>
                     </div>
                 @endforeach
             @else
                 @foreach($demo as $i => $s)
-                    @php $g = $gradients[$i % 4]; @endphp
+                    @php $g = \App\Support\ScheduleCardGradients::forIndex($i); @endphp
                     <div class="rounded-xl overflow-hidden border border-black/[0.06]">
                         <div class="h-20 flex items-end px-3 pb-2.5 relative" style="background:linear-gradient(135deg,{{ $g['from'] }},{{ $g['to'] }})">
                             <div class="w-9 h-9 rounded-full bg-white/90 flex items-center justify-center font-black text-sm" style="color:{{ $g['from'] }}">
@@ -117,7 +111,7 @@
                             <div class="text-[11px] text-[#3D2B1F]/50 mt-0.5">{{ $s['time'] }} · {{ $s['loc'] }}</div>
                             <div class="flex items-center justify-between mt-2.5">
                                 <span class="text-[11px] text-[#3D2B1F]/35">{{ $s['claims'] }} claims</span>
-                                <a href="{{ route('register') }}" class="text-[11px] font-bold bg-[#FF8C42] text-white px-2.5 py-1 rounded-full hover:bg-[#e67a35] transition-colors">Claim</a>
+                                <a href="{{ route('register') }}" class="text-[11px] font-bold text-white px-2.5 py-1 rounded-full transition-colors hover:opacity-90" style="background-color: {{ $g['from'] }};">Claim</a>
                             </div>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-@props(['interests', 'limit' => null, 'size' => 'sm'])
+@props(['interests', 'limit' => null, 'size' => 'sm', 'accent' => '#FF8C42'])
 
 @php
     $items = $limit ? $interests->take($limit) : $interests;
@@ -11,7 +11,10 @@
 @if ($items->isNotEmpty())
     <div {{ $attributes->merge(['class' => 'flex flex-wrap gap-1.5']) }}>
         @foreach ($items as $interest)
-            <span class="{{ $sizeClass }} bg-[#FF8C42]/15 text-[#FF8C42] rounded-full">{{ $interest->name_en }}</span>
+            <span
+                class="{{ $sizeClass }} rounded-full"
+                style="background-color: color-mix(in srgb, {{ $accent }} 15%, transparent); color: {{ $accent }};"
+            >{{ $interest->name_en }}</span>
         @endforeach
         @if ($extra > 0)
             <span class="{{ $sizeClass }} bg-[#3D2B1F]/5 text-[#3D2B1F]/50 rounded-full">+{{ $extra }}</span>

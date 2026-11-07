@@ -6,12 +6,14 @@
 
 @php
     use App\Support\CountryCodes;
+    use App\Support\ScheduleCardGradients;
     use App\Support\ScheduleTime;
 
     $profile = $schedule->user?->profile;
     $hostCountry = CountryCodes::name($profile?->country_code);
     $avatarUrl = $profile?->profileImageUrl();
     $backgroundUrl = $profile?->backgroundImageUrl();
+    $headerGradient = ScheduleCardGradients::forId((int) $schedule->id);
     $accepted = $schedule->accepted_claims_count ?? $schedule->claims->where('status', 'accepted')->count();
     $spotsLeft = max(0, $schedule->max_participants - $accepted);
     $viewerId = auth()->id();
@@ -98,7 +100,10 @@
     </div>
 @else
     <div {{ $attributes->class('h-full') }}>
-        <flux:card class="bg-[#FFF0E0] hover:shadow-md transition-shadow !flex !flex-col h-full min-h-[280px]">
+        <flux:card
+            class="hover:shadow-md transition-shadow !flex !flex-col h-full min-h-[280px]"
+            style="background-color: {{ $headerGradient['body'] }}; --color-accent: {{ $headerGradient['from'] }}; --color-accent-foreground: #fff;"
+        >
             @if ($backgroundUrl)
                 <div
                     class="h-14 shrink-0 rounded-t-lg bg-center bg-cover"
@@ -107,27 +112,34 @@
                     aria-label="Host background"
                 ></div>
             @else
-                <div class="h-14 shrink-0 rounded-t-lg" style="background: linear-gradient(135deg, #FF8C42, #FFD166);"></div>
+                <div class="h-14 shrink-0 rounded-t-lg" style="background: linear-gradient(135deg, {{ $headerGradient['from'] }}, {{ $headerGradient['to'] }});"></div>
             @endif
             <div class="px-4 pb-4 flex flex-col flex-1 -mt-8 min-h-0">
                 @if ($avatarUrl)
                     <img
                         src="{{ $avatarUrl }}"
                         alt="Profile picture of {{ $profile->display_name ?? 'Host' }}"
-                        class="w-12 h-12 shrink-0 rounded-full object-cover border-2 border-[#FFF0E0]"
+                        class="w-12 h-12 shrink-0 rounded-full object-cover border-2"
+                        style="border-color: {{ $headerGradient['body'] }};"
                     >
                 @else
-                    <div class="w-12 h-12 shrink-0 rounded-full bg-[#FF8C42] flex items-center justify-center text-white font-bold text-lg border-2 border-[#FFF0E0]">
+                    <div
+                        class="w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-white font-bold text-lg border-2"
+                        style="background-color: {{ $headerGradient['from'] }}; border-color: {{ $headerGradient['body'] }};"
+                    >
                         {{ strtoupper(substr($profile->display_name ?? '?', 0, 1)) }}
                     </div>
                 @endif
                 <div class="mt-2 flex flex-wrap items-center gap-1.5">
                     @if ($profile?->profile_slug)
-                        <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] leading-snug hover:text-[#FF8C42]">{{ $profile->display_name ?? 'Host' }}</a>
+                        <a href="{{ route('users.show', $profile->profile_slug) }}" wire:navigate class="font-semibold text-[#3D2B1F] leading-snug hover:text-[var(--color-accent)]">{{ $profile->display_name ?? 'Host' }}</a>
                     @else
                         <p class="font-semibold text-[#3D2B1F] leading-snug">{{ $profile->display_name ?? 'Host' }}</p>
                     @endif
-                    <span class="text-[10px] px-1.5 py-0.5 rounded-full {{ $schedule->type === 'recurring' ? 'bg-[#FF8C42]/20 text-[#FF8C42]' : 'bg-[#FFD166]/30 text-[#3D2B1F]' }}">{{ $badge }}</span>
+                    <span
+                        class="text-[10px] px-1.5 py-0.5 rounded-full"
+                        style="background-color: color-mix(in srgb, {{ $headerGradient['from'] }} 20%, transparent); color: {{ $headerGradient['from'] }};"
+                    >{{ $badge }}</span>
                 </div>
                 <p class="text-xs text-[#3D2B1F]/50 mt-0.5">
                     {{ $schedule->language->name_en }} · {{ $when }}@if ($hostCountry) · {{ $hostCountry }}@endif
@@ -138,13 +150,13 @@
                         <p class="text-xs text-[#3D2B1F]/65 line-clamp-3">{{ $schedule->description }}</p>
                     @endif
                     @if ($schedule->user?->interests?->isNotEmpty())
-                        <x-interest-tags :interests="$schedule->user->interests" :limit="3" size="xs" />
+                        <x-interest-tags :interests="$schedule->user->interests" :limit="3" size="xs" :accent="$headerGradient['from']" />
                     @endif
                 </div>
 
                 <div class="mt-auto shrink-0 pt-3">
                     <p class="text-[11px] text-[#3D2B1F]/45 mb-2">{{ $spotsLeft }} {{ Str::plural('spot', $spotsLeft) }} left</p>
-                    <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mb-2 text-xs text-[#FF8C42] hover:underline">View details</a>
+                    <a href="{{ route('schedules.show', $schedule) }}" wire:navigate class="inline-block mb-2 text-xs text-[var(--color-accent)] hover:underline">View details</a>
                     @if ($myClaim?->status === 'pending')
                         <flux:button type="button" variant="ghost" size="sm" class="w-full" disabled>Claim pending</flux:button>
                     @elseif ($myClaim?->status === 'accepted')
