@@ -43,4 +43,10 @@ return [
         'enabled' => env('TELEGRAM_NOTIFICATIONS_ENABLED', true),
     ],
 
+    'paypal' => [
+        'donate_email' => env('PAYPAL_DONATE_EMAIL', 'mohammad.daneshmandvojdani@gmail.com'),
+        'currency' => env('PAYPAL_DONATE_CURRENCY', 'USD'),
+        'item_name' => env('PAYPAL_DONATE_ITEM_NAME', 'SpeakLoudMate donation'),
+    ],
+
 ];

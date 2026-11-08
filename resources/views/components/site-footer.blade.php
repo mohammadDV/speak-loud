@@ -4,6 +4,7 @@
         ['blog.index', 'Blog'],
         ['faq.index', 'FAQ'],
         ['contact', 'Contact'],
+        ['donate', 'Donate'],
         ['support', 'Support'],
         ['terms', 'Terms'],
     ];

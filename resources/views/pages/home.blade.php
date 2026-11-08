@@ -48,6 +48,10 @@
                     Browse partners
                 </a>
             @endauth
+            <a href="{{ route('donate') }}"
+               class="md:hidden inline-flex items-center justify-center text-[14px] font-semibold text-[#FF8C42] px-6 py-3 rounded-full border border-[#FF8C42]/40 hover:border-[#FF8C42] hover:bg-[#FF8C42]/10 transition-all">
+                Donate
+            </a>
         </div>
 
         <div class="flex items-center gap-2.5">

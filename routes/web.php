@@ -19,6 +19,7 @@ Route::get('/', function () {
 })->name('home');
 Route::get('/about', fn () => view('pages.about'))->name('about');
 Route::get('/contact', fn () => view('pages.contact'))->name('contact');
+Route::get('/donate', fn () => view('pages.donate'))->name('donate');
 Route::get('/support', fn () => view('pages.support'))->name('support');
 Route::get('/terms', fn () => view('pages.terms'))->name('terms');
 Route::get('/robots.txt', RobotsController::class)->name('robots');

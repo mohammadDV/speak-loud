@@ -54,6 +54,7 @@ class SitemapBuilder
             ['loc' => route('home'), 'lastmod' => null],
             ['loc' => route('about'), 'lastmod' => null],
             ['loc' => route('contact'), 'lastmod' => null],
+            ['loc' => route('donate'), 'lastmod' => null],
             ['loc' => route('support'), 'lastmod' => null],
             ['loc' => route('terms'), 'lastmod' => null],
             ['loc' => route('blog.index'), 'lastmod' => null],

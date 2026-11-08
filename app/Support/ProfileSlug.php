@@ -13,6 +13,7 @@ class ProfileSlug
         'claims',
         'contact',
         'discover',
+        'donate',
         'login',
         'messages',
         'profile',

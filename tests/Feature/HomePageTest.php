@@ -51,6 +51,7 @@ test('home page footer links are organized and present', function () {
         ->assertSee(route('blog.index'), false)
         ->assertSee(route('faq.index'), false)
         ->assertSee(route('contact'), false)
+        ->assertSee(route('donate'), false)
         ->assertSee(route('support'), false)
         ->assertSee(route('terms'), false)
         ->assertSee('mohammaddv', false);
@@ -65,6 +66,15 @@ test('home page includes mobile bottom quick access destinations', function () {
         ->assertSee(route('schedule'), false)
         ->assertSee(route('messages'), false)
         ->assertSee(route('profile'), false);
+});
+
+test('home page exposes desktop nav donate link and mobile hero donate button', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee(route('donate'), false)
+        ->assertSee('Donate', false)
+        ->assertSee('M21 8.25c0-2.485-2.099-4.5-4.688-4.5', false)
+        ->assertSee('md:hidden inline-flex items-center justify-center text-[14px] font-semibold text-[#FF8C42]', false);
 });
 
 test('home page sets viewer timezone and exposes mobile menu controls without livewire', function () {
