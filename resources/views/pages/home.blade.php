@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <x-google-tag-manager />
     <x-seo-head />
     <x-viewer-timezone />
     @vite(['resources/css/app.css', 'resources/js/app.js'])

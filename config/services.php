@@ -49,4 +49,8 @@ return [
         'item_name' => env('PAYPAL_DONATE_ITEM_NAME', 'SpeakLoudMate donation'),
     ],
 
+    'google_tag_manager' => [
+        'id' => env('GOOGLE_TAG_MANAGER_ID'),
+    ],
+
 ];
