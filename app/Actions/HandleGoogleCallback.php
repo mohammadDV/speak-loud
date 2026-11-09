@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\SocialAccount;
 use App\Models\User;
+use App\Services\Uploads\S3UploadService;
 use App\Support\AuthRedirect;
 use App\Support\AuthSession;
 use App\Support\InvalidateUserSessions;
@@ -19,6 +20,8 @@ class HandleGoogleCallback
     public const PENDING_SESSION_KEY = 'google_oauth_pending';
 
     public const PENDING_TTL_SECONDS = 900;
+
+    public function __construct(private readonly S3UploadService $uploads) {}
 
     /**
      * @return RedirectResponse|array{status: 'pending'}
@@ -208,6 +211,12 @@ class HandleGoogleCallback
             $displayName = $profile->username;
         } else {
             $displayName = mb_substr($displayName, 0, 100);
+        }
+
+        foreach ([$profile->profile_image_path, $profile->background_image_path] as $path) {
+            if (is_string($path) && $path !== '') {
+                $this->uploads->deleteIfExists($path);
+            }
         }
 
         $profile->forceFill([

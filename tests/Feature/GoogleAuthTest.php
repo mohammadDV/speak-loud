@@ -7,6 +7,7 @@ use App\Support\AuthSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Contracts\Provider as SocialiteProvider;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -113,6 +114,10 @@ test('google oauth auto links verified local account and keeps password', functi
 });
 
 test('google oauth reclaiming unverified squatted account clears password and sessions', function () {
+    Storage::fake('s3');
+    Storage::disk('s3')->put('profiles/attacker.jpg', 'fake-image');
+    Storage::disk('s3')->put('profiles/attacker-bg.jpg', 'fake-bg');
+
     $user = User::factory()->unverified()->create([
         'email' => 'squatted@example.com',
         'password' => 'AttackerPass1!',
@@ -126,6 +131,7 @@ test('google oauth reclaiming unverified squatted account clears password and se
         'display_name' => 'Squatted User',
         'bio' => 'Attacker bio',
         'profile_image_path' => 'profiles/attacker.jpg',
+        'background_image_path' => 'profiles/attacker-bg.jpg',
     ]);
 
     DB::table('sessions')->insert([
@@ -161,7 +167,11 @@ test('google oauth reclaiming unverified squatted account clears password and se
         ->and($profile?->display_name)->toBe('Real Owner')
         ->and($profile?->bio)->toBeNull()
         ->and($profile?->profile_image_path)->toBeNull()
+        ->and($profile?->background_image_path)->toBeNull()
         ->and($profile?->username)->toBe('squatteduser');
+
+    Storage::disk('s3')->assertMissing('profiles/attacker.jpg');
+    Storage::disk('s3')->assertMissing('profiles/attacker-bg.jpg');
 
     auth()->logout();
 

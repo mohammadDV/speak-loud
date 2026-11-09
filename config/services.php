@@ -59,4 +59,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'home' => [
+        'demo_video_url' => env('HOME_DEMO_VIDEO_URL'),
+    ],
+
 ];

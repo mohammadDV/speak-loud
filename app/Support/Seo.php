@@ -350,4 +350,32 @@ class Seo
             'url' => $url,
         ];
     }
+
+    /**
+     * @param  list<array{name: string, text: string, image?: string|null}>  $steps
+     * @return array<string, mixed>
+     */
+    public static function howToSchema(string $name, string $description, array $steps): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'HowTo',
+            'name' => $name,
+            'description' => $description,
+            'step' => collect($steps)->values()->map(function (array $step, int $index): array {
+                $item = [
+                    '@type' => 'HowToStep',
+                    'position' => $index + 1,
+                    'name' => $step['name'],
+                    'text' => $step['text'],
+                ];
+
+                if (! empty($step['image'])) {
+                    $item['image'] = $step['image'];
+                }
+
+                return $item;
+            })->all(),
+        ];
+    }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" style="color-scheme: light only;">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -138,33 +138,104 @@
     </div>
 </section>
 
+{{-- ─── How to use ─────────────────────────────────────────── --}}
+<section class="border-t border-black/[0.06] py-14 sm:py-20">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="max-w-2xl mb-10 sm:mb-14">
+            <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">How to use</span>
+            <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#3D2B1F] tracking-tight mt-2">
+                Get from signup to your first practice session.
+            </h2>
+            <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-3 leading-relaxed">
+                Four steps. Publish when you are free, match with a partner, and start talking.
+            </p>
+        </div>
+
+        <div class="space-y-12 sm:space-y-16">
+            @foreach ($howToSteps as $i => $step)
+                <div @class([
+                    'grid md:grid-cols-2 gap-6 md:gap-10 items-center',
+                ])>
+                    <div @class(['md:order-2' => $i % 2 === 1])>
+                        <div class="flex items-center gap-3">
+                            <div class="inline-flex shrink-0 items-center justify-center w-9 h-9 rounded-full border border-[#3D2B1F]/15 text-[13px] font-bold text-[#3D2B1F]/45">
+                                {{ $step['n'] }}
+                            </div>
+                            <h3 class="text-xl sm:text-[1.35rem] font-bold text-[#3D2B1F] tracking-tight">
+                                {{ $step['title'] }}
+                            </h3>
+                        </div>
+                        <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-2.5 leading-relaxed max-w-md">
+                            {{ $step['body'] }}
+                        </p>
+                    </div>
+
+                    <div @class(['md:order-1' => $i % 2 === 1])>
+                        <x-home-screenshot-placeholder
+                            :label="$step['label']"
+                            :accent="$step['accent']"
+                            :src="$step['src']"
+                            :alt="$step['title']"
+                        />
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
 {{-- ─── Video section ──────────────────────────────────────── --}}
-<section class="border-t border-black/[0.06] py-20">
+@php
+    $demoVideo = \App\Support\HomeDemoVideo::embed();
+@endphp
+
+<section class="border-t border-black/[0.06] py-14 sm:py-20">
     <div class="max-w-2xl mx-auto px-5 text-center">
         <div class="inline-flex items-center gap-1.5 bg-[#FF8C42]/10 text-[#FF8C42] text-[11px] font-semibold px-3 py-1 rounded-full mb-5 uppercase tracking-wide">
-            How it works · 60s
+            Watch · 60s
         </div>
-        <h2 class="text-[2rem] font-black text-[#3D2B1F] tracking-tight mb-8">Watch how a session goes.</h2>
+        <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#3D2B1F] tracking-tight mb-3">
+            See it in 60 seconds.
+        </h2>
+        <p class="text-sm text-[#3D2B1F]/50 mb-8 max-w-md mx-auto">
+            A quick walkthrough of publishing a slot, claiming a partner, and starting the conversation.
+        </p>
 
         <div class="rounded-2xl overflow-hidden bg-[#1C1C1E] aspect-video relative shadow-[0_8px_40px_rgba(0,0,0,.18)]">
-            <div class="absolute inset-0 flex items-center justify-center">
-                <button class="w-16 h-16 rounded-full bg-white/15 hover:bg-white/25 transition-all flex items-center justify-center border border-white/10">
-                    <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-            </div>
-            <div class="absolute bottom-0 left-0 right-0 px-4 py-3">
-                <div class="h-1 bg-white/10 rounded-full">
-                    <div class="h-1 bg-[#FF8C42] rounded-full w-1/5"></div>
+            @if ($demoVideo !== null && $demoVideo['type'] === 'file')
+                <video
+                    class="absolute inset-0 h-full w-full object-cover"
+                    controls
+                    playsinline
+                    preload="metadata"
+                    src="{{ $demoVideo['src'] }}"
+                ></video>
+            @elseif ($demoVideo !== null)
+                <iframe
+                    class="absolute inset-0 h-full w-full"
+                    src="{{ $demoVideo['src'] }}"
+                    title="SpeakLoudMate demo video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                ></iframe>
+            @else
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center border border-white/10" aria-hidden="true">
+                        <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
                 </div>
-                <div class="flex justify-between text-[10px] text-white/40 mt-1.5"><span>0:12</span><span>1:00</span></div>
-            </div>
-        </div>
-
-        <div class="flex items-center justify-center gap-6 mt-8 text-[13px]">
-            <span class="font-semibold text-[#FF8C42]">1 · Set hours</span>
-            <span class="text-[#3D2B1F]/40">2 · Get claims</span>
-            <span class="text-[#3D2B1F]/40">3 · Pick partners</span>
-            <span class="text-[#3D2B1F]/40">4 · Talk</span>
+                <div class="absolute bottom-0 left-0 right-0 px-4 py-3">
+                    <div class="h-1 bg-white/10 rounded-full">
+                        <div class="h-1 bg-[#FF8C42] rounded-full w-1/5"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-white/40 mt-1.5">
+                        <span>Demo coming soon</span>
+                        <span>1:00</span>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -215,24 +286,6 @@
     </div>
 </section>
 @endif
-
-{{-- ─── How it works ───────────────────────────────────────── --}}
-<section class="border-t border-black/[0.06] py-16">
-    <div class="max-w-6xl mx-auto px-5 grid grid-cols-2 md:grid-cols-4 gap-8">
-        @foreach([
-            ['1','Set your hours',   'Mark when you are free, weekly or one-off.'],
-            ['2','Get claims',       'Other learners apply to your slot with a note.'],
-            ['3','Pick partners',    'Accept one or many. Decline the rest.'],
-            ['4','Just talk',        'Chat opens. Hop on a call. Repeat next week.'],
-        ] as [$n, $title, $body])
-        <div>
-            <div class="w-8 h-8 rounded-full border border-[#3D2B1F]/15 text-[#3D2B1F]/35 text-sm font-bold flex items-center justify-center mb-3">{{ $n }}</div>
-            <h3 class="font-semibold text-[#3D2B1F] text-[13px] mb-1.5">{{ $title }}</h3>
-            <p class="text-[12px] text-[#3D2B1F]/45 leading-relaxed">{{ $body }}</p>
-        </div>
-        @endforeach
-    </div>
-</section>
 
 <x-site-footer />
 

@@ -1,4 +1,12 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
+/* Keep admin panel light when the OS is in dark mode. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../../../app/Filament/Admin/**/*';
 @source '../../../../resources/views/filament/admin/**/*';
+
+:root,
+html {
+    color-scheme: light only;
+}

@@ -10,13 +10,61 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::get('/', function () {
+    $howToSteps = [
+        [
+            'n' => '1',
+            'title' => 'Create your profile',
+            'body' => 'Sign up, pick a username for your public link, and verify your email so you can publish slots and claim practice time.',
+            'label' => 'Create your profile',
+            'src' => 'images/screenshots/create-your-profile.webp',
+            'accent' => '#FF8C42',
+        ],
+        [
+            'n' => '2',
+            'title' => 'Publish practice hours',
+            'body' => 'Open Schedule and add weekly or one-off slots for the languages you want to practice or help with.',
+            'label' => 'Publish practice hours',
+            'src' => 'images/screenshots/publish-practice-hours.webp',
+            'accent' => '#E67A35',
+        ],
+        [
+            'n' => '3',
+            'title' => 'Claim or accept partners',
+            'body' => 'Browse Discover to claim open slots, or review people who claim yours and accept the partners that fit.',
+            'label' => 'Claim or accept partners',
+            'src' => 'images/screenshots/claim-or-accept-partners.webp',
+            'accent' => '#D35400',
+        ],
+        [
+            'n' => '4',
+            'title' => 'Talk and message',
+            'body' => 'Use Messages to coordinate details, then hop on your call and keep the rhythm going next week.',
+            'label' => 'Talk and message',
+            'src' => 'images/screenshots/talk-and-message.webp',
+            'accent' => '#FF8C42',
+        ],
+    ];
+
     Seo::share([
         'seoTitle' => 'Practice languages with real people',
         'seoDescription' => 'SpeakLoudMate connects language learners with partners for scheduled practice. Publish slots, accept claims, and talk with real people.',
         'seoUrl' => route('home'),
+        'seoJsonLd' => [
+            Seo::organizationSchema(),
+            Seo::websiteSchema(),
+            Seo::howToSchema(
+                'Get from signup to your first practice session',
+                'Four steps. Publish when you are free, match with a partner, and start talking.',
+                array_map(fn (array $step): array => [
+                    'name' => $step['title'],
+                    'text' => $step['body'],
+                    'image' => asset($step['src']),
+                ], $howToSteps),
+            ),
+        ],
     ]);
 
-    return view('pages.home');
+    return view('pages.home', ['howToSteps' => $howToSteps]);
 })->name('home');
 Route::get('/about', fn () => view('pages.about'))->name('about');
 Route::get('/contact', fn () => view('pages.contact'))->name('contact');

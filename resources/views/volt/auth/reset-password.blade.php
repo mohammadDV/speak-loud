@@ -1,12 +1,12 @@
 <?php
 
+use App\Support\InvalidateUserSessions;
 use App\Support\PasswordRules;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 
 mount(function (string $token) {
     Seo::share([
@@ -59,9 +59,10 @@ $resetPassword = function () {
         ],
         function ($user, $password) {
             $user->forceFill([
-                'password'       => Hash::make($password),
-                'remember_token' => Str::random(60),
+                'password' => Hash::make($password),
             ])->save();
+
+            InvalidateUserSessions::all($user);
         }
     );
 

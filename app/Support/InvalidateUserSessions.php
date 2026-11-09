@@ -38,12 +38,11 @@ class InvalidateUserSessions
 
     private static function deleteDatabaseSessions(User $user, ?string $exceptSessionId = null): void
     {
-        $table = config('session.table', 'sessions');
-
-        if (! Schema::hasTable($table)) {
+        if (! self::sessionsTableExists()) {
             return;
         }
 
+        $table = config('session.table', 'sessions');
         $query = DB::table($table)->where('user_id', $user->id);
 
         if ($exceptSessionId !== null && $exceptSessionId !== '') {
@@ -51,5 +50,12 @@ class InvalidateUserSessions
         }
 
         $query->delete();
+    }
+
+    private static function sessionsTableExists(): bool
+    {
+        return once(function (): bool {
+            return Schema::hasTable(config('session.table', 'sessions'));
+        });
     }
 }

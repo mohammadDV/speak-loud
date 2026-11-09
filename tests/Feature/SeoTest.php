@@ -43,6 +43,7 @@ test('home page includes seo meta tags and blog cover image alt', function () {
         ->assertSee('property="og:locale"', false)
         ->assertSee('application/ld+json', false)
         ->assertSee('"@type":"Organization"', false)
+        ->assertSee('"@type":"HowTo"', false)
         ->assertSee('images/og-default.png', false)
         ->assertSee('images/apple-touch-icon.png', false)
         ->assertSee('name="twitter:image:alt"', false)

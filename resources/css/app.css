@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+
+/* SpeakLoudMate is light-only. Keep dark: variants off unless .dark is present,
+   so iOS/system dark mode does not turn Flux labels white on cream backgrounds. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @import '../../vendor/livewire/flux/dist/flux.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -14,6 +19,11 @@
 :root {
     --color-accent: #FF8C42;
     --color-accent-foreground: #fff;
+    color-scheme: light only;
+}
+
+html {
+    color-scheme: light only;
 }
 
 @layer base {
