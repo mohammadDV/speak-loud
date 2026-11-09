@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureSessionVersionIsValid;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Support\TelegramExceptionFilter;
 use App\Support\TelegramNotifier;
@@ -26,8 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         // Required for Auth::logoutOtherDevices() after password changes.
+        // EnsureSessionVersionIsValid invalidates sessions across all session drivers.
         $middleware->web(append: [
             AuthenticateSession::class,
+            EnsureSessionVersionIsValid::class,
         ]);
 
         // Proxy IPs come from config/trustedproxy.php (TRUSTED_PROXIES) so they

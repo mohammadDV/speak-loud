@@ -17,6 +17,14 @@
         'flex-1',
         'pb-20 md:pb-0' => request()->routeIs('schedules.show'),
     ])>
+        @if (session('oauth_status'))
+            <div class="mx-auto max-w-3xl px-4 pt-4">
+                <div class="p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">
+                    {{ session('oauth_status') }}
+                </div>
+            </div>
+        @endif
+
         {{ $slot }}
     </main>
 

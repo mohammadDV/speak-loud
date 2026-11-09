@@ -1,5 +1,7 @@
 <?php
 
+use App\Support\AuthSession;
+use App\Support\NormalizeEmail;
 use App\Support\PasswordRules;
 use App\Support\ProfileSlug;
 use App\Support\Seo;
@@ -65,12 +67,13 @@ $register = function (RegisterUser $action) {
 
     $user = $action->execute([
         'username' => $this->username,
-        'email'    => $this->email,
+        'email'    => NormalizeEmail::normalize($this->email),
         'password' => $this->password,
     ]);
 
     Auth::login($user);
     session()->regenerate();
+    AuthSession::syncVersion($user);
     $user->sendEmailVerificationNotification();
     $this->redirect(route('verification.notice'), navigate: true);
 };
@@ -114,6 +117,8 @@ $register = function (RegisterUser $action) {
                     Create account
                 </flux:button>
             </form>
+
+            <x-google-oauth-button class="mt-5" label="Continue with Google" />
 
             <p class="text-center text-sm text-[#3D2B1F]/60 mt-6">
                 Already have an account?

@@ -1,6 +1,8 @@
 <?php
 
-use App\Support\SafeInternalRedirect;
+use App\Support\AuthRedirect;
+use App\Support\AuthSession;
+use App\Support\NormalizeEmail;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +33,8 @@ rules([
 $login = function () {
     $this->validate();
 
-    $throttleKey = Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+    $email = NormalizeEmail::normalize($this->email);
+    $throttleKey = Str::transliterate($email.'|'.request()->ip());
 
     if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
         $seconds = RateLimiter::availableIn($throttleKey);
@@ -40,7 +43,7 @@ $login = function () {
         return;
     }
 
-    if (! Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
+    if (! Auth::attempt(['email' => $email, 'password' => $this->password])) {
         RateLimiter::hit($throttleKey, 60);
         $this->addError('email', 'These credentials do not match our records.');
 
@@ -59,18 +62,9 @@ $login = function () {
 
     RateLimiter::clear($throttleKey);
     session()->regenerate();
+    AuthSession::syncVersion($user);
 
-    if ($pendingDirect = session('pending_direct_claim')) {
-        $this->redirect(route('users.show', $pendingDirect['profile_slug']), navigate: true);
-
-        return;
-    }
-
-    $redirect = SafeInternalRedirect::url(
-        session()->pull('pending_claim_return'),
-        route('discover'),
-    );
-    $this->redirect($redirect, navigate: true);
+    $this->redirect(AuthRedirect::afterLogin(), navigate: true);
 };
 
 ?>
@@ -85,6 +79,18 @@ $login = function () {
         @if (session('status') === 'password-reset')
             <div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">
                 Your password has been reset. You can sign in with your new password.
+            </div>
+        @endif
+
+        @if (session('oauth_status'))
+            <div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm ring-1 ring-green-200">
+                {{ session('oauth_status') }}
+            </div>
+        @endif
+
+        @if (session('oauth_error'))
+            <div class="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm ring-1 ring-red-200">
+                {{ session('oauth_error') }}
             </div>
         @endif
 
@@ -103,6 +109,8 @@ $login = function () {
                     Sign in
                 </flux:button>
             </form>
+
+            <x-google-oauth-button class="mt-5" label="Continue with Google" />
 
             <p class="text-center text-sm text-[#3D2B1F]/60 mt-6">
                 No account?

@@ -53,6 +53,33 @@ test('change password is rate limited per user', function () {
     expect(Hash::check('Oldpassword1!', $user->fresh()->password))->toBeTrue();
 });
 
+test('wrong current password attempts are rate limited', function () {
+    $user = User::factory()->create(['password' => 'Oldpassword1!']);
+
+    RateLimiter::clear('password-change|'.$user->id);
+
+    $component = Volt::actingAs($user)->test('profile.security');
+
+    for ($i = 0; $i < 5; $i++) {
+        $component
+            ->set('current_password', 'wrongpassword')
+            ->set('password', 'Newpassword1!')
+            ->set('password_confirmation', 'Newpassword1!')
+            ->call('updatePassword')
+            ->assertHasErrors(['current_password']);
+    }
+
+    $component
+        ->set('current_password', 'Oldpassword1!')
+        ->set('password', 'Newpassword1!')
+        ->set('password_confirmation', 'Newpassword1!')
+        ->call('updatePassword')
+        ->assertHasErrors(['current_password']);
+
+    expect(Hash::check('Oldpassword1!', $user->fresh()->password))->toBeTrue()
+        ->and(RateLimiter::tooManyAttempts('password-change|'.$user->id, 5))->toBeTrue();
+});
+
 test('unverified users are redirected from security page', function () {
     $user = User::factory()->unverified()->create();
 

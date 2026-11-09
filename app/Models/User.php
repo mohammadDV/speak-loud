@@ -109,6 +109,26 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
         return $this->hasOne(UserProfile::class);
     }
 
+    /**
+     * @return HasMany<SocialAccount, $this>
+     */
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    public function hasPassword(): bool
+    {
+        return filled($this->password);
+    }
+
+    public function hasGoogleAccount(): bool
+    {
+        return $this->socialAccounts()
+            ->where('provider', SocialAccount::PROVIDER_GOOGLE)
+            ->exists();
+    }
+
     public function languages(): HasMany
     {
         return $this->hasMany(UserLanguage::class);

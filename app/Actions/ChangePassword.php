@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\User;
+use App\Support\InvalidateUserSessions;
 use App\Support\TelegramNotifier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,8 +23,9 @@ class ChangePassword
             'password' => Hash::make($newPassword),
         ])->save();
 
-        if (Auth::id() === $user->id) {
+        if (Auth::user()?->is($user)) {
             Auth::logoutOtherDevices($newPassword);
+            InvalidateUserSessions::others($user);
 
             // Keep the current session valid under AuthenticateSession after rehash.
             session()->put([

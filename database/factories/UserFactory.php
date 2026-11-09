@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -56,5 +57,24 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'inactive',
         ]);
+    }
+
+    public function withoutPassword(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'password' => null,
+        ]);
+    }
+
+    public function withGoogle(?string $providerId = null): static
+    {
+        return $this->afterCreating(function (User $user) use ($providerId): void {
+            SocialAccount::factory()
+                ->google($providerId)
+                ->create([
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+        });
     }
 }

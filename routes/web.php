@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
 use App\Support\Seo;
@@ -35,6 +36,15 @@ Route::middleware('guest')->group(function () {
     Volt::route('/register', 'auth.register')->name('register');
     Volt::route('/forgot-password', 'auth.forgot-password')->name('password.request');
     Volt::route('/reset-password/{token}', 'auth.reset-password')->name('password.reset');
+
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+        ->middleware('throttle:10,1')
+        ->name('auth.google.redirect');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->middleware('throttle:20,1')
+        ->name('auth.google.callback');
+    Volt::route('/auth/google/complete', 'auth.complete-google-profile')
+        ->name('auth.google.complete');
 });
 
 Route::middleware(['auth', 'active'])->group(function () {
