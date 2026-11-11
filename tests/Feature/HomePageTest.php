@@ -84,7 +84,7 @@ test('home page sets viewer timezone and exposes mobile menu controls with livew
         ->assertSee('aria-label="Open menu"', false)
         ->assertSee('data-mobile-nav-toggle', false)
         ->assertSee('data-mobile-nav-drawer', false)
-        ->assertSee('/livewire/livewire', false)
+        ->assertSee('livewire.js', false)
         ->assertSee('wire:navigate', false);
 });
 

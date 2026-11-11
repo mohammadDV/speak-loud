@@ -94,6 +94,6 @@ test('marketing about page includes mobile nav with livewire for spa nav', funct
         ->assertSee('data-mobile-nav-toggle', false)
         ->assertSee('viewer_timezone=', false)
         ->assertSee('aria-label="Footer"', false)
-        ->assertSee('/livewire/livewire', false)
+        ->assertSee('livewire.js', false)
         ->assertSee('wire:navigate', false);
 });

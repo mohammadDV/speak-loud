@@ -111,12 +111,15 @@
                 @auth
                     <a href="{{ route('profile') }}"
                         wire:navigate
+                        aria-label="Profile"
                         @class([
-                            'hidden md:flex w-8 h-8 rounded-full items-center justify-center text-[13px] font-bold transition-all',
+                            'hidden md:inline-flex w-8 h-8 rounded-full items-center justify-center transition-all',
                             'bg-[#FF8C42] text-white ring-2 ring-[#FF8C42]/30' => request()->routeIs('profile*', 'tickets.*'),
                             'bg-[#FF8C42] text-white hover:ring-2 hover:ring-[#FF8C42]/20' => ! request()->routeIs('profile*', 'tickets.*'),
                         ])>
-                        {{ strtoupper(substr(auth()->user()->email, 0, 1)) }}
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2h19.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z"/>
+                        </svg>
                     </a>
                 @else
                     <a href="{{ route('login') }}" wire:navigate class="text-[13px] text-[#3D2B1F]/60 hover:text-[#3D2B1F] px-2 transition-colors">Sign in</a>

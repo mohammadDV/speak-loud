@@ -60,8 +60,10 @@ mount(function () {
                 </svg>
             </button>
             @auth
-                <a href="{{ route('profile') }}" class="w-8 h-8 rounded-full bg-[#FF8C42] text-white text-[13px] font-bold flex items-center justify-center">
-                    {{ strtoupper(substr(auth()->user()->email, 0, 1)) }}
+                <a href="{{ route('profile') }}" aria-label="Profile" class="w-8 h-8 rounded-full bg-[#FF8C42] text-white inline-flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v1.2h19.2v-1.2c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
                 </a>
             @else
                 <a href="{{ route('login') }}" class="text-[13px] text-[#3D2B1F]/60 hover:text-[#3D2B1F] px-2 transition-colors">Sign in</a>

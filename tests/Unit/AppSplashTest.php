@@ -7,6 +7,7 @@ uses(TestCase::class);
 test('splash renders the brand and stays hidden until its script shows it', function () {
     $this->blade('<x-app-splash />')
         ->assertSee('class="app-splash"', false)
+        ->assertSee('html.app-splash-visible .app-splash', false)
         ->assertSee('images/logo-mark.webp', false)
         ->assertSee('SpeakLoudMate')
         ->assertSee('Practice languages with real people')

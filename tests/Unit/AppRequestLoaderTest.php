@@ -27,14 +27,17 @@ test('request loader script clears waits safely and heals splash class leaks', f
         ->toContain('aria-hidden');
 });
 
-test('brand loader styles are extracted into the shared stylesheet', function () {
+test('request loader styles live in the shared stylesheet while splash stays inline', function () {
     expect(file_get_contents(resource_path('css/app.css')))
         ->toContain('brand-loaders.css');
 
     expect(file_get_contents(resource_path('css/brand-loaders.css')))
-        ->toContain('.app-splash')
         ->toContain('.app-request-loader__bar')
-        ->toContain('app-request-loading-overlay');
+        ->toContain('app-request-loading-overlay')
+        ->not->toContain('.app-splash');
+
+    expect(file_get_contents(resource_path('views/components/app-splash.blade.php')))
+        ->toContain('html.app-splash-visible .app-splash');
 });
 
 test('every page shell includes the request loader', function (string $view) {
