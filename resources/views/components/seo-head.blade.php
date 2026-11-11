@@ -25,6 +25,14 @@
     $resolvedJsonLd = $seoJsonLd ?? Seo::defaultJsonLd();
     $resolvedLocale = str_replace('-', '_', app()->getLocale());
     $twitterSite = Seo::twitterSite();
+    $resolvedImageType = match (strtolower(pathinfo(parse_url($resolvedImage, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION))) {
+        'png' => 'image/png',
+        'jpg', 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        default => null,
+    };
 @endphp
 
 <title>{{ $resolvedTitle }}</title>
@@ -36,8 +44,9 @@
 @endif
 <link rel="canonical" href="{{ $resolvedUrl }}">
 
+<link rel="icon" href="{{ asset('images/favicon-32.webp') }}" type="image/webp" sizes="32x32">
+<link rel="icon" href="{{ asset('images/favicon-32.png') }}" type="image/png" sizes="32x32">
 <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-<link rel="icon" type="image/png" href="{{ asset('images/favicon-32.png') }}" sizes="32x32">
 <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
 
 <meta property="og:site_name" content="{{ Seo::SITE_NAME }}">
@@ -48,6 +57,9 @@
 <meta property="og:url" content="{{ $resolvedUrl }}">
 <meta property="og:image" content="{{ $resolvedImage }}">
 <meta property="og:image:alt" content="{{ $resolvedImageAlt }}">
+@if ($resolvedImageType)
+    <meta property="og:image:type" content="{{ $resolvedImageType }}">
+@endif
 @if ($resolvedImageWidth)
     <meta property="og:image:width" content="{{ $resolvedImageWidth }}">
 @endif

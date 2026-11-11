@@ -28,6 +28,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             // Use the app login (/login) with its rate limits; admins then open /admin.
             ->brandName('SpeakLoudMate Admin')
+            ->brandLogo(asset('images/logo-mark.webp'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('images/favicon-32.webp'))
             ->colors([
                 'primary' => Color::Amber,
             ])

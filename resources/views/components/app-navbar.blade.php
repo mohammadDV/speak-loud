@@ -72,14 +72,14 @@
 <div data-mobile-nav data-open="false">
     <header class="sticky top-0 z-50 bg-[#FFF8F0]/95 backdrop-blur border-b border-black/[0.06]">
         <div class="max-w-6xl mx-auto px-5 h-[52px] flex items-center justify-between gap-4">
-            <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0" aria-label="SpeakLoudMate home">
-                <span class="w-7 h-7 rounded-lg bg-[#FF8C42] text-white font-black text-sm flex items-center justify-center leading-none select-none">S</span>
-                <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoudMate</span>
+            <a href="{{ route('home') }}" wire:navigate class="shrink-0" aria-label="SpeakLoudMate home">
+                <x-brand-logo :size="28" />
             </a>
 
             <nav class="hidden md:flex items-center gap-1 overflow-x-auto">
                 @foreach ($navLinks as [$route, $label, $icon])
                     <a href="{{ route($route) }}"
+                        wire:navigate
                         @class([
                             'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] transition-all whitespace-nowrap',
                             'text-[#FF8C42] bg-[#FF8C42]/10 font-medium' => $navRouteIs($route),
@@ -110,6 +110,7 @@
 
                 @auth
                     <a href="{{ route('profile') }}"
+                        wire:navigate
                         @class([
                             'hidden md:flex w-8 h-8 rounded-full items-center justify-center text-[13px] font-bold transition-all',
                             'bg-[#FF8C42] text-white ring-2 ring-[#FF8C42]/30' => request()->routeIs('profile*', 'tickets.*'),
@@ -118,8 +119,8 @@
                         {{ strtoupper(substr(auth()->user()->email, 0, 1)) }}
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="text-[13px] text-[#3D2B1F]/60 hover:text-[#3D2B1F] px-2 transition-colors">Sign in</a>
-                    <a href="{{ route('register') }}" class="hidden md:inline-flex text-[13px] bg-[#FF8C42] text-white px-4 py-1.5 rounded-full font-semibold hover:bg-[#e67a35] transition-colors">
+                    <a href="{{ route('login') }}" wire:navigate class="text-[13px] text-[#3D2B1F]/60 hover:text-[#3D2B1F] px-2 transition-colors">Sign in</a>
+                    <a href="{{ route('register') }}" wire:navigate class="hidden md:inline-flex text-[13px] bg-[#FF8C42] text-white px-4 py-1.5 rounded-full font-semibold hover:bg-[#e67a35] transition-colors">
                         Start free
                     </a>
                 @endauth
@@ -159,7 +160,7 @@
                         <p class="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#3D2B1F]/40">App</p>
                         <div class="space-y-0.5">
                             @foreach ($drawerAppLinks as [$route, $label])
-                                <a href="{{ route($route) }}" class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
+                                <a href="{{ route($route) }}" wire:navigate class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
                             @endforeach
                         </div>
                     </div>
@@ -168,7 +169,7 @@
                         <p class="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#3D2B1F]/40">Account</p>
                         <div class="space-y-0.5">
                             @foreach ($drawerAccountLinks as [$route, $label])
-                                <a href="{{ route($route) }}" class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
+                                <a href="{{ route($route) }}" wire:navigate class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
                             @endforeach
                         </div>
                     </div>
@@ -176,10 +177,10 @@
                     <div>
                         <p class="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#3D2B1F]/40">Get started</p>
                         <div class="space-y-0.5">
-                            <a href="{{ route('home') }}" class="{{ $drawerLinkClass('home') }}">Home</a>
-                            <a href="{{ route('discover') }}" class="{{ $drawerLinkClass('discover') }}">Discover</a>
-                            <a href="{{ route('login') }}" class="{{ $drawerLinkClass('login') }}">Sign in</a>
-                            <a href="{{ route('register') }}" class="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-[#FF8C42]">Start free</a>
+                            <a href="{{ route('home') }}" wire:navigate class="{{ $drawerLinkClass('home') }}">Home</a>
+                            <a href="{{ route('discover') }}" wire:navigate class="{{ $drawerLinkClass('discover') }}">Discover</a>
+                            <a href="{{ route('login') }}" wire:navigate class="{{ $drawerLinkClass('login') }}">Sign in</a>
+                            <a href="{{ route('register') }}" wire:navigate class="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-[#FF8C42]">Start free</a>
                         </div>
                     </div>
                 @endauth
@@ -188,7 +189,7 @@
                     <p class="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#3D2B1F]/40">Explore</p>
                     <div class="space-y-0.5">
                         @foreach ($drawerExploreLinks as [$route, $label])
-                            <a href="{{ route($route) }}" class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
+                            <a href="{{ route($route) }}" wire:navigate class="{{ $drawerLinkClass($route) }}">{{ $label }}</a>
                         @endforeach
                     </div>
                 </div>

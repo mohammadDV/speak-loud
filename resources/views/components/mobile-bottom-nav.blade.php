@@ -41,6 +41,7 @@
         @foreach ($tabs as $tab)
             <a
                 href="{{ route($tab['route']) }}"
+                wire:navigate
                 @class([
                     'flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors',
                     'text-[#FF8C42]' => $tab['active'],

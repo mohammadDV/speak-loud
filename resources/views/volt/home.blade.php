@@ -33,9 +33,8 @@ mount(function () {
     <div class="max-w-6xl mx-auto px-5 h-[52px] flex items-center justify-between gap-6">
 
         {{-- Logo --}}
-        <a href="/" class="flex items-center gap-2 shrink-0">
-            <span class="w-7 h-7 rounded-lg bg-[#FF8C42] text-white font-black text-sm flex items-center justify-center leading-none select-none">S</span>
-            <span class="font-bold text-[15px] text-[#3D2B1F] tracking-tight">SpeakLoudMate</span>
+        <a href="/" class="shrink-0" aria-label="SpeakLoudMate home">
+            <x-brand-logo :size="28" />
         </a>
 
         {{-- Nav links --}}

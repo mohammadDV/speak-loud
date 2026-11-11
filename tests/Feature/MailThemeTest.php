@@ -23,5 +23,6 @@ test('verify email renders speakloudmate branded html', function () {
         ->toContain('Instrument Sans')
         ->toContain('Hi Mail Theme,')
         ->toContain('The SpeakLoudMate team')
-        ->toContain('brand-badge');
+        ->toContain('brand-logo')
+        ->toContain('images/logo-mark.png');
 });

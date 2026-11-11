@@ -11,6 +11,8 @@
     @livewireStyles
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased min-h-screen flex flex-col">
+    <x-app-splash />
+    <x-app-request-loader />
     <x-app-navbar />
 
     <main @class([

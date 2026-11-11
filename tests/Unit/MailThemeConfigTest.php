@@ -30,6 +30,7 @@ test('markdown mail messages render with speakloudmate brand styles', function (
         ->toContain('Instrument Sans')
         ->toContain('Hi Ada,')
         ->toContain('The SpeakLoudMate team')
-        ->toContain('brand-badge')
+        ->toContain('brand-logo')
+        ->toContain('images/logo-mark.png')
         ->toContain('button-primary');
 });

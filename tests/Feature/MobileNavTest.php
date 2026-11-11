@@ -87,12 +87,13 @@ test('authenticated profile page includes mobile nav and footer', function () {
         ->assertSee('aria-label="Footer"', false);
 });
 
-test('marketing about page includes mobile nav without livewire runtime', function () {
+test('marketing about page includes mobile nav with livewire for spa nav', function () {
     $this->get(route('about'))
         ->assertOk()
         ->assertSee('aria-label="Quick access"', false)
         ->assertSee('data-mobile-nav-toggle', false)
         ->assertSee('viewer_timezone=', false)
         ->assertSee('aria-label="Footer"', false)
-        ->assertDontSee('/livewire/livewire', false);
+        ->assertSee('/livewire/livewire', false)
+        ->assertSee('wire:navigate', false);
 });

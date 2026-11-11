@@ -11,6 +11,8 @@
     @livewireStyles
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased">
+    <x-app-splash />
+    <x-app-request-loader />
     <flux:main>
         {{ $slot }}
     </flux:main>

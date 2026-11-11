@@ -77,14 +77,15 @@ test('home page exposes desktop nav donate link and mobile hero donate button', 
         ->assertSee('md:hidden inline-flex items-center justify-center text-[14px] font-semibold text-[#FF8C42]', false);
 });
 
-test('home page sets viewer timezone and exposes mobile menu controls without livewire', function () {
+test('home page sets viewer timezone and exposes mobile menu controls with livewire for spa nav', function () {
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('viewer_timezone=', false)
         ->assertSee('aria-label="Open menu"', false)
         ->assertSee('data-mobile-nav-toggle', false)
         ->assertSee('data-mobile-nav-drawer', false)
-        ->assertDontSee('/livewire/livewire', false);
+        ->assertSee('/livewire/livewire', false)
+        ->assertSee('wire:navigate', false);
 });
 
 test('home page forces light color scheme for ios dark mode safety', function () {

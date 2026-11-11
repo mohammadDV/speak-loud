@@ -7,9 +7,12 @@
     <x-seo-head />
     <x-viewer-timezone />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased pb-20 md:pb-0">
 
+<x-app-splash />
+<x-app-request-loader />
 <x-app-navbar />
 
 {{-- ─── Hero ───────────────────────────────────────────────── --}}
@@ -289,5 +292,6 @@
 
 <x-site-footer />
 
+@livewireScripts
 </body>
 </html>

@@ -24,8 +24,11 @@
     @stack('seo-extra')
     <x-viewer-timezone />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="bg-[#FFF8F0] text-[#3D2B1F] antialiased min-h-screen flex flex-col pb-20 md:pb-0">
+    <x-app-splash />
+    <x-app-request-loader />
     <x-app-navbar />
 
     <main class="flex-1 max-w-3xl mx-auto px-5 py-12 w-full">
@@ -36,5 +39,6 @@
     </main>
 
     <x-site-footer class="mt-12" />
+    @livewireScripts
 </body>
 </html>

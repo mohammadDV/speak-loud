@@ -14,7 +14,7 @@
     <div class="max-w-6xl mx-auto px-5 flex flex-col items-center gap-5 sm:flex-row sm:justify-between text-[12px] text-[#3D2B1F]/30">
         <nav class="flex w-full flex-wrap justify-center gap-x-5 gap-y-2.5 sm:w-auto sm:justify-end sm:order-2" aria-label="Footer">
             @foreach ($links as [$route, $label])
-                <a href="{{ route($route) }}" class="hover:text-[#3D2B1F] transition-colors">{{ $label }}</a>
+                <a href="{{ route($route) }}" wire:navigate class="hover:text-[#3D2B1F] transition-colors">{{ $label }}</a>
             @endforeach
         </nav>
         <p class="text-center sm:text-left sm:order-1">

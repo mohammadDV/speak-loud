@@ -34,6 +34,7 @@ class Seo
 
     public static function defaultImage(): string
     {
+        // PNG is the primary social share image for widest crawler support.
         return asset('images/og-default.png');
     }
 
@@ -230,7 +231,7 @@ class Seo
 
     public static function logoUrl(): string
     {
-        return asset('images/apple-touch-icon.png');
+        return asset('images/logo-mark.png');
     }
 
     /**
@@ -243,7 +244,12 @@ class Seo
             '@type' => 'Organization',
             'name' => self::SITE_NAME,
             'url' => url('/'),
-            'logo' => self::logoUrl(),
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => self::logoUrl(),
+                'width' => 734,
+                'height' => 512,
+            ],
         ];
     }
 
@@ -284,6 +290,8 @@ class Seo
                 'logo' => [
                     '@type' => 'ImageObject',
                     'url' => self::logoUrl(),
+                    'width' => 734,
+                    'height' => 512,
                 ],
             ],
         ];

@@ -1,6 +1,6 @@
 # SpeakLoudMate — Backend
 
-[Laravel](https://laravel.com) API and web application for **SpeakLoudMate** ([speakloudmate.app](https://speakloudmate.app)): a language-exchange platform where learners find partners, publish practice slots, send claims, and chat after a match is accepted.
+[Laravel](https://laravel.com) API and web application for **SpeakLoudMate** ([speakloudmate.com](https://speakloudmate.com)): a language-exchange platform where learners find partners, publish practice slots, send claims, and chat after a match is accepted.
 
 ## Stack
 

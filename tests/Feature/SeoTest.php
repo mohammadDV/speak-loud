@@ -45,6 +45,11 @@ test('home page includes seo meta tags and blog cover image alt', function () {
         ->assertSee('"@type":"Organization"', false)
         ->assertSee('"@type":"HowTo"', false)
         ->assertSee('images/og-default.png', false)
+        // JSON-LD escapes slashes as \/, so match the filename token instead of a raw path.
+        ->assertSee('logo-mark.png', false)
+        ->assertSee('"@type":"ImageObject"', false)
+        ->assertSee('og:image:type" content="image/png"', false)
+        ->assertSee('images/favicon-32.webp', false)
         ->assertSee('images/apple-touch-icon.png', false)
         ->assertSee('name="twitter:image:alt"', false)
         ->assertSee('Practice languages with real people | SpeakLoudMate', false)

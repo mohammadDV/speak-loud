@@ -85,7 +85,9 @@ $complete = function (CompleteGoogleRegistration $action) {
 <div class="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-[#3D2B1F]">SpeakLoudMate</h1>
+            <h1 class="flex justify-center mb-3">
+                <x-brand-logo :size="40" wordmark-class="text-3xl font-bold text-[#3D2B1F]" />
+            </h1>
             <p class="text-[#3D2B1F]/60 mt-1">Finish setting up your account</p>
         </div>
 
@@ -95,7 +97,7 @@ $complete = function (CompleteGoogleRegistration $action) {
             </p>
 
             <form wire:submit="complete" class="space-y-5">
-                <flux:input wire:model="username" label="Username" placeholder="speakloudmate.app/ alex" />
+                <flux:input wire:model="username" label="Username" placeholder="speakloudmate.com/ alex" />
 
                 <label class="flex items-start gap-3 text-sm text-[#3D2B1F]/75 cursor-pointer">
                     <input
