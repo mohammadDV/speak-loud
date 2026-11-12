@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\BlogCategories;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\BlogCategories\Pages\CreateBlogCategory;
 use App\Filament\Admin\Resources\BlogCategories\Pages\EditBlogCategory;
 use App\Filament\Admin\Resources\BlogCategories\Pages\ListBlogCategories;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\BlogCategories\Schemas\BlogCategoryForm;
 use App\Filament\Admin\Resources\BlogCategories\Tables\BlogCategoriesTable;
 use App\Models\BlogCategory;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class BlogCategoryResource extends Resource
+class BlogCategoryResource extends AdminOnlyResource
 {
     protected static ?string $model = BlogCategory::class;
 

@@ -36,12 +36,30 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     public function canAccessPanel(Panel $panel): bool
     {
+        return in_array($this->role, ['admin', 'moderator', 'editor', 'reviewer'], true)
+            && $this->status === 'active';
+    }
+
+    public function isAdmin(): bool
+    {
         return $this->role === 'admin' && $this->status === 'active';
     }
 
     public function isStaff(): bool
     {
         return in_array($this->role, ['admin', 'moderator'], true);
+    }
+
+    public function isDictionaryStaff(): bool
+    {
+        return in_array($this->role, ['admin', 'editor', 'reviewer'], true)
+            && $this->status === 'active';
+    }
+
+    public function canReviewDictionary(): bool
+    {
+        return in_array($this->role, ['admin', 'reviewer'], true)
+            && $this->status === 'active';
     }
 
     public function getFilamentName(): string

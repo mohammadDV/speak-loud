@@ -7,14 +7,14 @@ use App\Filament\Admin\Resources\Claims\Pages\EditClaim;
 use App\Filament\Admin\Resources\Claims\Pages\ListClaims;
 use App\Filament\Admin\Resources\Claims\Schemas\ClaimForm;
 use App\Filament\Admin\Resources\Claims\Tables\ClaimsTable;
+use App\Filament\Admin\Resources\StaffResource;
 use App\Models\Claim;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ClaimResource extends Resource
+class ClaimResource extends StaffResource
 {
     protected static ?string $model = Claim::class;
 

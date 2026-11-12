@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Tickets;
 
+use App\Filament\Admin\Resources\StaffResource;
 use App\Filament\Admin\Resources\Tickets\Pages\CreateTicket;
 use App\Filament\Admin\Resources\Tickets\Pages\EditTicket;
 use App\Filament\Admin\Resources\Tickets\Pages\ListTickets;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\Tickets\Schemas\TicketForm;
 use App\Filament\Admin\Resources\Tickets\Tables\TicketsTable;
 use App\Models\Ticket;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class TicketResource extends Resource
+class TicketResource extends StaffResource
 {
     protected static ?string $model = Ticket::class;
 

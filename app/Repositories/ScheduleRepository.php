@@ -75,7 +75,12 @@ class ScheduleRepository implements IScheduleRepository
             ])
             ->where('schedules.status', 'active')
             ->whereHas('user', fn ($q) => $q->where('status', 'active'))
-            ->havingRaw('accepted_claims_count < schedules.max_participants')
+            ->whereRaw('(
+                select count(*)
+                from claims
+                where claims.schedule_id = schedules.id
+                  and claims.status = ?
+            ) < schedules.max_participants', ['accepted'])
             ->where(function ($q) {
                 $q->where('schedules.type', 'recurring')
                     ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));
@@ -156,7 +161,12 @@ class ScheduleRepository implements IScheduleRepository
             ])
             ->where('user_id', $hostId)
             ->where('status', 'active')
-            ->havingRaw('accepted_claims_count < schedules.max_participants')
+            ->whereRaw('(
+                select count(*)
+                from claims
+                where claims.schedule_id = schedules.id
+                  and claims.status = ?
+            ) < schedules.max_participants', ['accepted'])
             ->where(function ($q) {
                 $q->where('type', 'recurring')
                     ->orWhereHas('oneTimeSlot', fn ($slot) => $slot->where('start_datetime', '>', now('UTC')));

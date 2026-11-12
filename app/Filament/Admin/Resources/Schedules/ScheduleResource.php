@@ -7,16 +7,16 @@ use App\Filament\Admin\Resources\Schedules\Pages\EditSchedule;
 use App\Filament\Admin\Resources\Schedules\Pages\ListSchedules;
 use App\Filament\Admin\Resources\Schedules\Schemas\ScheduleForm;
 use App\Filament\Admin\Resources\Schedules\Tables\SchedulesTable;
+use App\Filament\Admin\Resources\StaffResource;
 use App\Models\Schedule;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ScheduleResource extends Resource
+class ScheduleResource extends StaffResource
 {
     protected static ?string $model = Schedule::class;
 

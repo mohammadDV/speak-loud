@@ -43,6 +43,20 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function editor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'editor',
+        ]);
+    }
+
+    public function reviewer(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'reviewer',
+        ]);
+    }
+
     public function banned(): static
     {
         return $this->state(fn (array $attributes) => [

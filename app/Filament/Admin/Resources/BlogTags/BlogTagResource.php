@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\BlogTags;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\BlogTags\Pages\CreateBlogTag;
 use App\Filament\Admin\Resources\BlogTags\Pages\EditBlogTag;
 use App\Filament\Admin\Resources\BlogTags\Pages\ListBlogTags;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\BlogTags\Schemas\BlogTagForm;
 use App\Filament\Admin\Resources\BlogTags\Tables\BlogTagsTable;
 use App\Models\BlogTag;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class BlogTagResource extends Resource
+class BlogTagResource extends AdminOnlyResource
 {
     protected static ?string $model = BlogTag::class;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Faqs;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\Faqs\Pages\CreateFaq;
 use App\Filament\Admin\Resources\Faqs\Pages\EditFaq;
 use App\Filament\Admin\Resources\Faqs\Pages\ListFaqs;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\Faqs\Schemas\FaqForm;
 use App\Filament\Admin\Resources\Faqs\Tables\FaqsTable;
 use App\Models\Faq;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class FaqResource extends Resource
+class FaqResource extends AdminOnlyResource
 {
     protected static ?string $model = Faq::class;
 

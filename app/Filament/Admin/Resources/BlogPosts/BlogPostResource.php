@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\BlogPosts;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\BlogPosts\Pages\CreateBlogPost;
 use App\Filament\Admin\Resources\BlogPosts\Pages\EditBlogPost;
 use App\Filament\Admin\Resources\BlogPosts\Pages\ListBlogPosts;
@@ -9,14 +10,13 @@ use App\Filament\Admin\Resources\BlogPosts\Schemas\BlogPostForm;
 use App\Filament\Admin\Resources\BlogPosts\Tables\BlogPostsTable;
 use App\Models\BlogPost;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class BlogPostResource extends Resource
+class BlogPostResource extends AdminOnlyResource
 {
     protected static ?string $model = BlogPost::class;
 

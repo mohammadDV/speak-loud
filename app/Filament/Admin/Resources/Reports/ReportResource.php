@@ -7,14 +7,14 @@ use App\Filament\Admin\Resources\Reports\Pages\EditReport;
 use App\Filament\Admin\Resources\Reports\Pages\ListReports;
 use App\Filament\Admin\Resources\Reports\Schemas\ReportForm;
 use App\Filament\Admin\Resources\Reports\Tables\ReportsTable;
+use App\Filament\Admin\Resources\StaffResource;
 use App\Models\Report;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ReportResource extends Resource
+class ReportResource extends StaffResource
 {
     protected static ?string $model = Report::class;
 

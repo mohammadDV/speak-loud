@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Domain\Dictionary\Models\Lexeme;
+use App\Domain\Dictionary\Models\Sense;
+use App\Domain\Dictionary\Policies\LexemePolicy;
+use App\Domain\Dictionary\Policies\SensePolicy;
 use App\Repositories\BlogPostRepository;
 use App\Repositories\ClaimRepository;
 use App\Repositories\Contracts\IBlogPostRepository;
@@ -21,6 +25,7 @@ use App\Support\Seo;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\UnableToCheckFileExistence;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -41,6 +46,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Model::preventLazyLoading(! $this->app->isProduction());
+
+        Gate::policy(Lexeme::class, LexemePolicy::class);
+        Gate::policy(Sense::class, SensePolicy::class);
 
         Seo::share();
 

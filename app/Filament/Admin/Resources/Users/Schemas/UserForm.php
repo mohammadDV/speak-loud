@@ -32,7 +32,13 @@ class UserForm
                         : ['nullable', PasswordRules::rule()])
                     ->helperText(PasswordRules::instructions()),
                 Select::make('role')
-                    ->options(['user' => 'User', 'admin' => 'Admin', 'moderator' => 'Moderator'])
+                    ->options([
+                        'user' => 'User',
+                        'admin' => 'Admin',
+                        'moderator' => 'Moderator',
+                        'editor' => 'Editor',
+                        'reviewer' => 'Reviewer',
+                    ])
                     ->default('user')
                     ->required(),
                 Select::make('status')

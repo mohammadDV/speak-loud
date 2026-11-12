@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\FaqCategories;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\FaqCategories\Pages\CreateFaqCategory;
 use App\Filament\Admin\Resources\FaqCategories\Pages\EditFaqCategory;
 use App\Filament\Admin\Resources\FaqCategories\Pages\ListFaqCategories;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\FaqCategories\Schemas\FaqCategoryForm;
 use App\Filament\Admin\Resources\FaqCategories\Tables\FaqCategoriesTable;
 use App\Models\FaqCategory;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class FaqCategoryResource extends Resource
+class FaqCategoryResource extends AdminOnlyResource
 {
     protected static ?string $model = FaqCategory::class;
 

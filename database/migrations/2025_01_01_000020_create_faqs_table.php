@@ -20,7 +20,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('ALTER TABLE faqs ADD FULLTEXT ft_faq (question, answer)');
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE faqs ADD FULLTEXT ft_faq (question, answer)');
+        }
     }
 
     public function down(): void

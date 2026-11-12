@@ -7,16 +7,16 @@ use App\Filament\Admin\Resources\Messages\Pages\EditMessage;
 use App\Filament\Admin\Resources\Messages\Pages\ListMessages;
 use App\Filament\Admin\Resources\Messages\Schemas\MessageForm;
 use App\Filament\Admin\Resources\Messages\Tables\MessagesTable;
+use App\Filament\Admin\Resources\StaffResource;
 use App\Models\Message;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class MessageResource extends Resource
+class MessageResource extends StaffResource
 {
     protected static ?string $model = Message::class;
 

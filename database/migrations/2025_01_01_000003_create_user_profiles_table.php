@@ -29,7 +29,9 @@ return new class extends Migration
             $table->index('country_code', 'idx_country');
         });
 
-        DB::statement('ALTER TABLE user_profiles ADD FULLTEXT INDEX ft_bio (bio, display_name)');
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE user_profiles ADD FULLTEXT INDEX ft_bio (bio, display_name)');
+        }
     }
 
     public function down(): void

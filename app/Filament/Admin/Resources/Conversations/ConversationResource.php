@@ -7,14 +7,14 @@ use App\Filament\Admin\Resources\Conversations\Pages\EditConversation;
 use App\Filament\Admin\Resources\Conversations\Pages\ListConversations;
 use App\Filament\Admin\Resources\Conversations\Schemas\ConversationForm;
 use App\Filament\Admin\Resources\Conversations\Tables\ConversationsTable;
+use App\Filament\Admin\Resources\StaffResource;
 use App\Models\Conversation;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class ConversationResource extends Resource
+class ConversationResource extends StaffResource
 {
     protected static ?string $model = Conversation::class;
 

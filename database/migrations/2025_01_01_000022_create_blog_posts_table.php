@@ -27,7 +27,9 @@ return new class extends Migration
             $table->index(['status', 'published_at']);
         });
 
-        DB::statement('ALTER TABLE blog_posts ADD FULLTEXT ft_blog (title, excerpt, body)');
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE blog_posts ADD FULLTEXT ft_blog (title, excerpt, body)');
+        }
     }
 
     public function down(): void

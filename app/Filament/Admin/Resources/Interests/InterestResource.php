@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Interests;
 
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use App\Filament\Admin\Resources\Interests\Pages\CreateInterest;
 use App\Filament\Admin\Resources\Interests\Pages\EditInterest;
 use App\Filament\Admin\Resources\Interests\Pages\ListInterests;
@@ -9,12 +10,11 @@ use App\Filament\Admin\Resources\Interests\Schemas\InterestForm;
 use App\Filament\Admin\Resources\Interests\Tables\InterestsTable;
 use App\Models\Interest;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
-class InterestResource extends Resource
+class InterestResource extends AdminOnlyResource
 {
     protected static ?string $model = Interest::class;
 

@@ -6,14 +6,14 @@ use App\Filament\Admin\Resources\Activities\Pages\ListActivities;
 use App\Filament\Admin\Resources\Activities\Pages\ViewActivity;
 use App\Filament\Admin\Resources\Activities\Schemas\ActivityInfolist;
 use App\Filament\Admin\Resources\Activities\Tables\ActivitiesTable;
+use App\Filament\Admin\Resources\AdminOnlyResource;
 use BackedEnum;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Spatie\Activitylog\Models\Activity;
 
-class ActivityResource extends Resource
+class ActivityResource extends AdminOnlyResource
 {
     protected static ?string $model = Activity::class;
 

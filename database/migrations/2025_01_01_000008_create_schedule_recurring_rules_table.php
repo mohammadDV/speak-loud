@@ -21,7 +21,9 @@ return new class extends Migration
             $table->foreign('schedule_id')->references('id')->on('schedules')->cascadeOnDelete();
         });
 
-        DB::statement("ALTER TABLE schedule_recurring_rules MODIFY day_of_week SET('Mon','Tue','Wed','Thu','Fri','Sat','Sun') NOT NULL");
+        if (Schema::getConnection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE schedule_recurring_rules MODIFY day_of_week SET('Mon','Tue','Wed','Thu','Fri','Sat','Sun') NOT NULL");
+        }
     }
 
     public function down(): void
