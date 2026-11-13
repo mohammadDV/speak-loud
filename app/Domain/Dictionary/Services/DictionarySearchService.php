@@ -25,6 +25,7 @@ class DictionarySearchService
      *     target_language?: string|null,
      *     level?: string|null,
      *     part_of_speech?: string|null,
+     *     category?: string|null,
      *     per_page?: int
      * }  $params
      * @return LengthAwarePaginator<int, Lexeme>
@@ -80,6 +81,15 @@ class DictionarySearchService
             });
         }
 
+        if (! empty($params['category'])) {
+            $builder->whereHas(
+                'categories',
+                fn (Builder $categories) => $categories
+                    ->where('code', $params['category'])
+                    ->where('is_active', true),
+            );
+        }
+
         $builder->orderByRaw('CASE WHEN lemma = ? THEN 0 WHEN normalized_lemma = ? THEN 1 ELSE 2 END', [$query, $normalized])
             ->orderBy('lemma');
 
@@ -126,6 +136,7 @@ class DictionarySearchService
     {
         return [
             'language',
+            'categories' => fn ($query) => $query->where('is_active', true)->orderBy('categories.sort_order'),
             'forms',
             'senses' => fn (HasMany $query) => $query
                 ->where('status', ContentStatus::Published)

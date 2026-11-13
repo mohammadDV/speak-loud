@@ -9,6 +9,7 @@ use App\Domain\Dictionary\Actions\RejectLexeme;
 use App\Domain\Dictionary\Actions\SubmitLexemeForReview;
 use App\Domain\Dictionary\Actions\UpdateLexeme;
 use App\Domain\Dictionary\Enums\ContentStatus;
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Domain\Dictionary\Services\ContentPublishingService;
 use App\Filament\Admin\Resources\Lexemes\LexemeResource;
@@ -27,6 +28,17 @@ class EditLexeme extends EditRecord
 
     /**
      * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['categories'] = $this->lexeme()->categories()->pluck('categories.id')->all();
+
+        return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
@@ -39,6 +51,7 @@ class EditLexeme extends EditRecord
             'slug' => $data['slug'] ?? $record->slug,
             'pronunciation' => $data['pronunciation'] ?? $record->pronunciation,
             'disambiguation' => $data['disambiguation'] ?? $record->disambiguation,
+            'category_ids' => Category::resolveActiveIds($data['categories'] ?? []),
         ], $user);
     }
 

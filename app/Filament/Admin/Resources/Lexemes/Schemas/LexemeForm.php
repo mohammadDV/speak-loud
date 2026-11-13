@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Lexemes\Schemas;
 
 use App\Domain\Dictionary\Enums\ContentStatus;
+use App\Domain\Dictionary\Models\Category;
 use App\Models\Language;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -30,6 +31,12 @@ class LexemeForm
                 TextInput::make('disambiguation')
                     ->maxLength(255)
                     ->helperText('Optional label when multiple lexemes share the same spelling.'),
+                Select::make('categories')
+                    ->label('Categories')
+                    ->options(fn () => Category::query()->active()->orderBy('sort_order')->pluck('display_name', 'id'))
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 Select::make('status')
                     ->options(collect(ContentStatus::cases())->mapWithKeys(
                         fn (ContentStatus $status) => [$status->value => str_replace('_', ' ', ucfirst($status->value))]

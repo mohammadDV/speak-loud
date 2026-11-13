@@ -2,6 +2,7 @@
 
 namespace App\Domain\Dictionary\Services;
 
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Models\Language;
 use Illuminate\Support\Collection;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Cache;
 class DictionaryCache
 {
     private const LANGUAGES_KEY = 'dictionary:languages:active';
+
+    private const CATEGORIES_KEY = 'dictionary:categories:active';
 
     private const LEXEME_KEY = 'dictionary:lexeme:%d:%s';
 
@@ -31,6 +34,24 @@ class DictionaryCache
     public function forgetLanguages(): void
     {
         Cache::forget(self::LANGUAGES_KEY);
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function activeCategories(): Collection
+    {
+        return Cache::remember(self::CATEGORIES_KEY, now()->addHour(), function () {
+            return Category::query()
+                ->active()
+                ->orderBy('sort_order')
+                ->get();
+        });
+    }
+
+    public function forgetCategories(): void
+    {
+        Cache::forget(self::CATEGORIES_KEY);
     }
 
     public function rememberPublishedLexeme(int $id, ?string $targetLanguageCode, callable $callback): mixed

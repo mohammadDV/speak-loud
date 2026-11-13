@@ -2,6 +2,7 @@
 
 namespace App\Domain\Dictionary\Actions;
 
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Domain\Dictionary\Services\ContentPublishingService;
 use App\Domain\Dictionary\Support\TextNormalizer;
@@ -19,7 +20,8 @@ class UpdateLexeme
      *     lemma?: string,
      *     slug?: string|null,
      *     pronunciation?: string|null,
-     *     disambiguation?: string|null
+     *     disambiguation?: string|null,
+     *     category_ids?: list<int>
      * }  $data
      */
     public function execute(Lexeme $lexeme, array $data, User $actor): Lexeme
@@ -44,9 +46,14 @@ class UpdateLexeme
             }
 
             $lexeme->update($updates);
+
+            if (array_key_exists('category_ids', $data)) {
+                $lexeme->categories()->sync(Category::resolveActiveIds($data['category_ids']));
+            }
+
             $lexeme = $this->publishing->demotePublishedAfterEdit($lexeme->fresh() ?? $lexeme, $actor, 'Lexeme edited');
 
-            return $lexeme->fresh(['forms', 'language', 'senses']) ?? $lexeme;
+            return $lexeme->fresh(['forms', 'language', 'senses', 'categories']) ?? $lexeme;
         });
     }
 }

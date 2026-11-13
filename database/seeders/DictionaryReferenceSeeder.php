@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\DifficultyLevel;
 use App\Domain\Dictionary\Models\PartOfSpeech;
 use Illuminate\Database\Seeder;
@@ -44,6 +45,29 @@ class DictionaryReferenceSeeder extends Seeder
             DifficultyLevel::query()->updateOrCreate(
                 ['code' => $level['code']],
                 $level,
+            );
+        }
+
+        $categories = [
+            ['code' => 'family', 'display_name' => 'Family', 'sort_order' => 1],
+            ['code' => 'time_and_numbers', 'display_name' => 'Time and numbers', 'sort_order' => 2],
+            ['code' => 'colors', 'display_name' => 'Colors', 'sort_order' => 3],
+            ['code' => 'food', 'display_name' => 'Food', 'sort_order' => 4],
+            ['code' => 'travel', 'display_name' => 'Travel', 'sort_order' => 5],
+            ['code' => 'body', 'display_name' => 'Body', 'sort_order' => 6],
+            ['code' => 'clothing', 'display_name' => 'Clothing', 'sort_order' => 7],
+            ['code' => 'home', 'display_name' => 'Home', 'sort_order' => 8],
+            ['code' => 'work', 'display_name' => 'Work', 'sort_order' => 9],
+            ['code' => 'nature', 'display_name' => 'Nature', 'sort_order' => 10],
+            ['code' => 'animals', 'display_name' => 'Animals', 'sort_order' => 11],
+            ['code' => 'emotions', 'display_name' => 'Emotions', 'sort_order' => 12],
+            ['code' => 'greetings', 'display_name' => 'Greetings', 'sort_order' => 13],
+        ];
+
+        foreach ($categories as $category) {
+            Category::query()->updateOrCreate(
+                ['code' => $category['code']],
+                [...$category, 'is_active' => true],
             );
         }
     }

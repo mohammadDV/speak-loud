@@ -13,11 +13,12 @@ beforeEach(function () {
 test('bank fixture has two published senses with distinct translations', function () {
     $bank = Lexeme::query()
         ->where('lemma', 'Bank')
-        ->with(['senses.translations.targetLanguage', 'senses.germanNounDetail'])
+        ->with(['senses.translations.targetLanguage', 'senses.germanNounDetail', 'categories'])
         ->firstOrFail();
 
     expect($bank->status)->toBe(ContentStatus::Published)
-        ->and($bank->senses)->toHaveCount(2);
+        ->and($bank->senses)->toHaveCount(2)
+        ->and($bank->categories->pluck('code')->sort()->values()->all())->toBe(['home', 'work']);
 
     $financial = $bank->senses->firstWhere('definition', 'A financial institution that accepts deposits and makes loans.');
     $bench = $bank->senses->firstWhere('definition', 'A long seat for several people, typically outdoors.');

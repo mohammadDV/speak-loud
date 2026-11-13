@@ -4,6 +4,7 @@ namespace App\Domain\Dictionary\Actions;
 
 use App\Domain\Dictionary\Enums\ContentStatus;
 use App\Domain\Dictionary\Enums\FormType;
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Domain\Dictionary\Support\TextNormalizer;
 use App\Models\Language;
@@ -20,6 +21,7 @@ class CreateLexeme
      *     slug?: string|null,
      *     pronunciation?: string|null,
      *     disambiguation?: string|null,
+     *     category_ids?: list<int>,
      *     forms?: list<array{form: string, form_type?: string, is_primary?: bool}>
      * }  $data
      */
@@ -42,6 +44,10 @@ class CreateLexeme
                 'updated_by' => $actor->id,
             ]);
 
+            if (array_key_exists('category_ids', $data)) {
+                $lexeme->categories()->sync(Category::resolveActiveIds($data['category_ids']));
+            }
+
             foreach ($data['forms'] ?? [] as $formData) {
                 $form = trim($formData['form']);
                 $lexeme->forms()->create([
@@ -52,7 +58,7 @@ class CreateLexeme
                 ]);
             }
 
-            return $lexeme->fresh(['forms', 'language']) ?? $lexeme;
+            return $lexeme->fresh(['forms', 'language', 'categories']) ?? $lexeme;
         });
     }
 }

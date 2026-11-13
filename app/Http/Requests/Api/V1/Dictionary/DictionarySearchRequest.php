@@ -33,6 +33,12 @@ class DictionarySearchRequest extends FormRequest
             ],
             'level' => ['nullable', 'string', 'max:8', 'exists:difficulty_levels,code'],
             'part_of_speech' => ['nullable', 'string', 'max:32', 'exists:parts_of_speech,code'],
+            'category' => [
+                'nullable',
+                'string',
+                'max:64',
+                Rule::exists('categories', 'code')->where(fn ($query) => $query->where('is_active', true)),
+            ],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ];

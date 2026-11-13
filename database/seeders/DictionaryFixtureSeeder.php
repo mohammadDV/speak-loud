@@ -8,6 +8,7 @@ use App\Domain\Dictionary\Enums\GermanArticle;
 use App\Domain\Dictionary\Enums\GrammaticalGender;
 use App\Domain\Dictionary\Enums\PhraseType;
 use App\Domain\Dictionary\Enums\TranslationType;
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Collocation;
 use App\Domain\Dictionary\Models\CollocationTranslation;
 use App\Domain\Dictionary\Models\DifficultyLevel;
@@ -87,6 +88,15 @@ class DictionaryFixtureSeeder extends Seeder
                 ...collect($attrs)->except(['disambiguation', 'slug'])->all(),
             ],
         );
+    }
+
+    /**
+     * @param  list<string>  $codes
+     */
+    private function syncCategories(Lexeme $lexeme, array $codes): void
+    {
+        $ids = Category::query()->whereIn('code', $codes)->pluck('id');
+        $lexeme->categories()->sync($ids);
     }
 
     private function addForm(Lexeme $lexeme, string $form, FormType $type = FormType::Inflected): LexemeForm
@@ -250,6 +260,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Bank', ['slug' => 'bank-de']);
         $this->addForm($lexeme, 'Banken');
+        $this->syncCategories($lexeme, ['work', 'home']);
 
         $this->addSense(
             $lexeme,
@@ -306,6 +317,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Haus', ['slug' => 'haus-de']);
         $this->addForm($lexeme, 'Häuser');
+        $this->syncCategories($lexeme, ['home']);
         $this->addSense($lexeme, $noun, 'A building for human habitation.', $en, $a1, $en, $fa, ['en' => 'house', 'fa' => 'خانه'], [
             'sentence' => 'Das Haus ist groß.',
             'en' => 'The house is big.',
@@ -336,6 +348,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Kind', ['slug' => 'kind-de']);
         $this->addForm($lexeme, 'Kinder');
+        $this->syncCategories($lexeme, ['family']);
         $this->addSense($lexeme, $noun, 'A young human being.', $en, $a1, $en, $fa, ['en' => 'child', 'fa' => 'کودک'], null, [], [
             'gender' => GrammaticalGender::Neuter,
             'article' => GermanArticle::Das,
@@ -347,6 +360,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Mann', ['slug' => 'mann-de']);
         $this->addForm($lexeme, 'Männer');
+        $this->syncCategories($lexeme, ['family']);
         $this->addSense($lexeme, $noun, 'An adult male human.', $en, $a1, $en, $fa, ['en' => 'man', 'fa' => 'مرد'], null, [], [
             'gender' => GrammaticalGender::Masculine,
             'article' => GermanArticle::Der,
@@ -358,6 +372,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Frau', ['slug' => 'frau-de']);
         $this->addForm($lexeme, 'Frauen');
+        $this->syncCategories($lexeme, ['family']);
         $this->addSense($lexeme, $noun, 'An adult female human.', $en, $a1, $en, $fa, ['en' => 'woman', 'fa' => 'زن'], null, [], [
             'gender' => GrammaticalGender::Feminine,
             'article' => GermanArticle::Die,
@@ -379,6 +394,7 @@ class DictionaryFixtureSeeder extends Seeder
     private function seedWasser(Language $de, Language $en, Language $fa, PartOfSpeech $noun, DifficultyLevel $a1): void
     {
         $lexeme = $this->createLexeme($de, 'Wasser', ['slug' => 'wasser-de']);
+        $this->syncCategories($lexeme, ['food', 'nature']);
         $this->addSense($lexeme, $noun, 'A clear liquid essential for life.', $en, $a1, $en, $fa, ['en' => 'water', 'fa' => 'آب'], null, [], [
             'gender' => GrammaticalGender::Neuter,
             'article' => GermanArticle::Das,
@@ -414,6 +430,7 @@ class DictionaryFixtureSeeder extends Seeder
         foreach (['isst', 'aß', 'gegessen'] as $form) {
             $this->addForm($lexeme, $form);
         }
+        $this->syncCategories($lexeme, ['food']);
         $this->addSense($lexeme, $verb, 'To consume food.', $en, $a1, $en, $fa, ['en' => 'to eat', 'fa' => 'خوردن']);
     }
 
@@ -465,6 +482,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Zeit', ['slug' => 'zeit-de']);
         $this->addForm($lexeme, 'Zeiten');
+        $this->syncCategories($lexeme, ['time_and_numbers']);
         $this->addSense($lexeme, $noun, 'The indefinite continued progress of existence.', $en, $a1, $en, $fa, ['en' => 'time', 'fa' => 'زمان'], null, [], [
             'gender' => GrammaticalGender::Feminine,
             'article' => GermanArticle::Die,
@@ -476,6 +494,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Arbeit', ['slug' => 'arbeit-de']);
         $this->addForm($lexeme, 'Arbeiten');
+        $this->syncCategories($lexeme, ['work']);
         $this->addSense($lexeme, $noun, 'Activity involving mental or physical effort; a job.', $en, $a2, $en, $fa, ['en' => 'work', 'fa' => 'کار'], null, [], [
             'gender' => GrammaticalGender::Feminine,
             'article' => GermanArticle::Die,
@@ -487,6 +506,7 @@ class DictionaryFixtureSeeder extends Seeder
     {
         $lexeme = $this->createLexeme($de, 'Freund', ['slug' => 'freund-de']);
         $this->addForm($lexeme, 'Freunde');
+        $this->syncCategories($lexeme, ['family', 'emotions']);
         $this->addSense($lexeme, $noun, 'A person with whom one has a bond of mutual affection.', $en, $a1, $en, $fa, ['en' => 'friend', 'fa' => 'دوست'], null, [], [
             'gender' => GrammaticalGender::Masculine,
             'article' => GermanArticle::Der,

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Lexemes\Pages;
 
 use App\Domain\Dictionary\Actions\CreateLexeme as CreateLexemeAction;
+use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Filament\Admin\Resources\Lexemes\LexemeResource;
 use App\Models\User;
@@ -28,6 +29,7 @@ class CreateLexeme extends CreateRecord
             'slug' => $data['slug'] ?? null,
             'pronunciation' => $data['pronunciation'] ?? null,
             'disambiguation' => $data['disambiguation'] ?? null,
+            'category_ids' => Category::resolveActiveIds($data['categories'] ?? []),
         ], $user);
 
         return $lexeme;

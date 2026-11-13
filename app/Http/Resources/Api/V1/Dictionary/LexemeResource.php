@@ -25,6 +25,7 @@ class LexemeResource extends JsonResource
             'disambiguation' => $this->disambiguation,
             'status' => EnumValue::string($this->status),
             'language' => new LanguageResource($this->whenLoaded('language')),
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
             'forms' => LexemeFormResource::collection($this->whenLoaded('forms')),
             'senses' => SenseResource::collection($this->whenLoaded('senses')),
         ];

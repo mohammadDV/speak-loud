@@ -55,13 +55,15 @@ makes it possible to add languages without redesigning the database.
 9.  Store common collocations, fixed expressions, and idioms.
 10. Store CEFR learning levels (A1--C2) without assuming that every
     meaning has the same level.
-11. Provide German-specific grammatical information, especially `der`,
+11. Classify lexemes into one or more shared vocabulary categories
+    (topics) such as Family, Colors, or Time and numbers.
+12. Provide German-specific grammatical information, especially `der`,
     `die`, and `das`, plus plural forms.
-12. Provide an admin workflow for creating, importing, reviewing,
+13. Provide an admin workflow for creating, importing, reviewing,
     publishing, and revising content.
-13. Support AI-assisted content creation with validation and human
+14. Support AI-assisted content creation with validation and human
     approval.
-14. Support user vocabulary lists, practice, and progress tracking as
+15. Support user vocabulary lists, practice, and progress tracking as
     later learning features.
 
 ### 2.2 Non-goals for the first release
@@ -161,6 +163,21 @@ A common, natural combination of words, such as German
 `eine Entscheidung treffen`. Collocations are separate learning content
 and may have translations, examples, patterns, and level assessments.
 
+### 3.9 Category
+
+A **category** is a controlled vocabulary topic used for browsing and
+filtering, for example Family, Time and numbers, or Colors.
+
+Categories are assigned to lexemes. A lexeme may belong to multiple
+categories. Categories are a shared, flat catalog (not hierarchical and
+not language-specific).
+
+Categories are distinct from:
+
+-   **Part of speech** --- grammatical classification of a sense.
+-   **Sense `domain`** --- optional free-text editorial or linguistic
+    note on a sense (kept independently; not migrated into categories).
+
 ## 4. Users and permissions
 
 ### 4.1 Roles
@@ -242,6 +259,15 @@ derivatives, compounds, and related-word relationships.
 
 **FR-DICT-08 (P0):** Content has draft, review, published, and archived
 states (or an equivalent controlled lifecycle).
+
+**FR-DICT-09 (P0):** A lexeme can be assigned zero or more categories
+from a shared category catalog.
+
+**FR-DICT-10 (P0):** Administrators can create, edit, enable, and disable
+categories without code changes.
+
+**FR-DICT-11 (P0):** Dictionary search and browse can filter by category
+code.
 
 ### 5.3 Grammar
 
@@ -336,9 +362,9 @@ reviewer, and assessment date.
 
 ### 5.8 Admin content management
 
-**FR-ADMIN-01 (P0):** Editors can manage lexemes, forms, senses,
-grammar, translations, examples, collocations, and levels from a unified
-editor.
+**FR-ADMIN-01 (P0):** Editors can manage lexemes, categories, forms,
+senses, grammar, translations, examples, collocations, and levels from a
+unified editor.
 
 **FR-ADMIN-02 (P0):** Editors can save incomplete content as a draft.
 
@@ -391,7 +417,7 @@ German articles, translations, CEFR levels, or collocation naturalness.
 list.
 
 **FR-LEARN-02 (P1):** Users can create collections and study vocabulary
-by language, level, or topic.
+by language, level, or category/topic.
 
 **FR-LEARN-03 (P1):** Users can review saved vocabulary with flashcards
 or quizzes.
@@ -476,6 +502,31 @@ Suggested fields:
 -   `description`
 -   `sort_order`
 
+#### `categories`
+
+Suggested fields:
+
+-   `id`
+-   `code` --- unique stable code such as `family`, `colors`,
+    `time_and_numbers`
+-   `display_name`
+-   `description` --- optional
+-   `sort_order`
+-   `is_active`
+-   timestamps
+
+Categories are a flat shared catalog across all source languages.
+
+#### `category_lexeme`
+
+Pivot linking lexemes to categories:
+
+-   `id` --- optional
+-   `category_id`
+-   `lexeme_id`
+-   unique (`category_id`, `lexeme_id`)
+-   indexes on both foreign keys
+
 #### `senses`
 
 Suggested fields:
@@ -487,7 +538,8 @@ Suggested fields:
 -   `definition`
 -   `definition_language_id`
 -   `usage_label` --- optional controlled label or relation
--   `domain` --- optional controlled label or relation
+-   `domain` --- optional free-text editorial or linguistic note; not a
+    substitute for lexeme categories
 -   `frequency_rank` --- optional
 -   `sort_order`
 -   `status`
@@ -496,6 +548,9 @@ Suggested fields:
 If a spelling has two grammatical functions, create separate sense/usage
 records as appropriate. Avoid assigning multiple unrelated parts of
 speech to one undifferentiated sense.
+
+Do not migrate sense `domain` into the category catalog. Categories are
+lexeme-level topics; `domain` remains optional free text on the sense.
 
 #### `sense_translations`
 
@@ -737,18 +792,20 @@ tables may be preferable.
 1.  One language has many lexemes.
 2.  One lexeme has many forms.
 3.  One lexeme has many senses.
-4.  One sense has one primary part of speech in the initial model;
+4.  One lexeme has many categories; one category has many lexemes.
+5.  One sense has one primary part of speech in the initial model;
     different grammatical usages should be represented as separate
     senses or usage records.
-5.  One sense has many translations.
-6.  One sense has many examples.
-7.  One example has many translations.
-8.  One sense has many collocations.
-9.  One sense can have multiple level assessments over time, with one
+6.  One sense has many translations.
+7.  One sense has many examples.
+8.  One example has many translations.
+9.  One sense has many collocations.
+10. One sense can have multiple level assessments over time, with one
     current primary assessment if desired.
-10. One user can have many learning courses.
-11. One learning course has a source language and target language.
-12. User progress should refer to a sense and a course.
+11. Sense `domain` is independent of lexeme categories.
+12. One user can have many learning courses.
+13. One learning course has a source language and target language.
+14. User progress should refer to a sense and a course.
 
 ## 8. Example data model walkthrough
 
@@ -758,6 +815,7 @@ Use German `Bank` as a test case.
 
 -   Language: German (`de`)
 -   Lemma: `Bank`
+-   Categories: `work`, `home` (multiple categories allowed when useful)
 
 ### Sense 1
 
@@ -884,6 +942,7 @@ Use versioned API routes, for example `/api/v1`.
 
 ``` http
 GET /api/v1/languages
+GET /api/v1/categories
 GET /api/v1/dictionary/search
 GET /api/v1/lexemes/{id}
 GET /api/v1/lexemes/{id}/senses
@@ -897,6 +956,7 @@ Search parameters may include:
 -   `target_language` --- requested translation language
 -   `level` --- CEFR level
 -   `part_of_speech` --- grammatical category
+-   `category` --- vocabulary category code
 -   `page` and `per_page`
 
 Example:
@@ -905,10 +965,10 @@ Example:
 GET /api/v1/dictionary/search?q=Bank&source_language=de&target_language=fa
 ```
 
-A response should include the lexeme, its senses, grammatical
-information, translations for the requested target language, examples,
-collocations, and levels, subject to pagination and response-size
-limits.
+A response should include the lexeme, its categories, its senses,
+grammatical information, translations for the requested target language,
+examples, collocations, and levels, subject to pagination and
+response-size limits.
 
 ### Admin endpoints
 
@@ -1164,6 +1224,8 @@ Suggested indexes include:
 -   `languages(code)` unique.
 -   `lexemes(language_id, normalized_lemma)`.
 -   `lexeme_forms(lexeme_id, normalized_form)`.
+-   `categories(code)` unique.
+-   `category_lexeme(category_id, lexeme_id)` unique.
 -   `senses(lexeme_id, sort_order)`.
 -   `sense_translations(sense_id, target_language_id)`.
 -   `sense_levels(sense_id, difficulty_level_id)`.
@@ -1311,12 +1373,12 @@ fixed delivery commitment.
 -   Review the current application and database.
 -   Confirm domain terminology and duplicate/homograph policy.
 -   Design and review migrations.
--   Implement languages, lexemes, forms, senses, parts of speech, and
-    levels.
+-   Implement languages, lexemes, forms, senses, parts of speech,
+    categories, and levels.
 -   Add factories, seeders, and core tests.
 
 **Exit criteria:** A tested database can represent multiple languages,
-forms, senses, and levels.
+forms, senses, categories, and levels.
 
 ### Phase 2 --- Dictionary content and admin editor (Weeks 3--4)
 
@@ -1334,17 +1396,19 @@ multilingual entry without developer intervention.
 
 -   Implement language selection.
 -   Implement dictionary search and detail endpoints.
--   Display meanings, grammar, translations, examples, and collocations.
--   Implement inflected-form lookup.
+-   Display meanings, categories, grammar, translations, examples, and
+    collocations.
+-   Implement inflected-form lookup and category filter.
 -   Add pagination and API tests.
 
 **Exit criteria:** A user can search a German word and see the correct
-meaning-specific translation in their selected language.
+meaning-specific translation in their selected language, and can filter
+results by category.
 
 ### Phase 4 --- CEFR and vocabulary collections (Weeks 7--8)
 
 -   Implement sense-level CEFR assignments.
--   Build level and topic filters.
+-   Build level and category/topic filters.
 -   Implement saved senses and collections.
 -   Add content completeness reports.
 
@@ -1404,21 +1468,23 @@ true:
 2.  An editor can create a lexeme in any active language.
 3.  A lexeme can contain multiple meanings.
 4.  Each meaning can have its own part of speech.
-5.  A German noun can store and display its correct article and plural
+5.  A lexeme can be assigned multiple categories, and search can filter
+    by category.
+6.  A German noun can store and display its correct article and plural
     form.
-6.  A sense can have multiple translations into different languages.
-7.  A sense can have multiple examples, each with translations.
-8.  A sense can have multiple collocations with translations.
-9.  A sense can be assigned a CEFR level independently of other senses.
-10. Search can find a lemma and a configured inflected form.
-11. A learner can select a target translation language.
-12. The returned translation belongs to the correct sense.
-13. Editors can save drafts and submit content for review.
-14. Only authorized reviewers/admins can approve and publish.
-15. Published content is distinguishable from draft content.
-16. Important edits have revision history.
-17. Core workflows have automated tests.
-18. A new language can be introduced without creating a new
+7.  A sense can have multiple translations into different languages.
+8.  A sense can have multiple examples, each with translations.
+9.  A sense can have multiple collocations with translations.
+10. A sense can be assigned a CEFR level independently of other senses.
+11. Search can find a lemma and a configured inflected form.
+12. A learner can select a target translation language.
+13. The returned translation belongs to the correct sense.
+14. Editors can save drafts and submit content for review.
+15. Only authorized reviewers/admins can approve and publish.
+16. Published content is distinguishable from draft content.
+17. Important edits have revision history.
+18. Core workflows have automated tests.
+19. A new language can be introduced without creating a new
     language-pair schema.
 
 ## 20. Key product and technical decisions to confirm
@@ -1486,7 +1552,7 @@ Build one multilingual dictionary engine with a shared relational data
 model.
 
 -   Languages own lexemes.
--   Lexemes own forms and senses.
+-   Lexemes own forms and senses and may belong to many categories.
 -   Senses own grammatical usage, translations, examples, collocations,
     and learning-level assessments.
 -   Users own learning courses, saved vocabulary, and review progress.
