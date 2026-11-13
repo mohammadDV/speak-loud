@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $slug
  * @property string|null $pronunciation
  * @property string|null $disambiguation
+ * @property string|null $import_key
  * @property-read Language|null $language
  */
 class Lexeme extends Model
@@ -36,6 +37,7 @@ class Lexeme extends Model
         'slug',
         'pronunciation',
         'disambiguation',
+        'import_key',
         'status',
         'created_by',
         'updated_by',

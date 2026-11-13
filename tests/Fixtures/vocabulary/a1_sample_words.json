@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "level": "A1",
+    "source_language": "de",
+    "definition_language": "en",
+    "translation_languages": ["en"],
+    "lexeme_count": 2
+  },
+  "category_catalog": [
+    {"code": "family", "display_name": "Family"},
+    {"code": "general", "display_name": "General"}
+  ],
+  "lexemes": [
+    {
+      "import_key": "de:vater",
+      "language": "de",
+      "lemma": "Vater",
+      "slug": "de-vater",
+      "disambiguation": null,
+      "categories": ["family"],
+      "status": "published",
+      "forms": [
+        {
+          "form": "Väter",
+          "form_type": "inflected",
+          "is_primary": false,
+          "grammatical_features": {"number": "plural"}
+        }
+      ],
+      "senses": [
+        {
+          "import_key": "de:vater:sense:a1:1",
+          "part_of_speech": "noun",
+          "definition": "Father.",
+          "definition_language": "en",
+          "domain": "Family & People",
+          "level": "A1",
+          "sort_order": 0,
+          "status": "published",
+          "translations": [
+            {
+              "language": "en",
+              "text": "father",
+              "type": "equivalent",
+              "sort_order": 0,
+              "status": "published"
+            }
+          ],
+          "examples": [
+            {
+              "import_key": "de:vater:sense:a1:1:example:1",
+              "language": "de",
+              "sentence": "Mein Vater ist hier.",
+              "difficulty_level": "A1",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "My father is here.",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "collocations": [
+            {
+              "import_key": "de:vater:sense:a1:1:collocation:1",
+              "phrase": "mein Vater",
+              "pattern_type": "determiner+noun",
+              "phrase_type": "collocation",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "my father",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "german_noun": {
+            "article": "der",
+            "grammatical_gender": "masculine",
+            "plural_form": "Väter"
+          }
+        }
+      ]
+    },
+    {
+      "import_key": "de:gehen",
+      "language": "de",
+      "lemma": "gehen",
+      "slug": "de-gehen",
+      "categories": ["general"],
+      "status": "published",
+      "forms": [],
+      "senses": [
+        {
+          "import_key": "de:gehen:sense:a1:1",
+          "part_of_speech": "verb",
+          "definition": "To go.",
+          "definition_language": "en",
+          "domain": "General",
+          "level": "A1",
+          "sort_order": 0,
+          "status": "published",
+          "translations": [
+            {
+              "language": "en",
+              "text": "to go",
+              "type": "equivalent",
+              "sort_order": 0,
+              "status": "published"
+            }
+          ],
+          "examples": [
+            {
+              "import_key": "de:gehen:sense:a1:1:example:1",
+              "language": "de",
+              "sentence": "Ich will gehen.",
+              "difficulty_level": "A1",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "I want to go.",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "collocations": [
+            {
+              "import_key": "de:gehen:sense:a1:1:collocation:1",
+              "phrase": "gehen können",
+              "pattern_type": "verb+verb",
+              "phrase_type": "collocation",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "be able to go",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "verb_details": {
+            "is_irregular": true,
+            "is_reflexive": false
+          },
+          "grammar_notes": "Irregular verb."
+        }
+      ]
+    }
+  ]
+}

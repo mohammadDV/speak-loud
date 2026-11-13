@@ -62,6 +62,7 @@ class DictionaryReferenceSeeder extends Seeder
             ['code' => 'animals', 'display_name' => 'Animals', 'sort_order' => 11],
             ['code' => 'emotions', 'display_name' => 'Emotions', 'sort_order' => 12],
             ['code' => 'greetings', 'display_name' => 'Greetings', 'sort_order' => 13],
+            ['code' => 'general', 'display_name' => 'General', 'sort_order' => 14],
         ];
 
         foreach ($categories as $category) {

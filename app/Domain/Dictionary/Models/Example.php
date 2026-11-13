@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property ContentStatus $status
  * @property string $sentence
+ * @property string|null $import_key
  */
 class Example extends Model
 {
@@ -21,6 +22,7 @@ class Example extends Model
 
     protected $fillable = [
         'sense_id',
+        'import_key',
         'language_id',
         'sentence',
         'usage_note',

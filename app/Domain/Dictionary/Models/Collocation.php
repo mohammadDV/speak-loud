@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property ContentStatus $status
  * @property PhraseType $phrase_type
  * @property string $phrase
+ * @property string|null $import_key
  */
 class Collocation extends Model
 {
@@ -22,6 +23,7 @@ class Collocation extends Model
 
     protected $fillable = [
         'sense_id',
+        'import_key',
         'phrase',
         'pattern_type',
         'phrase_type',

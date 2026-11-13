@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $lexeme_id
  * @property int|null $part_of_speech_id
  * @property string|null $definition
+ * @property string|null $import_key
  * @property-read Lexeme|null $lexeme
  * @property-read PartOfSpeech|null $partOfSpeech
  * @property-read GermanNounDetail|null $germanNounDetail
@@ -29,6 +30,7 @@ class Sense extends Model
 
     protected $fillable = [
         'lexeme_id',
+        'import_key',
         'part_of_speech_id',
         'definition',
         'definition_language_id',

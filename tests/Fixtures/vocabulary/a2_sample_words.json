@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "level": "A2",
+    "source_language": "de",
+    "lexeme_count": 1
+  },
+  "lexemes": [
+    {
+      "import_key": "de:reise",
+      "language": "de",
+      "lemma": "Reise",
+      "slug": "de-reise",
+      "categories": ["travel"],
+      "status": "published",
+      "forms": [
+        {
+          "form": "Reisen",
+          "form_type": "inflected",
+          "is_primary": false
+        }
+      ],
+      "senses": [
+        {
+          "import_key": "de:reise:sense:a2:1",
+          "part_of_speech": "noun",
+          "definition": "Trip.",
+          "definition_language": "en",
+          "domain": "Travel",
+          "level": "A2",
+          "sort_order": 0,
+          "status": "published",
+          "translations": [
+            {
+              "language": "en",
+              "text": "trip",
+              "type": "equivalent",
+              "status": "published"
+            }
+          ],
+          "examples": [
+            {
+              "import_key": "de:reise:sense:a2:1:example:1",
+              "language": "de",
+              "sentence": "Die Reise war schön.",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "The trip was nice.",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "collocations": [
+            {
+              "import_key": "de:reise:sense:a2:1:collocation:1",
+              "phrase": "eine Reise machen",
+              "pattern_type": "verb+noun",
+              "phrase_type": "collocation",
+              "status": "published",
+              "translations": [
+                {
+                  "language": "en",
+                  "translation": "take a trip",
+                  "status": "published"
+                }
+              ]
+            }
+          ],
+          "german_noun": {
+            "article": "die",
+            "grammatical_gender": "feminine",
+            "plural_form": "Reisen"
+          }
+        }
+      ]
+    }
+  ]
+}
