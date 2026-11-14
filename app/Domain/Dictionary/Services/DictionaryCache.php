@@ -5,14 +5,15 @@ namespace App\Domain\Dictionary\Services;
 use App\Domain\Dictionary\Models\Category;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Models\Language;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class DictionaryCache
 {
-    private const LANGUAGES_KEY = 'dictionary:languages:active';
+    private const LANGUAGES_KEY = 'dictionary:languages:active:v2';
 
-    private const CATEGORIES_KEY = 'dictionary:categories:active';
+    private const CATEGORIES_KEY = 'dictionary:categories:active:v2';
 
     private const LEXEME_KEY = 'dictionary:lexeme:%d:%s';
 
@@ -23,17 +24,29 @@ class DictionaryCache
      */
     public function activeLanguages(): Collection
     {
-        return Cache::remember(self::LANGUAGES_KEY, now()->addHour(), function () {
-            return Language::query()
+        /** @var list<array<string, mixed>>|null $rows */
+        $rows = Cache::get(self::LANGUAGES_KEY);
+
+        if (! is_array($rows)) {
+            $rows = Language::query()
                 ->where('is_active', true)
                 ->orderBy('name_en')
-                ->get();
-        });
+                ->get()
+                ->map(fn (Language $language): array => $language->getAttributes())
+                ->all();
+
+            Cache::put(self::LANGUAGES_KEY, $rows, now()->addHour());
+        }
+
+        return (new Language)->newCollection(
+            array_map(fn (array $attributes): Language => (new Language)->newFromBuilder($attributes), $rows)
+        );
     }
 
     public function forgetLanguages(): void
     {
         Cache::forget(self::LANGUAGES_KEY);
+        Cache::forget('dictionary:languages:active');
     }
 
     /**
@@ -41,17 +54,32 @@ class DictionaryCache
      */
     public function activeCategories(): Collection
     {
-        return Cache::remember(self::CATEGORIES_KEY, now()->addHour(), function () {
-            return Category::query()
+        /** @var list<array<string, mixed>>|null $rows */
+        $rows = Cache::get(self::CATEGORIES_KEY);
+
+        if (! is_array($rows)) {
+            $rows = Category::query()
                 ->active()
                 ->orderBy('sort_order')
-                ->get();
-        });
+                ->get()
+                ->map(fn (Category $category): array => $category->getAttributes())
+                ->all();
+
+            Cache::put(self::CATEGORIES_KEY, $rows, now()->addHour());
+        }
+
+        /** @var EloquentCollection<int, Category> $collection */
+        $collection = (new Category)->newCollection(
+            array_map(fn (array $attributes): Category => (new Category)->newFromBuilder($attributes), $rows)
+        );
+
+        return $collection;
     }
 
     public function forgetCategories(): void
     {
         Cache::forget(self::CATEGORIES_KEY);
+        Cache::forget('dictionary:categories:active');
     }
 
     public function rememberPublishedLexeme(int $id, ?string $targetLanguageCode, callable $callback): mixed

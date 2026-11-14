@@ -1,6 +1,7 @@
 @php
     $authLinks = [
         ['discover', 'Discover', '<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>'],
+        ['learn.der-die-das', 'Learn', '<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.908.216-1.79.496-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342"/>'],
         ['schedule', 'Schedule', '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'],
         ['messages', 'Messages', '<path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9 4.5 2.25-4.5c.84-1.68 2.55-2.75 4.38-2.75h6.75a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3H9.75L3 18.75Z"/>'],
         ['claims', 'Claims', '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/>'],
@@ -15,6 +16,7 @@
     $guestLinks = [
         ['home', 'Home', '<path stroke-linecap="round" stroke-linejoin="round" d="m3 9 9-7 9 7v11a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9Z"/>'],
         ['discover', 'Discover', '<path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"/>'],
+        ['learn.der-die-das', 'Learn', '<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.908.216-1.79.496-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342"/>'],
     ];
 
     $navLinks = auth()->check()
@@ -25,6 +27,7 @@
         ['schedule', 'Schedule'],
         ['claims', 'Claims'],
         ['discover', 'Discover'],
+        ['learn.der-die-das', 'Learn'],
         ['messages', 'Messages'],
     ];
 
@@ -33,11 +36,13 @@
         ['profile.edit', 'Edit profile'],
         ['profile.security', 'Security'],
         ['tickets.index', 'Support tickets'],
+        ['learn.der-die-das.history', 'Quiz history'],
     ];
 
     $drawerExploreLinks = [
         ['blog.index', 'Blog'],
         ['faq.index', 'FAQ'],
+        ['learn.der-die-das', 'Learn der/die/das'],
         ['about', 'About'],
         ['contact', 'Contact'],
         ['donate', 'Donate'],
@@ -47,6 +52,7 @@
 
     $navRouteIs = function (string $route): bool {
         $patterns = match ($route) {
+            'learn.der-die-das' => ['learn.der-die-das', 'learn.der-die-das.*'],
             'schedule' => ['schedule', 'schedules.*'],
             'messages' => ['messages', 'messages.*'],
             'claims' => ['claims', 'claims.*'],
@@ -182,6 +188,7 @@
                         <div class="space-y-0.5">
                             <a href="{{ route('home') }}" wire:navigate class="{{ $drawerLinkClass('home') }}">Home</a>
                             <a href="{{ route('discover') }}" wire:navigate class="{{ $drawerLinkClass('discover') }}">Discover</a>
+                            <a href="{{ route('learn.der-die-das') }}" wire:navigate class="{{ $drawerLinkClass('learn.der-die-das') }}">Learn</a>
                             <a href="{{ route('login') }}" wire:navigate class="{{ $drawerLinkClass('login') }}">Sign in</a>
                             <a href="{{ route('register') }}" wire:navigate class="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-[#FF8C42]">Start free</a>
                         </div>

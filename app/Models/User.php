@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domain\Learning\Models\ArticleQuizSession;
+use App\Domain\Learning\Models\UserSenseFlag;
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use App\Support\SitemapBuilder;
@@ -205,6 +207,22 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function blogPosts(): HasMany
     {
         return $this->hasMany(BlogPost::class, 'author_id');
+    }
+
+    /**
+     * @return HasMany<ArticleQuizSession, $this>
+     */
+    public function articleQuizSessions(): HasMany
+    {
+        return $this->hasMany(ArticleQuizSession::class);
+    }
+
+    /**
+     * @return HasMany<UserSenseFlag, $this>
+     */
+    public function senseFlags(): HasMany
+    {
+        return $this->hasMany(UserSenseFlag::class);
     }
 
     public function blockedUsers(): BelongsToMany

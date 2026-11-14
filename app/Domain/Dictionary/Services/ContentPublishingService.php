@@ -10,6 +10,7 @@ use App\Domain\Dictionary\Models\ContentRevision;
 use App\Domain\Dictionary\Models\Lexeme;
 use App\Domain\Dictionary\Models\Sense;
 use App\Domain\Dictionary\Support\EnumValue;
+use App\Domain\Learning\Services\ArticleQuizCache;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -18,6 +19,7 @@ class ContentPublishingService
 {
     public function __construct(
         private readonly DictionaryCache $cache,
+        private readonly ArticleQuizCache $articleQuizCache,
     ) {}
 
     public function submitForReview(Lexeme $lexeme, User $actor): Lexeme
@@ -71,7 +73,7 @@ class ContentPublishingService
 
             $lexeme = $this->transitionLexeme($lexeme, ContentStatus::Published, $actor, 'Published');
             $this->snapshot($lexeme, $actor, 'Published snapshot');
-            $this->cache->forgetLexeme($lexeme);
+            $this->forgetCaches($lexeme);
 
             return $lexeme->fresh(['senses', 'forms', 'language']) ?? $lexeme;
         });
@@ -84,7 +86,7 @@ class ContentPublishingService
         return DB::transaction(function () use ($lexeme, $actor): Lexeme {
             $lexeme = $this->transitionLexeme($lexeme, ContentStatus::Archived, $actor, 'Archived');
             $this->cascadeStatus($lexeme, ContentStatus::Archived);
-            $this->cache->forgetLexeme($lexeme);
+            $this->forgetCaches($lexeme);
 
             return $lexeme->fresh(['senses', 'forms', 'language']) ?? $lexeme;
         });
@@ -101,7 +103,7 @@ class ContentPublishingService
                 $this->snapshot($lexeme, $actor, 'Unpublished to draft');
             }
 
-            $this->cache->forgetLexeme($lexeme);
+            $this->forgetCaches($lexeme);
 
             return $lexeme->fresh(['senses', 'forms', 'language']) ?? $lexeme;
         });
@@ -115,7 +117,7 @@ class ContentPublishingService
         $lexeme->loadMissing('language');
 
         if ($lexeme->status !== ContentStatus::Published) {
-            $this->cache->forgetLexeme($lexeme);
+            $this->forgetCaches($lexeme);
 
             return $lexeme;
         }
@@ -135,10 +137,22 @@ class ContentPublishingService
                 'updated_by' => $actor->id,
             ]);
 
-            $this->cache->forgetLexeme($lexeme);
+            $this->forgetCaches($lexeme);
 
             return $lexeme->fresh(['senses', 'forms', 'language']) ?? $lexeme;
         });
+    }
+
+    private function forgetCaches(Lexeme $lexeme): void
+    {
+        $this->cache->forgetLexeme($lexeme);
+
+        $senseIds = $lexeme->relationLoaded('senses')
+            ? $lexeme->senses->pluck('id')->all()
+            : $lexeme->senses()->pluck('id')->all();
+
+        $this->articleQuizCache->forgetPools();
+        $this->articleQuizCache->forgetCardsForSenses($senseIds);
     }
 
     private function transitionLexeme(Lexeme $lexeme, ContentStatus $next, User $actor, string $summary): Lexeme

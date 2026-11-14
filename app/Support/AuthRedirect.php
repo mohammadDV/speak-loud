@@ -17,8 +17,11 @@ class AuthRedirect
             }
         }
 
+        $pendingReturn = session()->pull('pending_claim_return')
+            ?? session()->pull('pending_learn_return');
+
         return SafeInternalRedirect::url(
-            session()->pull('pending_claim_return'),
+            $pendingReturn,
             route('discover'),
         );
     }

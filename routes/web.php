@@ -77,6 +77,7 @@ Volt::route('/blog', 'blog.index')->name('blog.index');
 Volt::route('/blog/{slug}', 'blog.show')->name('blog.show');
 Volt::route('/faq', 'faq.index')->name('faq.index');
 Volt::route('/discover', 'discover.index')->name('discover');
+Volt::route('/learn/der-die-das', 'learn.der-die-das')->name('learn.der-die-das');
 Volt::route('/u/{profileSlug}', 'users.show')->name('users.show');
 
 Route::middleware('guest')->group(function () {
@@ -117,5 +118,6 @@ Route::middleware(['auth', 'active'])->group(function () {
         Volt::route('/claims', 'claims.index')->name('claims');
         Volt::route('/tickets', 'tickets.index')->name('tickets.index');
         Volt::route('/tickets/{ticket}', 'tickets.show')->name('tickets.show');
+        Volt::route('/learn/der-die-das/history', 'learn.der-die-das-history')->name('learn.der-die-das.history');
     });
 });
