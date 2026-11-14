@@ -599,8 +599,11 @@ test('schedule modal uses twenty four hour selects without am pm labels', functi
         ->assertSeeHtml('value="00"')
         ->assertSeeHtml('value="13"')
         ->assertSeeHtml('value="23"')
-        ->assertDontSee('AM')
-        ->assertDontSee('PM')
+        // Avoid bare "AM"/"PM" asserts — Livewire wire IDs can contain those substrings.
+        ->assertDontSeeHtml('>AM<')
+        ->assertDontSeeHtml('>PM<')
+        ->assertDontSeeHtml('value="AM"')
+        ->assertDontSeeHtml('value="PM"')
         ->assertDontSee('type="time"', false)
         ->assertDontSee('datetime-local', false);
 });

@@ -264,6 +264,5 @@ test('ticket message timestamps use twenty four hour format', function () {
         ->get(route('tickets.show', $ticket))
         ->assertOk()
         ->assertSee($expected)
-        ->assertDontSee($message->created_at->format('g:i A'))
-        ->assertDontSee('PM');
+        ->assertDontSee($message->created_at->format('g:i A'));
 });

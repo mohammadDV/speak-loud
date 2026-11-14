@@ -9,9 +9,6 @@ use InvalidArgumentException;
 
 class ToggleUserSenseFlag
 {
-    /**
-     * @param  'important'|'learned'  $flag
-     */
     public function execute(User $user, int $senseId, string $flag): UserSenseFlag
     {
         if (! in_array($flag, ['important', 'learned'], true)) {

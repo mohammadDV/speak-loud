@@ -43,7 +43,7 @@ class ArticleQuizService
     /**
      * Languages that have at least one published translation for a published German noun with an article.
      *
-     * @return Collection<int, object{id: int, code: string, name_en: string, name_native: string}>
+     * @return Collection<int, array{id: int, code: string, name_en: string, name_native: string}>
      */
     public function translationLanguages(): Collection
     {
@@ -79,7 +79,7 @@ class ArticleQuizService
                 ->all();
         });
 
-        return collect($rows)->map(fn (array $row): object => (object) $row)->values();
+        return collect($rows)->values();
     }
 
     /**
@@ -229,8 +229,9 @@ class ArticleQuizService
 
         return $query
             ->distinct()
+            ->toBase()
             ->get()
-            ->map(fn ($row): array => [
+            ->map(fn (object $row): array => [
                 'sense_id' => (int) $row->sense_id,
                 'lemma' => (string) $row->lemma,
                 'article' => strtolower((string) $row->article),
@@ -345,8 +346,8 @@ class ArticleQuizService
             });
 
             $flag = $flagsBySense[$senseId] ?? null;
-            $card['is_important'] = (bool) ($flag?->is_important ?? false);
-            $card['is_learned'] = (bool) ($flag?->is_learned ?? false);
+            $card['is_important'] = $flag !== null ? (bool) $flag->is_important : false;
+            $card['is_learned'] = $flag !== null ? (bool) $flag->is_learned : false;
             $cards[] = $card;
         }
 
@@ -442,7 +443,7 @@ class ArticleQuizService
     private function assertTranslationLanguage(string $code): void
     {
         $exists = $this->translationLanguages()
-            ->contains(fn (object $language): bool => $language->code === $code);
+            ->contains(fn (array $language): bool => $language['code'] === $code);
 
         if (! $exists) {
             throw ValidationException::withMessages([

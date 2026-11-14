@@ -35,8 +35,8 @@ class SaveArticleQuizResult
 
             $session = ArticleQuizSession::query()->create([
                 'user_id' => $user->id,
-                'level_codes' => $payload['level_codes'] !== [] ? array_values($payload['level_codes']) : null,
-                'category_codes' => $payload['category_codes'] !== [] ? array_values($payload['category_codes']) : null,
+                'level_codes' => $payload['level_codes'] !== [] ? $payload['level_codes'] : null,
+                'category_codes' => $payload['category_codes'] !== [] ? $payload['category_codes'] : null,
                 'word_count' => $payload['word_count'],
                 'translation_language_code' => $payload['translation_language_code'],
                 'correct_count' => $correct,

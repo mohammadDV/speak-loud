@@ -47,10 +47,10 @@ mount(function (ArticleQuizService $quiz) {
         'display_name' => $category->display_name,
     ])->all();
 
-    $this->languages = $quiz->translationLanguages()->map(fn ($language) => [
-        'code' => $language->code,
-        'name_en' => $language->name_en,
-        'name_native' => $language->name_native,
+    $this->languages = $quiz->translationLanguages()->map(fn (array $language) => [
+        'code' => $language['code'],
+        'name_en' => $language['name_en'],
+        'name_native' => $language['name_native'],
     ])->all();
 
     $availableCodes = collect($this->languages)->pluck('code');
