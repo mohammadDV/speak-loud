@@ -34,6 +34,7 @@ state([
     'search_suggestions' => [],
     'show_search_suggestions' => false,
     'skip_search_refresh' => false,
+    'show_feature_guide' => false,
 ]);
 
 mount(function (ArticleQuizService $quiz) {
@@ -420,14 +421,61 @@ $closeDetails = function () {
     $this->search_detail = null;
 };
 
+$toggleFeatureGuide = function () {
+    $this->show_feature_guide = ! $this->show_feature_guide;
+};
+
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-6 md:py-10 pb-28 md:pb-10">
     <div class="flex items-start justify-between gap-3 mb-6">
-        <div>
+        <div class="min-w-0">
             <p class="text-xs font-semibold uppercase tracking-wide text-[#FF8C42] mb-1">German practice</p>
             <h1 class="text-2xl md:text-3xl font-bold text-[#3D2B1F]">Der / Die / Das</h1>
-            <p class="text-sm text-[#3D2B1F]/60 mt-1">Pick your filters, practice articles, and check your score.</p>
+            <p class="text-sm text-[#3D2B1F]/60 mt-1">
+                Practice German noun articles with filters, a word lookup, and a scored quiz.
+            </p>
+            <button
+                type="button"
+                wire:click="toggleFeatureGuide"
+                class="mt-2 text-sm font-semibold text-[#FF8C42] hover:underline"
+                aria-expanded="{{ $show_feature_guide ? 'true' : 'false' }}"
+            >
+                {{ $show_feature_guide ? 'Show less' : 'Show more' }}
+            </button>
+
+            @if ($show_feature_guide)
+                <div class="mt-3 rounded-2xl bg-[#FFF0E0] px-4 py-3 text-sm text-[#3D2B1F]/75 space-y-2">
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Look up a word:</span>
+                        type at least two letters to search published German nouns, open details for the article, meaning, examples, and collocations.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Set up a quiz:</span>
+                        optionally pick one or more CEFR levels and categories, choose how many words (5–50), and pick the language for translations.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Show articles:</span>
+                        preview the selected nouns with their correct der / die / das before you start.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Start quiz:</span>
+                        choose der, die, or das for every word, then submit to see your score. Open translations or more details on the results.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Without an account:</span>
+                        you can practice freely; your score stays on this page and is not saved.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">With an account:</span>
+                        results are saved to History. Mark words as Important or Learned; important words you have not learned yet are prioritized in later quizzes.
+                    </p>
+                    <p>
+                        <span class="font-semibold text-[#3D2B1F]">Your progress:</span>
+                        open History / Important / Learned to review past quizzes and manage marked words. You can remove one word or clear a whole list after confirming.
+                    </p>
+                </div>
+            @endif
         </div>
         @auth
             <a
@@ -435,7 +483,7 @@ $closeDetails = function () {
                 wire:navigate
                 class="shrink-0 text-sm font-semibold text-[#FF8C42] hover:underline"
             >
-                History
+                Progress
             </a>
         @endauth
     </div>

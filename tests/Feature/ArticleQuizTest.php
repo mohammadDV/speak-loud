@@ -37,7 +37,26 @@ test('guests can view the der die das quiz page', function () {
     $this->get(route('learn.der-die-das'))
         ->assertOk()
         ->assertSee('Der / Die / Das')
+        ->assertSee('Practice German noun articles with filters')
+        ->assertSee('Show more')
+        ->assertDontSee('Set up a quiz')
         ->assertSee('Start quiz');
+});
+
+test('feature guide expands when show more is clicked', function () {
+    Volt::test('learn.der-die-das')
+        ->assertSet('show_feature_guide', false)
+        ->assertDontSee('Mark words as Important or Learned')
+        ->call('toggleFeatureGuide')
+        ->assertSet('show_feature_guide', true)
+        ->assertSee('Look up a word')
+        ->assertSee('Set up a quiz')
+        ->assertSee('Show articles')
+        ->assertSee('Start quiz')
+        ->assertSee('Without an account')
+        ->assertSee('With an account')
+        ->assertSee('Your progress')
+        ->assertSee('Show less');
 });
 
 test('guest can complete a quiz and see results without persisting a session', function () {
@@ -321,7 +340,7 @@ test('history page requires authentication and lists saved sessions', function (
     $this->actingAs($user)
         ->get(route('learn.der-die-das.history'))
         ->assertOk()
-        ->assertSee('Quiz history')
+        ->assertSee('Your progress')
         ->assertSee('80%');
 });
 
