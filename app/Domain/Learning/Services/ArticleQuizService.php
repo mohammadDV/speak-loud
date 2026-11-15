@@ -130,8 +130,21 @@ class ArticleQuizService
 
         $wordCount = min($wordCount, count($pool));
         $selectedIds = $this->selectFromPool($pool, $wordCount, $user);
+        $cards = $this->hydrateCards($selectedIds, $translationLanguageCode, $user);
 
-        return $this->hydrateCards($selectedIds, $translationLanguageCode, $user);
+        if (count($cards) < 5) {
+            throw ValidationException::withMessages([
+                'word_count' => 'Not enough German nouns match these filters. Try other levels or categories.',
+            ]);
+        }
+
+        if (count($cards) !== count($selectedIds)) {
+            throw ValidationException::withMessages([
+                'word_count' => 'Some quiz words became unavailable. Please try again.',
+            ]);
+        }
+
+        return $cards;
     }
 
     /**

@@ -15,11 +15,17 @@ class ArticleQuizWordSearchService
 {
     public const MIN_QUERY_LENGTH = 2;
 
+    public const MAX_QUERY_LENGTH = 64;
+
     public const MAX_SUGGESTIONS = 8;
 
     public const SUGGEST_RATE_LIMIT = 30;
 
+    public const DETAILS_RATE_LIMIT = 60;
+
     public const SUGGEST_RATE_DECAY_SECONDS = 60;
+
+    public const DETAILS_RATE_DECAY_SECONDS = 60;
 
     public function __construct(
         private readonly ArticleQuizCache $quizCache,
@@ -33,7 +39,7 @@ class ArticleQuizWordSearchService
      */
     public function suggest(string $query, string $translationLanguageCode, int $limit = self::MAX_SUGGESTIONS): array
     {
-        $query = trim($query);
+        $query = $this->normalizeQuery($query);
         $limit = min(max($limit, 1), self::MAX_SUGGESTIONS);
 
         if (mb_strlen($query) < self::MIN_QUERY_LENGTH) {
@@ -70,6 +76,7 @@ class ArticleQuizWordSearchService
     public function details(int $senseId, string $translationLanguageCode, ?User $user = null): ?array
     {
         $this->assertTranslationLanguage($translationLanguageCode);
+        $this->assertWithinDetailsRateLimit();
 
         $row = DB::table('senses')
             ->select([
@@ -202,17 +209,53 @@ class ArticleQuizWordSearchService
         ).'%';
     }
 
+    private function normalizeQuery(string $query): string
+    {
+        $query = trim($query);
+
+        if (mb_strlen($query) > self::MAX_QUERY_LENGTH) {
+            return mb_substr($query, 0, self::MAX_QUERY_LENGTH);
+        }
+
+        return $query;
+    }
+
     private function assertWithinSuggestRateLimit(): void
     {
-        $key = 'article-quiz-suggest|'.(auth()->id() ?? request()->ip());
+        $this->assertWithinRateLimit(
+            'article-quiz-suggest|'.(auth()->id() ?? request()->ip()),
+            self::SUGGEST_RATE_LIMIT,
+            self::SUGGEST_RATE_DECAY_SECONDS,
+            'search_query',
+            'Too many searches. Please wait a moment and try again.',
+        );
+    }
 
-        if (RateLimiter::tooManyAttempts($key, self::SUGGEST_RATE_LIMIT)) {
+    private function assertWithinDetailsRateLimit(): void
+    {
+        $this->assertWithinRateLimit(
+            'article-quiz-details|'.(auth()->id() ?? request()->ip()),
+            self::DETAILS_RATE_LIMIT,
+            self::DETAILS_RATE_DECAY_SECONDS,
+            'search_query',
+            'Too many word lookups. Please wait a moment and try again.',
+        );
+    }
+
+    private function assertWithinRateLimit(
+        string $key,
+        int $maxAttempts,
+        int $decaySeconds,
+        string $field,
+        string $message,
+    ): void {
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             throw ValidationException::withMessages([
-                'search_query' => 'Too many searches. Please wait a moment and try again.',
+                $field => $message,
             ]);
         }
 
-        RateLimiter::hit($key, self::SUGGEST_RATE_DECAY_SECONDS);
+        RateLimiter::hit($key, $decaySeconds);
     }
 
     private function assertTranslationLanguage(string $code): void

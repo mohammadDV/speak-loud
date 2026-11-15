@@ -12,7 +12,9 @@ use Livewire\Volt\Volt;
 beforeEach(function () {
     $this->seed(LanguageSeeder::class);
     $this->seed(DictionaryReferenceSeeder::class);
-    RateLimiter::clear('article-quiz-suggest|'.(request()->ip() ?? '127.0.0.1'));
+    $ip = request()->ip() ?? '127.0.0.1';
+    RateLimiter::clear('article-quiz-suggest|'.$ip);
+    RateLimiter::clear('article-quiz-details|'.$ip);
 });
 
 test('word search suggestions require at least two characters', function () {
@@ -104,4 +106,27 @@ test('word search suggestions are rate limited', function () {
 
     expect(fn () => $service->suggest('Li', 'en'))
         ->toThrow(ValidationException::class);
+});
+
+test('word search details are rate limited', function () {
+    $senses = createPublishedGermanNouns(1, ['lemma_prefix' => 'Detail']);
+    RateLimiter::clear('article-quiz-details|'.request()->ip());
+
+    $service = app(ArticleQuizWordSearchService::class);
+
+    for ($i = 0; $i < ArticleQuizWordSearchService::DETAILS_RATE_LIMIT; $i++) {
+        $service->details($senses[0]->id, 'en');
+    }
+
+    expect(fn () => $service->details($senses[0]->id, 'en'))
+        ->toThrow(ValidationException::class);
+});
+
+test('word search truncates queries longer than the max length', function () {
+    createPublishedGermanNouns(1, ['lemma_prefix' => 'Lang']);
+
+    $long = str_repeat('a', ArticleQuizWordSearchService::MAX_QUERY_LENGTH + 20);
+    $suggestions = app(ArticleQuizWordSearchService::class)->suggest($long, 'en');
+
+    expect($suggestions)->toBeArray();
 });

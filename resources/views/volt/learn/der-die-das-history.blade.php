@@ -4,6 +4,7 @@ use App\Domain\Learning\Actions\ClearUserSenseFlags;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Services\UserSenseFlagListService;
 use App\Support\Seo;
+use App\Support\SpeechLocale;
 use function Livewire\Volt\{state, mount, title};
 
 state([
@@ -254,11 +255,17 @@ $confirmAction = function (ClearUserSenseFlags $clear) {
                             <div class="border-t border-[#3D2B1F]/10 px-4 py-3 space-y-2 bg-[#FFF8F0]">
                                 @foreach ($selected_answers as $answer)
                                     <div class="flex items-center justify-between gap-3 text-sm">
-                                        <p class="text-[#3D2B1F]">
-                                            <span class="font-semibold text-[#FF8C42]">{{ $answer['correct_article'] }}</span>
-                                            {{ $answer['lemma'] }}
+                                        <p class="text-[#3D2B1F] flex items-center gap-1 flex-wrap min-w-0">
+                                            <span>
+                                                <span class="font-semibold text-[#FF8C42]">{{ $answer['correct_article'] }}</span>
+                                                {{ $answer['lemma'] }}
+                                            </span>
+                                            <x-speak-word
+                                                :text="trim($answer['correct_article'].' '.$answer['lemma'])"
+                                                :lang="SpeechLocale::german()"
+                                            />
                                         </p>
-                                        <p class="{{ $answer['is_correct'] ? 'text-emerald-700' : 'text-red-700' }}">
+                                        <p class="{{ $answer['is_correct'] ? 'text-emerald-700' : 'text-red-700' }} shrink-0">
                                             @if ($answer['is_correct'])
                                                 True
                                             @else
@@ -306,12 +313,25 @@ $confirmAction = function (ClearUserSenseFlags $clear) {
                 @foreach ($words as $word)
                     <div class="rounded-2xl bg-[#FFF0E0] px-4 py-3 flex items-start justify-between gap-3" wire:key="flag-{{ $tab }}-{{ $word['sense_id'] }}">
                         <div class="min-w-0">
-                            <p class="font-semibold text-[#3D2B1F]">
-                                <span class="text-[#FF8C42]">{{ $word['article'] }}</span>
-                                {{ $word['lemma'] }}
+                            <p class="font-semibold text-[#3D2B1F] flex items-center gap-1 flex-wrap">
+                                <span>
+                                    <span class="text-[#FF8C42]">{{ $word['article'] }}</span>
+                                    {{ $word['lemma'] }}
+                                </span>
+                                <x-speak-word
+                                    :text="trim($word['article'].' '.$word['lemma'])"
+                                    :lang="SpeechLocale::german()"
+                                />
                             </p>
                             @if (! empty($word['translation']))
-                                <p class="text-sm text-[#3D2B1F]/55 mt-0.5">{{ $word['translation'] }}</p>
+                                <p class="text-sm text-[#3D2B1F]/55 mt-0.5 flex items-center gap-1 flex-wrap">
+                                    <span>{{ $word['translation'] }}</span>
+                                    <x-speak-word
+                                        :text="$word['translation']"
+                                        :lang="SpeechLocale::for($translation_language)"
+                                        label="Hear translation"
+                                    />
+                                </p>
                             @endif
                         </div>
                         <button

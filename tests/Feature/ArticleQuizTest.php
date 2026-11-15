@@ -164,6 +164,9 @@ test('preview shows articles and quiz phase only shows radio choices in html', f
         ->assertSee('Preview with articles')
         ->assertSee($lemma)
         ->assertSeeHtml('<span class="text-[#FF8C42]">'.$article.'</span>')
+        ->assertSeeHtml('data-speak')
+        ->assertSeeHtml('data-speak-text="'.e(trim($article.' '.$lemma)).'"')
+        ->assertSeeHtml('aria-label="Hear pronunciation"')
         ->call('startQuiz')
         ->assertSet('phase', 'quiz')
         ->assertSee('Choose the article')
@@ -171,7 +174,72 @@ test('preview shows articles and quiz phase only shows radio choices in html', f
         ->assertSee('der')
         ->assertSee('die')
         ->assertSee('das')
-        ->assertDontSeeHtml('<span class="text-[#FF8C42]">'.$article.'</span>');
+        ->assertDontSeeHtml('<span class="text-[#FF8C42]">'.$article.'</span>')
+        ->assertSeeHtml('data-speak-text="'.e($lemma).'"')
+        ->assertDontSeeHtml('data-speak-text="'.e(trim($article.' '.$lemma)).'"');
+});
+
+test('results show speak controls for german words and visible translations', function () {
+    $senses = createPublishedGermanNouns(5);
+    $articlesBySenseId = articlesBySenseId($senses);
+    $lemma = $senses[0]->lexeme->lemma;
+    $article = $articlesBySenseId[$senses[0]->id];
+
+    Volt::test('learn.der-die-das')
+        ->set('word_count', 5)
+        ->set('translation_language', 'en')
+        ->call('startQuiz')
+        ->tap(function ($component) use ($articlesBySenseId) {
+            $answers = [];
+            foreach ($component->get('cards') as $card) {
+                $answers[(string) $card['sense_id']] = $articlesBySenseId[(int) $card['sense_id']];
+            }
+            $component->set('answers', $answers);
+        })
+        ->call('submitQuiz')
+        ->assertSet('phase', 'results')
+        ->assertSeeHtml('data-speak-text="'.e(trim($article.' '.$lemma)).'"')
+        ->call('toggleTranslation', $senses[0]->id)
+        ->assertSeeHtml('aria-label="Hear translation"')
+        ->assertSeeHtml('data-speak-text="word 0"');
+});
+
+test('submit is rejected until the quiz phase has started', function () {
+    $senses = createPublishedGermanNouns(5);
+    $articlesBySenseId = articlesBySenseId($senses);
+
+    Volt::test('learn.der-die-das')
+        ->set('word_count', 5)
+        ->set('translation_language', 'en')
+        ->call('previewArticles')
+        ->assertSet('phase', 'preview')
+        ->tap(function ($component) use ($articlesBySenseId) {
+            $answers = [];
+            foreach ($component->get('cards') as $card) {
+                $answers[(string) $card['sense_id']] = $articlesBySenseId[(int) $card['sense_id']];
+            }
+            $component->set('answers', $answers);
+        })
+        ->call('submitQuiz')
+        ->assertSet('phase', 'preview')
+        ->assertSet('show_error_modal', true)
+        ->assertSee('Start the quiz before submitting answers');
+
+    expect(ArticleQuizSession::query()->count())->toBe(0);
+});
+
+test('word lookup is unavailable during the quiz phase', function () {
+    createPublishedGermanNouns(5, ['lemma_prefix' => 'QuizWort']);
+
+    Volt::test('learn.der-die-das')
+        ->set('word_count', 5)
+        ->set('translation_language', 'en')
+        ->call('startQuiz')
+        ->assertSet('phase', 'quiz')
+        ->assertDontSee('Look up a word')
+        ->set('search_query', 'Quiz')
+        ->assertSet('show_search_suggestions', false)
+        ->assertCount('search_suggestions', 0);
 });
 
 test('word count is validated between 5 and 50', function () {

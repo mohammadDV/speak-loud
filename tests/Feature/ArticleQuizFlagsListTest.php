@@ -48,11 +48,17 @@ test('important and learned tabs list the users flagged nouns', function () {
         'sense_id' => $senses[1]->id,
     ]);
 
+    $importantLemma = $senses[0]->lexeme->lemma;
+    $importantArticle = strtolower((string) $senses[0]->germanNounDetail->article->value);
+
     Volt::actingAs($user)
         ->test('learn.der-die-das-history')
         ->call('setTab', 'important')
-        ->assertSee($senses[0]->lexeme->lemma)
+        ->assertSee($importantLemma)
         ->assertDontSee($senses[1]->lexeme->lemma)
+        ->assertSeeHtml('data-speak')
+        ->assertSeeHtml('data-speak-text="'.e(trim($importantArticle.' '.$importantLemma)).'"')
+        ->assertSeeHtml('aria-label="Hear translation"')
         ->call('setTab', 'learned')
         ->assertSee($senses[1]->lexeme->lemma)
         ->assertDontSee($senses[0]->lexeme->lemma);

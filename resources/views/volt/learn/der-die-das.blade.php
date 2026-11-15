@@ -5,11 +5,12 @@ use App\Domain\Learning\Actions\ToggleUserSenseFlag;
 use App\Domain\Learning\Services\ArticleQuizService;
 use App\Domain\Learning\Services\ArticleQuizWordSearchService;
 use App\Support\Seo;
+use App\Support\SpeechLocale;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use function Livewire\Volt\{state, mount, title, updated};
 
 state([
-    'phase' => 'setup',
     'level_codes' => [],
     'category_codes' => [],
     'word_count' => 10,
@@ -17,7 +18,6 @@ state([
     'levels' => [],
     'categories' => [],
     'languages' => [],
-    'cards' => [],
     'answers' => [],
     'results' => [],
     'correct_count' => 0,
@@ -36,6 +36,13 @@ state([
     'skip_search_refresh' => false,
     'show_feature_guide' => false,
 ]);
+
+// Client cannot tamper with quiz phase, deck, or graded sense IDs.
+state([
+    'phase' => 'setup',
+    'cards' => [],
+    'quiz_sense_ids' => [],
+])->locked();
 
 mount(function (ArticleQuizService $quiz) {
     Seo::share([
@@ -99,7 +106,19 @@ updated([
 ]);
 
 $refreshWordSuggestions = function () {
+    if ($this->phase === 'quiz') {
+        $this->search_suggestions = [];
+        $this->show_search_suggestions = false;
+
+        return;
+    }
+
     $query = trim((string) $this->search_query);
+    if (mb_strlen($query) > ArticleQuizWordSearchService::MAX_QUERY_LENGTH) {
+        $query = mb_substr($query, 0, ArticleQuizWordSearchService::MAX_QUERY_LENGTH);
+        $this->skip_search_refresh = true;
+        $this->search_query = $query;
+    }
 
     if (mb_strlen($query) < ArticleQuizWordSearchService::MIN_QUERY_LENGTH) {
         $this->search_suggestions = [];
@@ -131,11 +150,23 @@ $refreshWordSuggestions = function () {
 };
 
 $selectSearchSuggestion = function (int $senseId) {
-    $detail = app(ArticleQuizWordSearchService::class)->details(
-        $senseId,
-        $this->translation_language,
-        auth()->user(),
-    );
+    if ($this->phase === 'quiz') {
+        return;
+    }
+
+    try {
+        $detail = app(ArticleQuizWordSearchService::class)->details(
+            $senseId,
+            $this->translation_language,
+            auth()->user(),
+        );
+    } catch (ValidationException $e) {
+        $message = collect($e->errors())->flatten()->first()
+            ?? 'Too many word lookups. Please wait a moment and try again.';
+        $this->showError($message, 'word-search');
+
+        return;
+    }
 
     if ($detail === null) {
         $this->showError('That word is not available right now.');
@@ -243,6 +274,7 @@ $loadCards = function (ArticleQuizService $quiz) {
         return false;
     }
 
+    $this->quiz_sense_ids = [];
     $this->answers = [];
     foreach ($this->cards as $card) {
         $this->answers[(string) $card['sense_id']] = '';
@@ -261,6 +293,7 @@ $previewArticles = function (ArticleQuizService $quiz) {
         return;
     }
 
+    $this->quiz_sense_ids = [];
     $this->phase = 'preview';
 };
 
@@ -273,29 +306,67 @@ $startQuiz = function (ArticleQuizService $quiz) {
 
     // Drop answer fields from Livewire state before the quiz phase.
     $this->cards = $quiz->toQuizPromptCards($this->cards);
+    $this->quiz_sense_ids = array_map(
+        static fn (array $card): int => (int) $card['sense_id'],
+        $this->cards,
+    );
 
     $this->answers = [];
-    foreach ($this->cards as $card) {
-        $this->answers[(string) $card['sense_id']] = '';
+    foreach ($this->quiz_sense_ids as $senseId) {
+        $this->answers[(string) $senseId] = '';
     }
 
     $this->phase = 'quiz';
     $this->details_sense_id = null;
     $this->search_detail = null;
+    $this->search_suggestions = [];
+    $this->show_search_suggestions = false;
+    $this->skip_search_refresh = true;
+    $this->search_query = '';
 };
 
 $backToSetup = function () {
     $this->phase = 'setup';
     $this->cards = [];
+    $this->quiz_sense_ids = [];
     $this->answers = [];
     $this->results = [];
     $this->error_message = null;
     $this->show_error_modal = false;
     $this->scroll_to_id = null;
     $this->details_sense_id = null;
+    $this->search_detail = null;
 };
 
 $submitQuiz = function (SaveArticleQuizResult $save, ArticleQuizService $quiz) {
+    if ($this->phase !== 'quiz') {
+        $this->showError('Start the quiz before submitting answers.');
+
+        return;
+    }
+
+    $senseIds = array_values(array_map(
+        static fn (mixed $id): int => (int) $id,
+        $this->quiz_sense_ids,
+    ));
+
+    if ($senseIds === []) {
+        $this->showError('This quiz session is no longer valid. Please start again.');
+        $this->phase = 'setup';
+        $this->cards = [];
+        $this->quiz_sense_ids = [];
+
+        return;
+    }
+
+    $throttleKey = 'article-quiz-submit|'.(auth()->id() ?? request()->ip());
+    if (RateLimiter::tooManyAttempts($throttleKey, 10)) {
+        $seconds = RateLimiter::availableIn($throttleKey);
+        $this->showError('Too many quiz submissions. Please try again in '.$seconds.' seconds.');
+
+        return;
+    }
+
     try {
         $this->validate([
             'answers' => ['required', 'array'],
@@ -310,8 +381,8 @@ $submitQuiz = function (SaveArticleQuizResult $save, ArticleQuizService $quiz) {
             ?? 'Pick der, die, or das for every word.';
 
         $scrollTo = null;
-        foreach ($this->cards as $card) {
-            $senseKey = (string) $card['sense_id'];
+        foreach ($senseIds as $senseId) {
+            $senseKey = (string) $senseId;
             $answer = trim((string) ($this->answers[$senseKey] ?? ''));
             if ($answer === '' || ! in_array($answer, ['der', 'die', 'das'], true)) {
                 $scrollTo = 'quiz-word-'.$senseKey;
@@ -324,12 +395,15 @@ $submitQuiz = function (SaveArticleQuizResult $save, ArticleQuizService $quiz) {
         return;
     }
 
-    $senseIds = array_map(static fn (array $card): int => (int) $card['sense_id'], $this->cards);
+    $answersForGrading = [];
+    foreach ($senseIds as $senseId) {
+        $answersForGrading[(string) $senseId] = (string) ($this->answers[(string) $senseId] ?? '');
+    }
 
     try {
         $graded = $quiz->gradeAnswers(
             $senseIds,
-            $this->answers,
+            $answersForGrading,
             $this->translation_language,
             auth()->user(),
         );
@@ -342,11 +416,14 @@ $submitQuiz = function (SaveArticleQuizResult $save, ArticleQuizService $quiz) {
         return;
     }
 
+    RateLimiter::hit($throttleKey, 60);
+
     $this->results = $graded['results'];
     $this->correct_count = $graded['correct_count'];
     $this->incorrect_count = $graded['incorrect_count'];
     $this->percentage = $graded['percentage'];
     $this->cards = [];
+    $this->quiz_sense_ids = [];
     $this->phase = 'results';
 
     if (auth()->check()) {
@@ -375,7 +452,13 @@ $toggleFlag = function (int $senseId, string $flag, ToggleUserSenseFlag $toggle)
         return $this->redirect(route('login'), navigate: true);
     }
 
-    $record = $toggle->execute(auth()->user(), $senseId, $flag);
+    try {
+        $record = $toggle->execute(auth()->user(), $senseId, $flag);
+    } catch (\InvalidArgumentException $e) {
+        $this->showError($e->getMessage());
+
+        return;
+    }
 
     $this->results = collect($this->results)->map(function (array $row) use ($senseId, $record) {
         if ((int) $row['sense_id'] !== $senseId) {
@@ -488,6 +571,7 @@ $toggleFeatureGuide = function () {
         @endauth
     </div>
 
+    @if ($phase !== 'quiz')
     <div class="mb-6" x-data="{ open: @entangle('show_search_suggestions') }" @click.outside="open = false">
         <label for="word-search" class="block text-sm font-medium text-[#3D2B1F] mb-1">Look up a word</label>
         <p class="text-xs text-[#3D2B1F]/45 mb-2">Search any German noun to see der/die/das and its meaning.</p>
@@ -527,24 +611,35 @@ $toggleFeatureGuide = function () {
                 @elseif ($search_suggestions !== [])
                     <ul class="max-h-72 overflow-y-auto py-1" role="listbox">
                         @foreach ($search_suggestions as $suggestion)
-                            <li>
+                            <li class="flex items-stretch gap-1 px-2 py-1 hover:bg-[#FFF0E0]">
                                 <button
                                     type="button"
                                     wire:click="selectSearchSuggestion({{ $suggestion['sense_id'] }})"
-                                    class="flex w-full items-start justify-between gap-3 px-4 py-2.5 text-left hover:bg-[#FFF0E0]"
+                                    class="min-w-0 flex-1 px-2 py-1.5 text-left"
                                     role="option"
                                 >
-                                    <span class="min-w-0">
-                                        <span class="font-semibold text-[#3D2B1F]">
-                                            <span class="text-[#FF8C42]">{{ $suggestion['article'] }}</span>
-                                            {{ $suggestion['lemma'] }}
-                                        </span>
-                                        @if (! empty($suggestion['translation']))
-                                            <span class="mt-0.5 block truncate text-xs text-[#3D2B1F]/55">{{ $suggestion['translation'] }}</span>
-                                        @endif
+                                    <span class="font-semibold text-[#3D2B1F]">
+                                        <span class="text-[#FF8C42]">{{ $suggestion['article'] }}</span>
+                                        {{ $suggestion['lemma'] }}
                                     </span>
-                                    <span class="shrink-0 text-xs font-semibold text-[#FF8C42]">Details</span>
+                                    @if (! empty($suggestion['translation']))
+                                        <span class="mt-0.5 block truncate text-xs text-[#3D2B1F]/55">{{ $suggestion['translation'] }}</span>
+                                    @endif
+                                    <span class="mt-1 block text-xs font-semibold text-[#FF8C42]">Details</span>
                                 </button>
+                                <div class="flex shrink-0 items-center gap-0.5 pr-1">
+                                    <x-speak-word
+                                        :text="trim($suggestion['article'].' '.$suggestion['lemma'])"
+                                        :lang="SpeechLocale::german()"
+                                    />
+                                    @if (! empty($suggestion['translation']))
+                                        <x-speak-word
+                                            :text="$suggestion['translation']"
+                                            :lang="SpeechLocale::for($translation_language)"
+                                            label="Hear translation"
+                                        />
+                                    @endif
+                                </div>
                             </li>
                         @endforeach
                     </ul>
@@ -552,6 +647,7 @@ $toggleFeatureGuide = function () {
             </div>
         </div>
     </div>
+    @endif
 
     @if ($phase === 'setup')
         <div id="quiz-setup" class="bg-[#FFF0E0] rounded-2xl p-4 md:p-6 space-y-4">
@@ -634,13 +730,26 @@ $toggleFeatureGuide = function () {
         <div class="space-y-3 mb-6">
             @foreach ($cards as $card)
                 <div class="rounded-xl bg-[#FFF0E0] px-4 py-3 flex items-center justify-between gap-3">
-                    <div>
-                        <p class="font-semibold text-[#3D2B1F]">
-                            <span class="text-[#FF8C42]">{{ $card['article'] }}</span>
-                            {{ $card['lemma'] }}
+                    <div class="min-w-0">
+                        <p class="font-semibold text-[#3D2B1F] flex items-center gap-1 flex-wrap">
+                            <span>
+                                <span class="text-[#FF8C42]">{{ $card['article'] }}</span>
+                                {{ $card['lemma'] }}
+                            </span>
+                            <x-speak-word
+                                :text="trim($card['article'].' '.$card['lemma'])"
+                                :lang="SpeechLocale::german()"
+                            />
                         </p>
                         @if (! empty($card['translation']))
-                            <p class="text-sm text-[#3D2B1F]/55">{{ $card['translation'] }}</p>
+                            <p class="text-sm text-[#3D2B1F]/55 flex items-center gap-1 flex-wrap mt-0.5">
+                                <span>{{ $card['translation'] }}</span>
+                                <x-speak-word
+                                    :text="$card['translation']"
+                                    :lang="SpeechLocale::for($translation_language)"
+                                    label="Hear translation"
+                                />
+                            </p>
                         @endif
                     </div>
                     <button
@@ -672,7 +781,13 @@ $toggleFeatureGuide = function () {
                 @php $senseKey = (string) $card['sense_id']; @endphp
                 <fieldset id="quiz-word-{{ $senseKey }}" class="rounded-2xl bg-[#FFF0E0] p-4">
                     <legend class="sr-only">Word {{ $index + 1 }}</legend>
-                    <p class="text-xl font-bold text-[#3D2B1F] mb-3">{{ $card['lemma'] }}</p>
+                    <p class="text-xl font-bold text-[#3D2B1F] mb-3 flex items-center gap-1.5 flex-wrap">
+                        <span>{{ $card['lemma'] }}</span>
+                        <x-speak-word
+                            :text="$card['lemma']"
+                            :lang="SpeechLocale::german()"
+                        />
+                    </p>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach (['der', 'die', 'das'] as $article)
                             <label
@@ -734,10 +849,16 @@ $toggleFeatureGuide = function () {
                 @endphp
                 <div class="rounded-xl border {{ $row['is_correct'] ? 'border-emerald-200 bg-emerald-50/60' : 'border-red-200 bg-red-50/60' }} px-4 py-3">
                     <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <p class="font-semibold text-[#3D2B1F]">
-                                <span class="text-[#FF8C42]">{{ $row['correct_article'] }}</span>
-                                {{ $row['lemma'] }}
+                        <div class="min-w-0">
+                            <p class="font-semibold text-[#3D2B1F] flex items-center gap-1 flex-wrap">
+                                <span>
+                                    <span class="text-[#FF8C42]">{{ $row['correct_article'] }}</span>
+                                    {{ $row['lemma'] }}
+                                </span>
+                                <x-speak-word
+                                    :text="trim($row['correct_article'].' '.$row['lemma'])"
+                                    :lang="SpeechLocale::german()"
+                                />
                             </p>
                             <p class="text-xs mt-1 {{ $row['is_correct'] ? 'text-emerald-700' : 'text-red-700' }}">
                                 @if ($row['is_correct'])
@@ -747,7 +868,14 @@ $toggleFeatureGuide = function () {
                                 @endif
                             </p>
                             @if ($showingTranslation && ! empty($row['translation']))
-                                <p class="text-sm text-[#3D2B1F]/70 mt-1">{{ $row['translation'] }}</p>
+                                <p class="text-sm text-[#3D2B1F]/70 mt-1 flex items-center gap-1 flex-wrap">
+                                    <span>{{ $row['translation'] }}</span>
+                                    <x-speak-word
+                                        :text="$row['translation']"
+                                        :lang="SpeechLocale::for($translation_language)"
+                                        label="Hear translation"
+                                    />
+                                </p>
                             @endif
                         </div>
                         <span class="text-xs font-bold uppercase tracking-wide {{ $row['is_correct'] ? 'text-emerald-700' : 'text-red-700' }}">
@@ -828,13 +956,26 @@ $toggleFeatureGuide = function () {
         <div class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center">
             <div class="absolute inset-0 bg-[#3D2B1F]/40" wire:click="closeDetails"></div>
             <div class="relative w-full sm:max-w-lg max-h-[85dvh] overflow-y-auto rounded-t-2xl sm:rounded-2xl bg-[#FFF8F0] p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+                @php
+                    $detailArticle = (string) ($detailCard['correct_article'] ?? $detailCard['article'] ?? '');
+                    $showDetailArticle = $phase !== 'quiz' || is_array($search_detail);
+                    $detailSpeakGerman = $showDetailArticle && $detailArticle !== ''
+                        ? trim($detailArticle.' '.$detailCard['lemma'])
+                        : (string) $detailCard['lemma'];
+                @endphp
                 <div class="flex items-start justify-between gap-3 mb-3">
-                    <div>
-                        <p class="text-xl font-bold text-[#3D2B1F]">
-                            @if ($phase !== 'quiz' || is_array($search_detail))
-                                <span class="text-[#FF8C42]">{{ $detailCard['correct_article'] ?? $detailCard['article'] ?? '' }}</span>
-                            @endif
-                            {{ $detailCard['lemma'] }}
+                    <div class="min-w-0">
+                        <p class="text-xl font-bold text-[#3D2B1F] flex items-center gap-1.5 flex-wrap">
+                            <span>
+                                @if ($showDetailArticle && $detailArticle !== '')
+                                    <span class="text-[#FF8C42]">{{ $detailArticle }}</span>
+                                @endif
+                                {{ $detailCard['lemma'] }}
+                            </span>
+                            <x-speak-word
+                                :text="$detailSpeakGerman"
+                                :lang="SpeechLocale::german()"
+                            />
                         </p>
                         @if (! empty($detailCard['plural_form']))
                             <p class="text-sm text-[#3D2B1F]/55">Plural: {{ $detailCard['plural_form'] }}</p>
@@ -849,7 +990,18 @@ $toggleFeatureGuide = function () {
                 @if (! empty($detailCard['translations']))
                     <div class="mb-4">
                         <h3 class="text-xs font-semibold uppercase tracking-wide text-[#3D2B1F]/45 mb-1">Translations</h3>
-                        <p class="text-sm text-[#3D2B1F]">{{ implode(' · ', $detailCard['translations']) }}</p>
+                        <ul class="space-y-1.5">
+                            @foreach ($detailCard['translations'] as $translationText)
+                                <li class="text-sm text-[#3D2B1F] flex items-center gap-1 flex-wrap">
+                                    <span>{{ $translationText }}</span>
+                                    <x-speak-word
+                                        :text="$translationText"
+                                        :lang="SpeechLocale::for($translation_language)"
+                                        label="Hear translation"
+                                    />
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 @endif
 
