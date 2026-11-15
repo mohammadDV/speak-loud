@@ -8,17 +8,36 @@ class ArticleQuizCache
 {
     private const POOL_VERSION_KEY = 'learn:article-pool-version';
 
-    private const POOL_KEY = 'learn:article-pool:v%d:%s:%s';
+    private const POOL_KEY = 'learn:article-pool:ids:v%d:%s:%s';
 
-    private const CARD_KEY = 'learn:article-card:%d:%s';
+    private const CARD_KEY = 'learn:article-card:v2:%d:%s';
 
-    private const CARD_TARGETS_KEY = 'learn:article-card:%d:targets';
+    private const CARD_TARGETS_KEY = 'learn:article-card:v2:%d:targets';
 
     private const TRANSLATION_LANGUAGES_KEY = 'learn:article-translation-languages:v%d';
+
+    private const SUGGESTIONS_KEY = 'learn:article-suggest:v2:%d:%s:%s';
 
     public function poolVersion(): int
     {
         return (int) Cache::get(self::POOL_VERSION_KEY, 1);
+    }
+
+    /**
+     * @param  callable(): list<array{sense_id: int, lemma: string, article: string, translation: string|null}>  $callback
+     * @return list<array{sense_id: int, lemma: string, article: string, translation: string|null}>
+     */
+    public function rememberSuggestions(string $normalizedQuery, string $languageCode, callable $callback): array
+    {
+        $key = sprintf(
+            self::SUGGESTIONS_KEY,
+            $this->poolVersion(),
+            $this->normalizeFilter($languageCode),
+            $this->normalizeFilter($normalizedQuery),
+        );
+
+        /** @var list<array{sense_id: int, lemma: string, article: string, translation: string|null}> */
+        return Cache::remember($key, now()->addMinutes(15), $callback);
     }
 
     /**
@@ -36,8 +55,8 @@ class ArticleQuizCache
     /**
      * @param  list<string>  $levelCodes
      * @param  list<string>  $categoryCodes
-     * @param  callable(): list<array{sense_id: int, article: string, lemma: string}>  $callback
-     * @return list<array{sense_id: int, article: string, lemma: string}>
+     * @param  callable(): list<int>  $callback
+     * @return list<int>
      */
     public function rememberPool(array $levelCodes, array $categoryCodes, callable $callback): array
     {
@@ -48,7 +67,7 @@ class ArticleQuizCache
             $this->normalizeFilterList($categoryCodes),
         );
 
-        /** @var list<array{sense_id: int, article: string, lemma: string}> */
+        /** @var list<int> */
         return Cache::remember($key, now()->addHour(), $callback);
     }
 

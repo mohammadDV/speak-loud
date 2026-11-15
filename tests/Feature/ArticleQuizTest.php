@@ -1,15 +1,8 @@
 <?php
 
-use App\Domain\Dictionary\Enums\GermanArticle;
-use App\Domain\Dictionary\Enums\GrammaticalGender;
-use App\Domain\Dictionary\Models\Category;
-use App\Domain\Dictionary\Models\DifficultyLevel;
-use App\Domain\Dictionary\Models\GermanNounDetail;
-use App\Domain\Dictionary\Models\Lexeme;
-use App\Domain\Dictionary\Models\PartOfSpeech;
+use App\Domain\Dictionary\Models\Example;
 use App\Domain\Dictionary\Models\Sense;
-use App\Domain\Dictionary\Models\SenseLevel;
-use App\Domain\Dictionary\Models\SenseTranslation;
+use App\Domain\Learning\Actions\ToggleUserSenseFlag;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Domain\Learning\Services\ArticleQuizCache;
@@ -21,78 +14,24 @@ use Database\Seeders\LanguageSeeder;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Volt\Volt;
 
+/**
+ * @param  list<Sense>  $senses
+ * @return array<int, string>
+ */
+function articlesBySenseId(array $senses): array
+{
+    $map = [];
+    foreach ($senses as $sense) {
+        $map[$sense->id] = strtolower((string) $sense->germanNounDetail->article->value);
+    }
+
+    return $map;
+}
+
 beforeEach(function () {
     $this->seed(LanguageSeeder::class);
     $this->seed(DictionaryReferenceSeeder::class);
 });
-
-/**
- * @return list<Sense>
- */
-function createPublishedGermanNouns(int $count, array $options = []): array
-{
-    $de = Language::query()->where('code', 'de')->firstOrFail();
-    $en = Language::query()->where('code', 'en')->firstOrFail();
-    $noun = PartOfSpeech::query()->where('code', 'noun')->firstOrFail();
-    $levelCode = $options['level'] ?? 'A1';
-    $categoryCode = $options['category'] ?? 'family';
-    $level = DifficultyLevel::query()->where('code', $levelCode)->firstOrFail();
-    $category = Category::query()->where('code', $categoryCode)->firstOrFail();
-
-    $articles = [
-        GermanArticle::Der,
-        GermanArticle::Die,
-        GermanArticle::Das,
-    ];
-    $genders = [
-        GrammaticalGender::Masculine,
-        GrammaticalGender::Feminine,
-        GrammaticalGender::Neuter,
-    ];
-
-    $senses = [];
-
-    for ($i = 0; $i < $count; $i++) {
-        $article = $articles[$i % 3];
-        $gender = $genders[$i % 3];
-        $lemma = ($options['lemma_prefix'] ?? 'Wort').$i.fake()->unique()->numerify('###');
-
-        $lexeme = Lexeme::factory()->published()->forLanguage($de)->create([
-            'lemma' => $lemma,
-        ]);
-        $lexeme->categories()->sync([$category->id]);
-
-        $sense = Sense::factory()->published()->create([
-            'lexeme_id' => $lexeme->id,
-            'part_of_speech_id' => $noun->id,
-            'definition' => 'Test noun '.$i,
-            'definition_language_id' => $en->id,
-        ]);
-
-        GermanNounDetail::factory()->create([
-            'sense_id' => $sense->id,
-            'article' => $article,
-            'grammatical_gender' => $gender,
-            'plural_form' => $lemma.'e',
-        ]);
-
-        SenseLevel::factory()->create([
-            'sense_id' => $sense->id,
-            'difficulty_level_id' => $level->id,
-            'is_primary' => true,
-        ]);
-
-        SenseTranslation::factory()->published()->create([
-            'sense_id' => $sense->id,
-            'target_language_id' => $en->id,
-            'translation_text' => 'word '.$i,
-        ]);
-
-        $senses[] = $sense->fresh(['germanNounDetail', 'lexeme']);
-    }
-
-    return $senses;
-}
 
 test('guests can view the der die das quiz page', function () {
     $this->get(route('learn.der-die-das'))
@@ -103,6 +42,7 @@ test('guests can view the der die das quiz page', function () {
 
 test('guest can complete a quiz and see results without persisting a session', function () {
     $senses = createPublishedGermanNouns(5);
+    $articlesBySenseId = articlesBySenseId($senses);
 
     Volt::test('learn.der-die-das')
         ->set('word_count', 5)
@@ -110,10 +50,11 @@ test('guest can complete a quiz and see results without persisting a session', f
         ->call('startQuiz')
         ->assertSet('phase', 'quiz')
         ->assertDontSee('Show articles')
-        ->tap(function ($component) {
+        ->tap(function ($component) use ($articlesBySenseId) {
             $answers = [];
             foreach ($component->get('cards') as $card) {
-                $answers[(string) $card['sense_id']] = $card['article'];
+                expect($card)->not->toHaveKey('article');
+                $answers[(string) $card['sense_id']] = $articlesBySenseId[(int) $card['sense_id']];
             }
             $component->set('answers', $answers);
         })
@@ -129,19 +70,21 @@ test('guest can complete a quiz and see results without persisting a session', f
 
 test('authenticated user quiz results are persisted with answers', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
-    createPublishedGermanNouns(5);
+    $senses = createPublishedGermanNouns(5);
+    $articlesBySenseId = articlesBySenseId($senses);
 
     Volt::actingAs($user)
         ->test('learn.der-die-das')
         ->set('word_count', 5)
         ->set('translation_language', 'en')
         ->call('startQuiz')
-        ->tap(function ($component) {
+        ->tap(function ($component) use ($articlesBySenseId) {
             $answers = [];
             foreach ($component->get('cards') as $index => $card) {
+                $correct = $articlesBySenseId[(int) $card['sense_id']];
                 $answers[(string) $card['sense_id']] = $index === 0
-                    ? ($card['article'] === 'der' ? 'die' : 'der')
-                    : $card['article'];
+                    ? ($correct === 'der' ? 'die' : 'der')
+                    : $correct;
             }
             $component->set('answers', $answers);
         })
@@ -156,6 +99,36 @@ test('authenticated user quiz results are persisted with answers', function () {
         ->and($session->word_count)->toBe(5)
         ->and($session->correct_count)->toBe(4)
         ->and($session->answers)->toHaveCount(5);
+});
+
+test('persisted quiz scores ignore client claimed correctness and use database articles', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $senses = createPublishedGermanNouns(5);
+    $articlesBySenseId = articlesBySenseId($senses);
+
+    Volt::actingAs($user)
+        ->test('learn.der-die-das')
+        ->set('word_count', 5)
+        ->set('translation_language', 'en')
+        ->call('startQuiz')
+        ->tap(function ($component) use ($articlesBySenseId) {
+            $answers = [];
+            foreach ($component->get('cards') as $card) {
+                $correct = $articlesBySenseId[(int) $card['sense_id']];
+                $answers[(string) $card['sense_id']] = $correct === 'der' ? 'die' : 'der';
+            }
+            $component->set('answers', $answers);
+        })
+        ->call('submitQuiz')
+        ->assertSet('phase', 'results')
+        ->assertSet('correct_count', 0)
+        ->assertSet('percentage', 0);
+
+    $session = ArticleQuizSession::query()->where('user_id', $user->id)->first();
+
+    expect($session)->not->toBeNull()
+        ->and($session->correct_count)->toBe(0)
+        ->and($session->answers->every(fn ($answer) => $answer->is_correct === false))->toBeTrue();
 });
 
 test('preview shows articles and quiz phase only shows radio choices in html', function () {
@@ -219,8 +192,9 @@ test('level and category filters limit the pool', function () {
 
     expect($familyA1)->toHaveCount(5)
         ->and($foodB1)->toHaveCount(5)
-        ->and(array_column($familyA1, 'sense_id'))
-        ->not->toEqualCanonicalizing(array_column($foodB1, 'sense_id'));
+        ->and($familyA1)
+        ->not->toEqualCanonicalizing($foodB1)
+        ->and($familyA1[0])->toBeInt();
 });
 
 test('multiple levels and categories can be selected together', function () {
@@ -257,8 +231,7 @@ test('important words are prioritized for authenticated users', function () {
     }
 
     $pool = app(ArticleQuizService::class)->queryPool();
-    $selected = app(ArticleQuizService::class)->selectFromPool($pool, 5, $user);
-    $selectedIds = array_column($selected, 'sense_id');
+    $selectedIds = app(ArticleQuizService::class)->selectFromPool($pool, 5, $user);
 
     $importantSelected = array_values(array_intersect($importantIds, $selectedIds));
     $expectedQuota = (int) max(1, (int) floor(5 * 0.4));
@@ -271,16 +244,17 @@ test('authenticated user can toggle important and learned flags', function () {
     $user = User::factory()->create(['email_verified_at' => now()]);
     $senses = createPublishedGermanNouns(5);
     $senseId = $senses[0]->id;
+    $articlesBySenseId = articlesBySenseId($senses);
 
     Volt::actingAs($user)
         ->test('learn.der-die-das')
         ->set('word_count', 5)
         ->set('translation_language', 'en')
         ->call('startQuiz')
-        ->tap(function ($component) {
+        ->tap(function ($component) use ($articlesBySenseId) {
             $answers = [];
             foreach ($component->get('cards') as $card) {
-                $answers[(string) $card['sense_id']] = $card['article'];
+                $answers[(string) $card['sense_id']] = $articlesBySenseId[(int) $card['sense_id']];
             }
             $component->set('answers', $answers);
         })
@@ -293,6 +267,41 @@ test('authenticated user can toggle important and learned flags', function () {
     expect($flag)->not->toBeNull()
         ->and($flag->is_important)->toBeTrue()
         ->and($flag->is_learned)->toBeTrue();
+});
+
+test('toggle flag rejects senses that are not published german nouns', function () {
+    $user = User::factory()->create(['email_verified_at' => now()]);
+    $sense = Sense::factory()->create();
+
+    expect(fn () => app(ToggleUserSenseFlag::class)->execute($user, $sense->id, 'important'))
+        ->toThrow(InvalidArgumentException::class, 'Sense not found.');
+});
+
+test('hydrate cards keeps up to five examples per sense', function () {
+    $senses = createPublishedGermanNouns(2, ['lemma_prefix' => 'Beispiel']);
+    $de = Language::query()->where('code', 'de')->firstOrFail();
+
+    foreach ($senses as $senseIndex => $sense) {
+        for ($i = 0; $i < 6; $i++) {
+            Example::factory()->published()->create([
+                'sense_id' => $sense->id,
+                'language_id' => $de->id,
+                'sentence' => "Example {$senseIndex}-{$i}",
+                'sort_order' => $i,
+            ]);
+        }
+    }
+
+    $cards = app(ArticleQuizService::class)->hydrateCards(
+        array_map(fn (Sense $sense): int => $sense->id, $senses),
+        'en',
+    );
+
+    expect($cards)->toHaveCount(2)
+        ->and($cards[0]['examples'])->toHaveCount(5)
+        ->and($cards[1]['examples'])->toHaveCount(5)
+        ->and($cards[0]['examples'][0]['sentence'])->toBe('Example 0-0')
+        ->and($cards[1]['examples'][0]['sentence'])->toBe('Example 1-0');
 });
 
 test('history page requires authentication and lists saved sessions', function () {

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Learning\Actions;
 
+use App\Domain\Dictionary\Enums\ContentStatus;
 use App\Domain\Dictionary\Models\Sense;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Models\User;
@@ -15,7 +16,19 @@ class ToggleUserSenseFlag
             throw new InvalidArgumentException('Flag must be important or learned.');
         }
 
-        if (! Sense::query()->whereKey($senseId)->exists()) {
+        $exists = Sense::query()
+            ->whereKey($senseId)
+            ->where('status', ContentStatus::Published->value)
+            ->whereNull('deleted_at')
+            ->whereHas('lexeme', function ($query): void {
+                $query->where('status', ContentStatus::Published->value)
+                    ->whereNull('deleted_at')
+                    ->whereHas('language', fn ($language) => $language->where('code', 'de'));
+            })
+            ->whereHas('germanNounDetail', fn ($query) => $query->whereNotNull('article'))
+            ->exists();
+
+        if (! $exists) {
             throw new InvalidArgumentException('Sense not found.');
         }
 

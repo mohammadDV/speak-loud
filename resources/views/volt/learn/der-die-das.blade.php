@@ -3,9 +3,10 @@
 use App\Domain\Learning\Actions\SaveArticleQuizResult;
 use App\Domain\Learning\Actions\ToggleUserSenseFlag;
 use App\Domain\Learning\Services\ArticleQuizService;
+use App\Domain\Learning\Services\ArticleQuizWordSearchService;
 use App\Support\Seo;
 use Illuminate\Validation\ValidationException;
-use function Livewire\Volt\{state, mount, title};
+use function Livewire\Volt\{state, mount, title, updated};
 
 state([
     'phase' => 'setup',
@@ -24,10 +25,15 @@ state([
     'percentage' => 0,
     'saved_session_id' => null,
     'details_sense_id' => null,
+    'search_detail' => null,
     'show_translation_for' => [],
     'error_message' => null,
     'show_error_modal' => false,
     'scroll_to_id' => null,
+    'search_query' => '',
+    'search_suggestions' => [],
+    'show_search_suggestions' => false,
+    'skip_search_refresh' => false,
 ]);
 
 mount(function (ArticleQuizService $quiz) {
@@ -73,6 +79,82 @@ mount(function (ArticleQuizService $quiz) {
 });
 
 title(fn () => Seo::pageTitle('Der / Die / Das quiz'));
+
+updated([
+    'search_query' => function () {
+        if ($this->skip_search_refresh) {
+            $this->skip_search_refresh = false;
+
+            return;
+        }
+
+        $this->refreshWordSuggestions();
+    },
+    'translation_language' => function () {
+        if (trim((string) $this->search_query) !== '') {
+            $this->refreshWordSuggestions();
+        }
+    },
+]);
+
+$refreshWordSuggestions = function () {
+    $query = trim((string) $this->search_query);
+
+    if (mb_strlen($query) < ArticleQuizWordSearchService::MIN_QUERY_LENGTH) {
+        $this->search_suggestions = [];
+        $this->show_search_suggestions = false;
+
+        return;
+    }
+
+    if ($this->translation_language === '') {
+        $this->search_suggestions = [];
+        $this->show_search_suggestions = false;
+
+        return;
+    }
+
+    try {
+        $this->search_suggestions = app(ArticleQuizWordSearchService::class)->suggest(
+            $query,
+            $this->translation_language,
+        );
+        $this->show_search_suggestions = true;
+    } catch (ValidationException $e) {
+        $this->search_suggestions = [];
+        $this->show_search_suggestions = false;
+        $message = collect($e->errors())->flatten()->first()
+            ?? 'Too many searches. Please wait a moment and try again.';
+        $this->showError($message, 'word-search');
+    }
+};
+
+$selectSearchSuggestion = function (int $senseId) {
+    $detail = app(ArticleQuizWordSearchService::class)->details(
+        $senseId,
+        $this->translation_language,
+        auth()->user(),
+    );
+
+    if ($detail === null) {
+        $this->showError('That word is not available right now.');
+
+        return;
+    }
+
+    $this->search_detail = $detail;
+    $this->details_sense_id = $senseId;
+    $this->search_suggestions = [];
+    $this->show_search_suggestions = false;
+    $this->skip_search_refresh = true;
+    $this->search_query = (string) $detail['lemma'];
+};
+
+$clearSearch = function () {
+    $this->search_query = '';
+    $this->search_suggestions = [];
+    $this->show_search_suggestions = false;
+};
 
 $showError = function (string $message, ?string $scrollToId = null) {
     $this->error_message = $message;
@@ -188,6 +270,9 @@ $startQuiz = function (ArticleQuizService $quiz) {
         }
     }
 
+    // Drop answer fields from Livewire state before the quiz phase.
+    $this->cards = $quiz->toQuizPromptCards($this->cards);
+
     $this->answers = [];
     foreach ($this->cards as $card) {
         $this->answers[(string) $card['sense_id']] = '';
@@ -195,6 +280,7 @@ $startQuiz = function (ArticleQuizService $quiz) {
 
     $this->phase = 'quiz';
     $this->details_sense_id = null;
+    $this->search_detail = null;
 };
 
 $backToSetup = function () {
@@ -208,7 +294,7 @@ $backToSetup = function () {
     $this->details_sense_id = null;
 };
 
-$submitQuiz = function (SaveArticleQuizResult $save) {
+$submitQuiz = function (SaveArticleQuizResult $save, ArticleQuizService $quiz) {
     try {
         $this->validate([
             'answers' => ['required', 'array'],
@@ -237,58 +323,42 @@ $submitQuiz = function (SaveArticleQuizResult $save) {
         return;
     }
 
-    $results = [];
-    $correct = 0;
+    $senseIds = array_map(static fn (array $card): int => (int) $card['sense_id'], $this->cards);
 
-    foreach ($this->cards as $index => $card) {
-        $senseId = (string) $card['sense_id'];
-        $selected = strtolower((string) ($this->answers[$senseId] ?? ''));
-        $article = strtolower((string) $card['article']);
-        $isCorrect = $selected === $article;
+    try {
+        $graded = $quiz->gradeAnswers(
+            $senseIds,
+            $this->answers,
+            $this->translation_language,
+            auth()->user(),
+        );
+    } catch (ValidationException $e) {
+        $this->setErrorBag($e->validator->getMessageBag());
+        $message = collect($e->errors())->flatten()->first()
+            ?? 'Something went wrong grading this quiz. Please try again.';
+        $this->showError($message);
 
-        if ($isCorrect) {
-            $correct++;
-        }
-
-        $results[] = [
-            'sense_id' => $card['sense_id'],
-            'lemma' => $card['lemma'],
-            'correct_article' => $article,
-            'selected_article' => $selected,
-            'is_correct' => $isCorrect,
-            'position' => $index,
-            'translation' => $card['translation'] ?? null,
-            'translations' => $card['translations'] ?? [],
-            'gender' => $card['gender'] ?? null,
-            'plural_form' => $card['plural_form'] ?? null,
-            'examples' => $card['examples'] ?? [],
-            'collocations' => $card['collocations'] ?? [],
-            'is_important' => $card['is_important'] ?? false,
-            'is_learned' => $card['is_learned'] ?? false,
-        ];
+        return;
     }
 
-    $total = count($results);
-    $this->results = $results;
-    $this->correct_count = $correct;
-    $this->incorrect_count = $total - $correct;
-    $this->percentage = $total > 0 ? (int) round(($correct / $total) * 100) : 0;
+    $this->results = $graded['results'];
+    $this->correct_count = $graded['correct_count'];
+    $this->incorrect_count = $graded['incorrect_count'];
+    $this->percentage = $graded['percentage'];
+    $this->cards = [];
     $this->phase = 'results';
 
     if (auth()->check()) {
         $session = $save->execute(auth()->user(), [
             'level_codes' => array_values($this->level_codes),
             'category_codes' => array_values($this->category_codes),
-            'word_count' => $total,
+            'word_count' => count($graded['results']),
             'translation_language_code' => $this->translation_language,
             'answers' => array_map(fn (array $row): array => [
                 'sense_id' => $row['sense_id'],
-                'lemma' => $row['lemma'],
-                'correct_article' => $row['correct_article'],
                 'selected_article' => $row['selected_article'],
-                'is_correct' => $row['is_correct'],
                 'position' => $row['position'],
-            ], $results),
+            ], $graded['results']),
         ]);
 
         $this->saved_session_id = $session->id;
@@ -341,11 +411,13 @@ $toggleTranslation = function (int $senseId) {
 };
 
 $openDetails = function (int $senseId) {
+    $this->search_detail = null;
     $this->details_sense_id = $this->details_sense_id === $senseId ? null : $senseId;
 };
 
 $closeDetails = function () {
     $this->details_sense_id = null;
+    $this->search_detail = null;
 };
 
 ?>
@@ -366,6 +438,71 @@ $closeDetails = function () {
                 History
             </a>
         @endauth
+    </div>
+
+    <div class="mb-6" x-data="{ open: @entangle('show_search_suggestions') }" @click.outside="open = false">
+        <label for="word-search" class="block text-sm font-medium text-[#3D2B1F] mb-1">Look up a word</label>
+        <p class="text-xs text-[#3D2B1F]/45 mb-2">Search any German noun to see der/die/das and its meaning.</p>
+        <div class="relative">
+            <div class="flex gap-2">
+                <input
+                    id="word-search"
+                    type="search"
+                    wire:model.live.debounce.300ms="search_query"
+                    autocomplete="off"
+                    placeholder="Type at least 2 letters…"
+                    class="w-full rounded-xl border border-[#3D2B1F]/10 bg-white px-4 py-3 text-sm text-[#3D2B1F] placeholder:text-[#3D2B1F]/35 focus:border-[#FF8C42] focus:outline-none focus:ring-2 focus:ring-[#FF8C42]/30"
+                    @focus="open = {{ count($search_suggestions) > 0 ? 'true' : 'false' }}"
+                >
+                @if ($search_query !== '')
+                    <button
+                        type="button"
+                        wire:click="clearSearch"
+                        class="shrink-0 rounded-xl bg-[#FFF0E0] px-3 text-sm font-semibold text-[#3D2B1F]/70 hover:text-[#3D2B1F]"
+                    >
+                        Clear
+                    </button>
+                @endif
+            </div>
+
+            <div wire:loading wire:target="search_query" class="absolute right-3 top-3 text-xs text-[#3D2B1F]/40">
+                Searching…
+            </div>
+
+            <div
+                x-show="open"
+                x-cloak
+                class="absolute z-30 mt-2 w-full overflow-hidden rounded-xl border border-[#3D2B1F]/10 bg-white shadow-lg"
+            >
+                @if ($search_suggestions === [] && mb_strlen(trim($search_query)) >= 2)
+                    <p class="px-4 py-3 text-sm text-[#3D2B1F]/55">No matching German nouns found.</p>
+                @elseif ($search_suggestions !== [])
+                    <ul class="max-h-72 overflow-y-auto py-1" role="listbox">
+                        @foreach ($search_suggestions as $suggestion)
+                            <li>
+                                <button
+                                    type="button"
+                                    wire:click="selectSearchSuggestion({{ $suggestion['sense_id'] }})"
+                                    class="flex w-full items-start justify-between gap-3 px-4 py-2.5 text-left hover:bg-[#FFF0E0]"
+                                    role="option"
+                                >
+                                    <span class="min-w-0">
+                                        <span class="font-semibold text-[#3D2B1F]">
+                                            <span class="text-[#FF8C42]">{{ $suggestion['article'] }}</span>
+                                            {{ $suggestion['lemma'] }}
+                                        </span>
+                                        @if (! empty($suggestion['translation']))
+                                            <span class="mt-0.5 block truncate text-xs text-[#3D2B1F]/55">{{ $suggestion['translation'] }}</span>
+                                        @endif
+                                    </span>
+                                    <span class="shrink-0 text-xs font-semibold text-[#FF8C42]">Details</span>
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
     </div>
 
     @if ($phase === 'setup')
@@ -630,8 +767,12 @@ $closeDetails = function () {
     @php
         $detailCard = null;
         if ($details_sense_id) {
-            $source = $phase === 'results' ? $results : $cards;
-            $detailCard = collect($source)->firstWhere('sense_id', $details_sense_id);
+            if (is_array($search_detail) && (int) ($search_detail['sense_id'] ?? 0) === (int) $details_sense_id) {
+                $detailCard = $search_detail;
+            } else {
+                $source = $phase === 'results' ? $results : $cards;
+                $detailCard = collect($source)->firstWhere('sense_id', $details_sense_id);
+            }
         }
     @endphp
 
@@ -642,7 +783,7 @@ $closeDetails = function () {
                 <div class="flex items-start justify-between gap-3 mb-3">
                     <div>
                         <p class="text-xl font-bold text-[#3D2B1F]">
-                            @if ($phase !== 'quiz')
+                            @if ($phase !== 'quiz' || is_array($search_detail))
                                 <span class="text-[#FF8C42]">{{ $detailCard['correct_article'] ?? $detailCard['article'] ?? '' }}</span>
                             @endif
                             {{ $detailCard['lemma'] }}
