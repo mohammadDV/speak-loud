@@ -49,6 +49,23 @@ CATEGORY_MAP = {
 DEFAULT_CATEGORY = "general"
 PUBLISHED = "published"
 
+# Flat-file gloss / example fields → ISO language codes used by dictionary:import.
+TRANSLATION_LANGS = ("en", "es", "fa", "ar", "tr")
+GLOSS_FIELDS = {
+    "en": "english",
+    "es": "spanish",
+    "fa": "persian",
+    "ar": "arabic",
+    "tr": "turkish",
+}
+EXAMPLE_FIELDS = {
+    "en": "example_en",
+    "es": "example_es",
+    "fa": "example_fa",
+    "ar": "example_ar",
+    "tr": "example_tr",
+}
+
 CATEGORY_CATALOG = [
     {"code": "family", "display_name": "Family"},
     {"code": "time_and_numbers", "display_name": "Time and numbers"},
@@ -310,11 +327,16 @@ def map_pos(word: dict, parsed: dict) -> str | None:
     return pos
 
 
-def primary_english(english: str) -> str:
-    text = english.split(";")[0].strip()
+def primary_gloss(text: str) -> str:
+    original = text.strip()
+    text = original.split(";")[0].strip()
     text = text.split(",")[0].strip()
     text = re.sub(r"\s*\(.*?\)\s*", "", text).strip()
-    return text or english.strip()
+    return text or original
+
+
+def primary_english(english: str) -> str:
+    return primary_gloss(english) or english.strip()
 
 
 def english_infinitive(english: str) -> str:
@@ -333,9 +355,105 @@ def make_definition(pos: str | None, english: str) -> str:
     return f"{gloss[0].upper()}{gloss[1:]}." if gloss else english
 
 
-def build_example(pos: str | None, lemma: str, article: str | None, english: str, level: str) -> dict:
+def word_glosses(word: dict) -> dict[str, str]:
+    glosses: dict[str, str] = {}
+    for code, field in GLOSS_FIELDS.items():
+        raw = str(word.get(field) or "").strip()
+        if raw:
+            glosses[code] = raw
+    if "en" not in glosses and str(word.get("english") or "").strip():
+        glosses["en"] = str(word["english"]).strip()
+    return glosses
+
+
+def sense_translations(glosses: dict[str, str]) -> list[dict]:
+    translations = []
+    for i, code in enumerate(TRANSLATION_LANGS):
+        text = glosses.get(code)
+        if not text:
+            continue
+        translations.append(
+            {
+                "language": code,
+                "text": text,
+                "type": "equivalent",
+                "sort_order": i,
+                "status": PUBLISHED,
+            }
+        )
+    return translations
+
+
+def example_translations_from_flat(word: dict) -> list[dict]:
+    translations = []
+    for code in TRANSLATION_LANGS:
+        field = EXAMPLE_FIELDS[code]
+        text = str(word.get(field) or "").strip()
+        if not text:
+            continue
+        translations.append(
+            {
+                "language": code,
+                "translation": text,
+                "status": PUBLISHED,
+            }
+        )
+    return translations
+
+
+def multi_collocation_translations(template_en: str, glosses: dict[str, str], verb_forms: dict[str, str]) -> list[dict]:
+    """Build collocation glosses for each language using simple EN template patterns."""
+    translations = []
+    for code in TRANSLATION_LANGS:
+        gloss = primary_gloss(glosses.get(code, glosses.get("en", "")))
+        verb = verb_forms.get(code) or gloss
+        if not gloss:
+            continue
+
+        text = template_en.replace("{gloss}", gloss).replace("{verb}", verb)
+        translations.append(
+            {
+                "language": code,
+                "translation": text,
+                "status": PUBLISHED,
+            }
+        )
+    return translations
+
+
+def verb_forms_by_lang(glosses: dict[str, str]) -> dict[str, str]:
+    forms: dict[str, str] = {}
+    for code, raw in glosses.items():
+        text = primary_gloss(raw)
+        if code == "en" and text.lower().startswith("to "):
+            text = text[3:].strip()
+        forms[code] = text
+    return forms
+
+
+def build_example(
+    pos: str | None,
+    lemma: str,
+    article: str | None,
+    word: dict,
+    level: str,
+) -> dict:
+    glosses = word_glosses(word)
+    english = glosses.get("en", "")
     gloss = primary_english(english)
     verb = english_infinitive(english)
+
+    flat_de = str(word.get("example_de") or "").strip()
+    flat_translations = example_translations_from_flat(word)
+
+    if flat_de and flat_translations:
+        return {
+            "language": "de",
+            "sentence": flat_de,
+            "difficulty_level": level,
+            "status": PUBLISHED,
+            "translations": flat_translations,
+        }
 
     if pos == "noun" and article:
         poss = POSSESSIVE[article]
@@ -379,18 +497,20 @@ def build_example(pos: str | None, lemma: str, article: str | None, english: str
         sentence = f"Ich lerne das Wort „{lemma}“."
         en = f"I am learning the word “{gloss}”."
 
+    translations = flat_translations or [
+        {
+            "language": "en",
+            "translation": en,
+            "status": PUBLISHED,
+        }
+    ]
+
     return {
         "language": "de",
-        "sentence": sentence,
+        "sentence": flat_de or sentence,
         "difficulty_level": level,
         "status": PUBLISHED,
-        "translations": [
-            {
-                "language": "en",
-                "translation": en,
-                "status": PUBLISHED,
-            }
-        ],
+        "translations": translations,
     }
 
 
@@ -398,134 +518,56 @@ def build_collocations(
     pos: str | None,
     lemma: str,
     article: str | None,
-    english: str,
+    word: dict,
     is_reflexive: bool,
 ) -> list[dict]:
-    gloss = primary_english(english)
-    verb = english_infinitive(english)
+    glosses = word_glosses(word)
+    verbs = verb_forms_by_lang(glosses)
+    gloss = primary_english(glosses.get("en", ""))
+    verb = english_infinitive(glosses.get("en", ""))
     items: list[dict] = []
+
+    def item(phrase: str, pattern_type: str, phrase_type: str, template_en: str) -> dict:
+        return {
+            "phrase": phrase,
+            "pattern_type": pattern_type,
+            "phrase_type": phrase_type,
+            "translations": multi_collocation_translations(template_en, glosses, verbs),
+        }
 
     if pos == "noun" and article:
         poss = POSSESSIVE[article]
         indef = INDEFINITE[article]
-        items.append(
-            {
-                "phrase": f"{poss} {lemma}",
-                "pattern_type": "determiner+noun",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"my {gloss}"}],
-            }
-        )
-        items.append(
-            {
-                "phrase": f"{indef} {lemma}",
-                "pattern_type": "determiner+noun",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"a {gloss}"}],
-            }
-        )
+        items.append(item(f"{poss} {lemma}", "determiner+noun", "collocation", "my {gloss}"))
+        items.append(item(f"{indef} {lemma}", "determiner+noun", "collocation", "a {gloss}"))
     elif pos == "noun":
-        items.append(
-            {
-                "phrase": f"ohne {lemma}",
-                "pattern_type": "preposition+noun",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"without {gloss}"}],
-            }
-        )
+        items.append(item(f"ohne {lemma}", "preposition+noun", "collocation", "without {gloss}"))
     elif pos == "verb":
         if is_reflexive:
-            items.append(
-                {
-                    "phrase": f"sich {lemma}",
-                    "pattern_type": "pronoun+verb",
-                    "phrase_type": "collocation",
-                    "translations": [{"language": "en", "translation": f"to {verb} (oneself)"}],
-                }
-            )
-        items.append(
-            {
-                "phrase": f"{lemma} können",
-                "pattern_type": "verb+verb",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"be able to {verb}"}],
-            }
-        )
-        items.append(
-            {
-                "phrase": f"jeden Tag {lemma}",
-                "pattern_type": "adverbial+verb",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"{verb} every day"}],
-            }
-        )
+            items.append(item(f"sich {lemma}", "pronoun+verb", "collocation", "to {verb} (oneself)"))
+        items.append(item(f"{lemma} können", "verb+verb", "collocation", "be able to {verb}"))
+        items.append(item(f"jeden Tag {lemma}", "adverbial+verb", "collocation", "{verb} every day"))
     elif pos == "adjective":
-        items.append(
-            {
-                "phrase": f"sehr {lemma}",
-                "pattern_type": "adverb+adjective",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"very {gloss}"}],
-            }
-        )
-        items.append(
-            {
-                "phrase": f"nicht {lemma}",
-                "pattern_type": "particle+adjective",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"not {gloss}"}],
-            }
-        )
+        items.append(item(f"sehr {lemma}", "adverb+adjective", "collocation", "very {gloss}"))
+        items.append(item(f"nicht {lemma}", "particle+adjective", "collocation", "not {gloss}"))
     elif pos == "adverb":
-        items.append(
-            {
-                "phrase": f"ganz {lemma}",
-                "pattern_type": "adverb+adverb",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"quite {gloss}"}],
-            }
-        )
+        items.append(item(f"ganz {lemma}", "adverb+adverb", "collocation", "quite {gloss}"))
     elif pos == "preposition":
-        items.append(
-            {
-                "phrase": f"{lemma} dem Haus",
-                "pattern_type": "preposition+noun",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"{gloss} the house"}],
-            }
-        )
+        items.append(item(f"{lemma} dem Haus", "preposition+noun", "collocation", "{gloss} the house"))
     elif pos == "interjection":
-        items.append(
-            {
-                "phrase": lemma,
-                "pattern_type": "fixed",
-                "phrase_type": "fixed_expression",
-                "translations": [{"language": "en", "translation": gloss}],
-            }
-        )
+        items.append(item(lemma, "fixed", "fixed_expression", "{gloss}"))
     elif pos == "numeral":
-        items.append(
-            {
-                "phrase": f"{lemma} Mal",
-                "pattern_type": "numeral+noun",
-                "phrase_type": "collocation",
-                "translations": [{"language": "en", "translation": f"{gloss} times"}],
-            }
-        )
+        items.append(item(f"{lemma} Mal", "numeral+noun", "collocation", "{gloss} times"))
     else:
-        items.append(
-            {
-                "phrase": lemma,
-                "pattern_type": "fixed",
-                "phrase_type": "fixed_expression",
-                "translations": [{"language": "en", "translation": gloss}],
-            }
-        )
+        items.append(item(lemma, "fixed", "fixed_expression", "{gloss}"))
+
+    # Silence unused locals when templates drive translations.
+    _ = (gloss, verb)
 
     result = items[:2]
-    for item in result:
-        item["status"] = PUBLISHED
-        for translation in item.get("translations", []):
+    for entry in result:
+        entry["status"] = PUBLISHED
+        for translation in entry.get("translations", []):
             translation["status"] = PUBLISHED
     return result
 
@@ -607,15 +649,7 @@ def transform_word(
                 else f"{grammar_notes}; irregular verb."
             )
 
-    translations = [
-        {
-            "language": "en",
-            "text": word["english"].strip(),
-            "type": "equivalent",
-            "sort_order": 0,
-            "status": PUBLISHED,
-        }
-    ]
+    translations = sense_translations(word_glosses(word))
 
     disambiguation = None
     if lemma_total > 1:
@@ -629,7 +663,7 @@ def transform_word(
     # Level-scoped sense keys so A1–C2 entries do not overwrite each other.
     sense_import_key = make_import_key(lexeme_import_key, "sense", level.lower(), "1")
 
-    examples = [build_example(pos, lemma, parsed.get("article"), word["english"], level)]
+    examples = [build_example(pos, lemma, parsed.get("article"), word, level)]
     for i, example in enumerate(examples, start=1):
         example["import_key"] = make_import_key(sense_import_key, "example", str(i))
 
@@ -637,7 +671,7 @@ def transform_word(
         pos,
         lemma,
         parsed.get("article"),
-        word["english"],
+        word,
         is_reflexive,
     )
     for i, collocation in enumerate(collocations, start=1):
@@ -747,7 +781,7 @@ def transform_level(level: str) -> Path:
             "level": level,
             "source_language": "de",
             "definition_language": "en",
-            "translation_languages": ["en"],
+            "translation_languages": list(TRANSLATION_LANGS),
             "source": data.get("source"),
             "original_count": data.get("count"),
             "lexeme_count": len(lexemes),
@@ -756,7 +790,7 @@ def transform_level(level: str) -> Path:
                 "Ready for import into the dictionary data model (see language-service-spec.md).",
                 f"Each entry is one German lexeme with at least one {level} sense.",
                 f"Examples and collocations were regenerated as simple {level} learning content.",
-                "Persian translations are omitted; English is provided for all senses/examples/collocations.",
+                "Sense/example/collocation translations include en, es, fa, ar, and tr when present on the flat source.",
                 "Categories use English catalog codes only (family, food, general, ...).",
                 "Unmapped topics fall back to category code general.",
                 "All content statuses are published.",

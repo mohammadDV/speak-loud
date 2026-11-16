@@ -15,6 +15,27 @@ These files live under `database/data/vocabulary/` (not `storage/`) so they are 
 
 Flat source backups: `*_german_words.flat.json`
 
+## Translation languages
+
+Flat sources and import JSON include sense/example translations for:
+
+- `en` (english / example_en)
+- `es` (spanish / example_es)
+- `fa` (persian / example_fa)
+- `ar` (arabic / example_ar)
+- `tr` (turkish / example_tr)
+
+Fill or refresh flat translations (Argos offline MT from English):
+
+```bash
+# requires a venv with argostranslate + en→{es,fa,ar,tr} packages installed
+python3 database/data/vocabulary/fill_flat_translations.py
+python3 database/data/vocabulary/fill_flat_translations.py --force   # overwrite
+python3 database/data/vocabulary/fill_flat_translations.py A1 A2
+```
+
+Then regenerate import JSON and re-import (idempotent via `import_key`).
+
 ## Local / production
 
 ```bash
@@ -34,7 +55,13 @@ php artisan dictionary:import --level=B1
 php artisan dictionary:import --all --dry-run
 ```
 
-Re-run after correcting sentences, adding collocations, or adding translation languages (`fa`, etc.). Imports are idempotent via `import_key`.
+Re-run after correcting sentences, adding collocations, or adding translation languages. Imports are idempotent via `import_key`.
+
+After import, bump article-quiz caches if needed:
+
+```bash
+php artisan tinker --execute 'app(\App\Domain\Learning\Services\ArticleQuizCache::class)->forgetPools();'
+```
 
 ## Regenerate import JSON from flat sources
 

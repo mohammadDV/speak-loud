@@ -3,7 +3,7 @@
     "level": "A1",
     "source_language": "de",
     "definition_language": "en",
-    "translation_languages": ["en"],
+    "translation_languages": ["en", "es", "fa", "ar", "tr"],
     "lexeme_count": 2
   },
   "category_catalog": [
@@ -44,6 +44,34 @@
               "type": "equivalent",
               "sort_order": 0,
               "status": "published"
+            },
+            {
+              "language": "es",
+              "text": "padre",
+              "type": "equivalent",
+              "sort_order": 1,
+              "status": "published"
+            },
+            {
+              "language": "fa",
+              "text": "پدر",
+              "type": "equivalent",
+              "sort_order": 2,
+              "status": "published"
+            },
+            {
+              "language": "ar",
+              "text": "أب",
+              "type": "equivalent",
+              "sort_order": 3,
+              "status": "published"
+            },
+            {
+              "language": "tr",
+              "text": "baba",
+              "type": "equivalent",
+              "sort_order": 4,
+              "status": "published"
             }
           ],
           "examples": [
@@ -57,6 +85,26 @@
                 {
                   "language": "en",
                   "translation": "My father is here.",
+                  "status": "published"
+                },
+                {
+                  "language": "es",
+                  "translation": "Mi padre está aquí.",
+                  "status": "published"
+                },
+                {
+                  "language": "fa",
+                  "translation": "پدر من اینجاست.",
+                  "status": "published"
+                },
+                {
+                  "language": "ar",
+                  "translation": "أبي هنا.",
+                  "status": "published"
+                },
+                {
+                  "language": "tr",
+                  "translation": "Babam burada.",
                   "status": "published"
                 }
               ]
@@ -73,6 +121,26 @@
                 {
                   "language": "en",
                   "translation": "my father",
+                  "status": "published"
+                },
+                {
+                  "language": "es",
+                  "translation": "mi padre",
+                  "status": "published"
+                },
+                {
+                  "language": "fa",
+                  "translation": "پدر من",
+                  "status": "published"
+                },
+                {
+                  "language": "ar",
+                  "translation": "أبي",
+                  "status": "published"
+                },
+                {
+                  "language": "tr",
+                  "translation": "babam",
                   "status": "published"
                 }
               ]

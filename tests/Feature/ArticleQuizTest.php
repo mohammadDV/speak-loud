@@ -2,6 +2,7 @@
 
 use App\Domain\Dictionary\Models\Example;
 use App\Domain\Dictionary\Models\Sense;
+use App\Domain\Dictionary\Models\SenseTranslation;
 use App\Domain\Learning\Actions\ToggleUserSenseFlag;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Models\UserSenseFlag;
@@ -458,6 +459,30 @@ test('translation language options only include languages with published transla
     expect($codes)->toContain('en')
         ->and($codes)->not->toContain('de')
         ->and($codes)->not->toContain('ja');
+});
+
+test('translation language options include spanish persian arabic and turkish when published', function () {
+    $senses = createPublishedGermanNouns(5);
+    $langs = Language::query()->whereIn('code', ['es', 'fa', 'ar', 'tr'])->get()->keyBy('code');
+
+    foreach ($senses as $sense) {
+        foreach (['es' => 'padre', 'fa' => 'پدر', 'ar' => 'أب', 'tr' => 'baba'] as $code => $text) {
+            SenseTranslation::factory()->published()->create([
+                'sense_id' => $sense->id,
+                'target_language_id' => $langs[$code]->id,
+                'translation_text' => $text,
+            ]);
+        }
+    }
+
+    app(ArticleQuizCache::class)->forgetPools();
+
+    $codes = app(ArticleQuizService::class)
+        ->translationLanguages()
+        ->pluck('code')
+        ->all();
+
+    expect($codes)->toContain('en', 'es', 'fa', 'ar', 'tr');
 });
 
 test('learn link is present on public pages', function () {

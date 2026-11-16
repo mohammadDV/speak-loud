@@ -81,6 +81,27 @@ test('reimport updates corrected example sentences without duplicating', functio
         ->and(Lexeme::query()->where('import_key', 'de:vater')->count())->toBe(1);
 });
 
+test('import upserts spanish persian arabic and turkish sense translations', function () {
+    $this->artisan('dictionary:import', [
+        'path' => $this->fixtureDir.'/a1_sample_words.json',
+    ])->assertSuccessful();
+
+    $senseId = Lexeme::query()->where('import_key', 'de:vater')->firstOrFail()->senses()->firstOrFail()->id;
+
+    $translations = SenseTranslation::query()
+        ->where('sense_id', $senseId)
+        ->with('targetLanguage')
+        ->get()
+        ->keyBy(fn ($t) => $t->targetLanguage?->code);
+
+    expect($translations->keys()->sort()->values()->all())->toBe(['ar', 'en', 'es', 'fa', 'tr'])
+        ->and($translations['en']->translation_text)->toBe('father')
+        ->and($translations['es']->translation_text)->toBe('padre')
+        ->and($translations['fa']->translation_text)->toBe('پدر')
+        ->and($translations['ar']->translation_text)->toBe('أب')
+        ->and($translations['tr']->translation_text)->toBe('baba');
+});
+
 test('reimport can add a new translation language', function () {
     $path = $this->fixtureDir.'/a1_sample_words.json';
 
@@ -88,8 +109,8 @@ test('reimport can add a new translation language', function () {
 
     $payload = json_decode(File::get($path), true);
     $payload['lexemes'][0]['senses'][0]['translations'][] = [
-        'language' => 'fa',
-        'text' => 'پدر',
+        'language' => 'fr',
+        'text' => 'père',
         'type' => 'equivalent',
         'status' => 'published',
     ];
@@ -104,9 +125,8 @@ test('reimport can add a new translation language', function () {
         ->with('targetLanguage')
         ->get();
 
-    expect($translations)->toHaveCount(2)
-        ->and($translations->firstWhere(fn ($t) => $t->targetLanguage?->code === 'en')?->translation_text)->toBe('father')
-        ->and($translations->firstWhere(fn ($t) => $t->targetLanguage?->code === 'fa')?->translation_text)->toBe('پدر');
+    expect($translations->contains(fn ($t) => $t->targetLanguage?->code === 'fr' && $t->translation_text === 'père'))->toBeTrue()
+        ->and($translations->contains(fn ($t) => $t->targetLanguage?->code === 'fa' && $t->translation_text === 'پدر'))->toBeTrue();
 });
 
 test('directory import can filter by cefr level', function () {
