@@ -513,7 +513,9 @@ $toggleFeatureGuide = function () {
 <div class="max-w-3xl mx-auto px-4 py-6 md:py-10 pb-28 md:pb-10">
     <div class="flex items-start justify-between gap-3 mb-6">
         <div class="min-w-0">
-            <p class="text-xs font-semibold uppercase tracking-wide text-[#FF8C42] mb-1">German practice</p>
+            <p class="text-xs font-semibold uppercase tracking-wide text-[#FF8C42] mb-1">
+                <a href="{{ route('learn.index') }}" wire:navigate class="hover:underline">German practice</a>
+            </p>
             <h1 class="text-2xl md:text-3xl font-bold text-[#3D2B1F]">Der / Die / Das</h1>
             <p class="text-sm text-[#3D2B1F]/60 mt-1">
                 Practice German noun articles with filters, a word lookup, and a scored quiz.

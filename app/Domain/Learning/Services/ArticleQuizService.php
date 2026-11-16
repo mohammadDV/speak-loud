@@ -9,6 +9,7 @@ use App\Domain\Dictionary\Models\DifficultyLevel;
 use App\Domain\Dictionary\Models\Sense;
 use App\Domain\Dictionary\Services\DictionaryCache;
 use App\Domain\Dictionary\Support\EnumValue;
+use App\Domain\Learning\Enums\SenseFlagContext;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Models\Language;
 use App\Models\User;
@@ -309,17 +310,26 @@ class ArticleQuizService
      * @param  list<int>  $pool
      * @return list<int>
      */
-    public function selectFromPool(array $pool, int $wordCount, ?User $user = null): array
-    {
+    public function selectFromPool(
+        array $pool,
+        int $wordCount,
+        ?User $user = null,
+        SenseFlagContext $flagContext = SenseFlagContext::Article,
+    ): array {
         $ids = array_values(array_unique(array_map(static fn (mixed $id): int => (int) $id, $pool)));
         $idSet = array_fill_keys($ids, true);
         $selectedIds = [];
 
         if ($user !== null) {
+            // Avoid binding the entire pool into WHERE IN when the dictionary is large.
             $flags = UserSenseFlag::query()
                 ->where('user_id', $user->id)
-                ->whereIn('sense_id', $ids)
-                ->get(['sense_id', 'is_important', 'is_learned']);
+                ->where('context', $flagContext)
+                ->where(function ($query): void {
+                    $query->where('is_important', true)->orWhere('is_learned', true);
+                })
+                ->get(['sense_id', 'is_important', 'is_learned'])
+                ->filter(fn (UserSenseFlag $flag): bool => isset($idSet[(int) $flag->sense_id]));
 
             $importantIds = $flags->where('is_important', true)->where('is_learned', false)->pluck('sense_id')->all();
             $learnedIds = $flags->where('is_learned', true)->pluck('sense_id')->all();
@@ -425,6 +435,7 @@ class ArticleQuizService
         if ($user !== null) {
             $flagsBySense = UserSenseFlag::query()
                 ->where('user_id', $user->id)
+                ->where('context', SenseFlagContext::Article)
                 ->whereIn('sense_id', $senseIds)
                 ->get()
                 ->keyBy('sense_id')

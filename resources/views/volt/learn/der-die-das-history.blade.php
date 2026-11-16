@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Learning\Actions\ClearUserSenseFlags;
+use App\Domain\Learning\Enums\SenseFlagContext;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Services\UserSenseFlagListService;
 use App\Support\Seo;
@@ -84,12 +85,20 @@ $setTab = function (string $tab, UserSenseFlagListService $list) {
     $this->dismissConfirm();
 
     if ($tab === 'important' && ! $this->important_loaded) {
-        $this->important_words = $list->important(auth()->user(), $this->translation_language);
+        $this->important_words = $list->important(
+            auth()->user(),
+            $this->translation_language,
+            SenseFlagContext::Article,
+        );
         $this->important_loaded = true;
     }
 
     if ($tab === 'learned' && ! $this->learned_loaded) {
-        $this->learned_words = $list->learned(auth()->user(), $this->translation_language);
+        $this->learned_words = $list->learned(
+            auth()->user(),
+            $this->translation_language,
+            SenseFlagContext::Article,
+        );
         $this->learned_loaded = true;
     }
 };
@@ -164,7 +173,7 @@ $confirmAction = function (ClearUserSenseFlags $clear) {
     $this->dismissConfirm();
 
     if ($action === 'remove_one' && $senseId !== null) {
-        $clear->clearOne(auth()->user(), (int) $senseId, $flag);
+        $clear->clearOne(auth()->user(), (int) $senseId, $flag, SenseFlagContext::Article);
         $property = $flag === 'important' ? 'important_words' : 'learned_words';
         $this->{$property} = collect($this->{$property})
             ->reject(fn (array $word): bool => (int) $word['sense_id'] === (int) $senseId)
@@ -175,7 +184,7 @@ $confirmAction = function (ClearUserSenseFlags $clear) {
     }
 
     if ($action === 'clear_all') {
-        $clear->clearAll(auth()->user(), $flag);
+        $clear->clearAll(auth()->user(), $flag, SenseFlagContext::Article);
 
         if ($flag === 'important') {
             $this->important_words = [];

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Learning\Models\ArticleQuizSession;
+use App\Domain\Learning\Models\MeaningQuizSession;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
@@ -215,6 +216,14 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function articleQuizSessions(): HasMany
     {
         return $this->hasMany(ArticleQuizSession::class);
+    }
+
+    /**
+     * @return HasMany<MeaningQuizSession, $this>
+     */
+    public function meaningQuizSessions(): HasMany
+    {
+        return $this->hasMany(MeaningQuizSession::class);
     }
 
     /**

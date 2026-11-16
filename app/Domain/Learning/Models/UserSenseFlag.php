@@ -3,6 +3,7 @@
 namespace App\Domain\Learning\Models;
 
 use App\Domain\Dictionary\Models\Sense;
+use App\Domain\Learning\Enums\SenseFlagContext;
 use App\Models\User;
 use Database\Factories\Learning\UserSenseFlagFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ class UserSenseFlag extends Model
     protected $fillable = [
         'user_id',
         'sense_id',
+        'context',
         'is_important',
         'is_learned',
     ];
@@ -24,6 +26,7 @@ class UserSenseFlag extends Model
     protected function casts(): array
     {
         return [
+            'context' => SenseFlagContext::class,
             'is_important' => 'boolean',
             'is_learned' => 'boolean',
             'sense_id' => 'integer',

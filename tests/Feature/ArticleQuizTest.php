@@ -488,5 +488,5 @@ test('translation language options include spanish persian arabic and turkish wh
 test('learn link is present on public pages', function () {
     $this->get(route('discover'))
         ->assertOk()
-        ->assertSee(route('learn.der-die-das'), false);
+        ->assertSee(route('learn.index'), false);
 });
