@@ -913,7 +913,7 @@ $toggleFeatureGuide = function () {
             </flux:button>
             @auth
                 <a href="{{ route('learn.der-die-das.history') }}" wire:navigate class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-[#3D2B1F] bg-[#FFF0E0]">
-                    View history
+                    History
                 </a>
             @endauth
         </div>
