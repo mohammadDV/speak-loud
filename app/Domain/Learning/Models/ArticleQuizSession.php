@@ -2,7 +2,9 @@
 
 namespace App\Domain\Learning\Models;
 
+use App\Domain\Learning\Events\QuizCompleted;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Database\Factories\Learning\ArticleQuizSessionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -60,5 +62,26 @@ class ArticleQuizSession extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(ArticleQuizAnswer::class)->orderBy('position');
+    }
+
+    public function completionEvent(): QuizCompleted
+    {
+        if ($this->relationLoaded('answers')) {
+            $total = $this->answers->count();
+            $correct = $this->answers->where('is_correct', true)->count();
+        } else {
+            $total = (int) $this->correct_count + (int) $this->incorrect_count;
+            $correct = (int) $this->correct_count;
+        }
+
+        return new QuizCompleted(
+            userId: (int) $this->user_id,
+            activityType: 'article_quiz',
+            sourceId: (string) $this->id,
+            totalQuestions: $total,
+            correctAnswers: $correct,
+            completedAt: CarbonImmutable::parse($this->completed_at)->utc(),
+            mode: null,
+        );
     }
 }

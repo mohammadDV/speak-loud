@@ -37,6 +37,12 @@ class SaveMeaningQuizResult
      */
     public function execute(User $user, array $payload): MeaningQuizSession
     {
+        if ($user->status !== 'active') {
+            throw ValidationException::withMessages([
+                'answers' => 'Your account must be active to save quiz results.',
+            ]);
+        }
+
         $quizType = MeaningQuizType::tryFrom((string) $payload['quiz_type']);
         if ($quizType === null) {
             throw ValidationException::withMessages([
@@ -129,6 +135,8 @@ class SaveMeaningQuizResult
 
             return $session->load('answers');
         });
+
+        event($session->completionEvent());
 
         TelegramNotifier::notify(
             "Meaning quiz completed: #{$session->id} by user #{$user->id} ({$user->email})"

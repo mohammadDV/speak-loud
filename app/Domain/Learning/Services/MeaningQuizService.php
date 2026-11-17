@@ -91,9 +91,15 @@ class MeaningQuizService
         return collect($rows)->values();
     }
 
+    public function lastFillNotice(): ?string
+    {
+        return $this->articleQuizService->lastFillNotice();
+    }
+
     /**
      * @param  list<string>  $levelCodes
      * @param  list<string>  $categoryCodes
+     * @param  list<int>  $focusedSenseIds
      * @return list<array{
      *     sense_id: int,
      *     lemma: string,
@@ -114,6 +120,8 @@ class MeaningQuizService
         string $translationLanguageCode,
         MeaningQuizType $quizType,
         ?User $user = null,
+        ?string $focus = null,
+        array $focusedSenseIds = [],
     ): array {
         $levelCodes = $this->normalizeLevelCodes($levelCodes);
         $categoryCodes = $this->normalizeCategoryCodes($categoryCodes);
@@ -142,6 +150,8 @@ class MeaningQuizService
             $wordCount,
             $user,
             SenseFlagContext::Meaning,
+            $focus,
+            $focusedSenseIds,
         );
         $cards = $this->hydrateCards($selectedIds, $translationLanguageCode, $user, withExtras: false);
 

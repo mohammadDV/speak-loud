@@ -2,8 +2,10 @@
 
 use App\Domain\Learning\Actions\SaveArticleQuizResult;
 use App\Domain\Learning\Actions\ToggleUserSenseFlag;
+use App\Domain\Learning\Enums\SenseFlagContext;
 use App\Domain\Learning\Services\ArticleQuizService;
 use App\Domain\Learning\Services\ArticleQuizWordSearchService;
+use App\Domain\Learning\Services\LearningInsightsService;
 use App\Support\Seo;
 use App\Support\SpeechLocale;
 use Illuminate\Support\Facades\RateLimiter;
@@ -35,6 +37,8 @@ state([
     'show_search_suggestions' => false,
     'skip_search_refresh' => false,
     'show_feature_guide' => false,
+    'focus' => null,
+    'fill_notice' => null,
 ]);
 
 // Client cannot tamper with quiz phase, deck, or graded sense IDs.
@@ -84,6 +88,14 @@ mount(function (ArticleQuizService $quiz) {
     if (! $availableCodes->contains($this->translation_language)) {
         $this->translation_language = (string) ($availableCodes->first() ?? '');
     }
+
+    $count = request()->integer('count');
+    if ($count >= 5 && $count <= 50) {
+        $this->word_count = $count;
+    }
+
+    $focus = request()->query('focus');
+    $this->focus = in_array($focus, ['important', 'difficult'], true) ? $focus : null;
 });
 
 title(fn () => Seo::pageTitle('Der / Die / Das quiz'));
@@ -228,9 +240,10 @@ $dismissError = function () {
     $this->scrollToField($target);
 };
 
-$loadCards = function (ArticleQuizService $quiz) {
+$loadCards = function (ArticleQuizService $quiz, LearningInsightsService $insights) {
     $this->error_message = null;
     $this->show_error_modal = false;
+    $this->fill_notice = null;
 
     try {
         $this->validate([
@@ -247,13 +260,24 @@ $loadCards = function (ArticleQuizService $quiz) {
             'translation_language.required' => 'Choose a translation language.',
         ]);
 
+        $focusedIds = [];
+        $user = auth()->user();
+        if ($user !== null && $this->focus === 'important') {
+            $focusedIds = $insights->importantUnlearnedSenseIds($user, SenseFlagContext::Article);
+        } elseif ($user !== null && $this->focus === 'difficult') {
+            $focusedIds = $insights->difficultSenseIds($user, 'article_quiz');
+        }
+
         $this->cards = $quiz->buildQuiz(
             (int) $this->word_count,
             array_values($this->level_codes),
             array_values($this->category_codes),
             $this->translation_language,
-            auth()->user(),
+            $user,
+            $this->focus,
+            $focusedIds,
         );
+        $this->fill_notice = $quiz->lastFillNotice();
     } catch (ValidationException $e) {
         $this->setErrorBag($e->validator->getMessageBag());
         $message = collect($e->errors())->flatten()->first()
@@ -288,8 +312,8 @@ $loadCards = function (ArticleQuizService $quiz) {
     return true;
 };
 
-$previewArticles = function (ArticleQuizService $quiz) {
-    if (! $this->loadCards($quiz)) {
+$previewArticles = function (ArticleQuizService $quiz, LearningInsightsService $insights) {
+    if (! $this->loadCards($quiz, $insights)) {
         return;
     }
 
@@ -297,9 +321,9 @@ $previewArticles = function (ArticleQuizService $quiz) {
     $this->phase = 'preview';
 };
 
-$startQuiz = function (ArticleQuizService $quiz) {
+$startQuiz = function (ArticleQuizService $quiz, LearningInsightsService $insights) {
     if ($this->phase !== 'preview' || $this->cards === []) {
-        if (! $this->loadCards($quiz)) {
+        if (! $this->loadCards($quiz, $insights)) {
             return;
         }
     }
@@ -511,11 +535,30 @@ $toggleFeatureGuide = function () {
 ?>
 
 <div class="max-w-3xl mx-auto px-4 py-6 md:py-10 pb-28 md:pb-10">
-    <div class="flex items-start justify-between gap-3 mb-6">
+    <div class="mb-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <a
+                href="{{ route('learn.index') }}"
+                wire:navigate
+                class="inline-flex items-center gap-1.5 rounded-xl bg-[#FFF0E0] px-3.5 py-2 text-sm font-bold text-[#3D2B1F] hover:bg-[#FFE4C8] transition"
+            >
+                <span aria-hidden="true">←</span>
+                Back to Learn
+            </a>
+            @auth
+                <a
+                    href="{{ route('learn.der-die-das.history') }}"
+                    wire:navigate
+                    class="inline-flex items-center gap-2 rounded-xl bg-[#FF8C42] px-3.5 py-2 text-sm font-bold text-white hover:bg-[#f07d33] shadow-sm transition"
+                >
+                    View progress
+                    <span aria-hidden="true">→</span>
+                </a>
+            @endauth
+        </div>
+
         <div class="min-w-0">
-            <p class="text-xs font-semibold uppercase tracking-wide text-[#FF8C42] mb-1">
-                <a href="{{ route('learn.index') }}" wire:navigate class="hover:underline">German practice</a>
-            </p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#FF8C42] mb-1">German practice</p>
             <h1 class="text-2xl md:text-3xl font-bold text-[#3D2B1F]">Der / Die / Das</h1>
             <p class="text-sm text-[#3D2B1F]/60 mt-1">
                 Practice German noun articles with filters, a word lookup, and a scored quiz.
@@ -557,20 +600,11 @@ $toggleFeatureGuide = function () {
                     </p>
                     <p>
                         <span class="font-semibold text-[#3D2B1F]">Your progress:</span>
-                        open History / Important / Learned to review past quizzes and manage marked words. You can remove one word or clear a whole list after confirming.
+                        open View progress for History / Important / Learned to review past quizzes and manage marked words.
                     </p>
                 </div>
             @endif
         </div>
-        @auth
-            <a
-                href="{{ route('learn.der-die-das.history') }}"
-                wire:navigate
-                class="shrink-0 text-sm font-semibold text-[#FF8C42] hover:underline"
-            >
-                Progress
-            </a>
-        @endauth
     </div>
 
     @if ($phase !== 'quiz')
@@ -685,6 +719,10 @@ $toggleFeatureGuide = function () {
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @if ($fill_notice)
+                        <p class="mb-3 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">{{ $fill_notice }}</p>
+                    @endif
+
                     <div id="quiz-field-word-count">
                         <flux:label>Number of words (5–50)</flux:label>
                         <flux:input type="number" wire:model="word_count" min="5" max="50" class="mt-1" />
@@ -724,6 +762,10 @@ $toggleFeatureGuide = function () {
     @endif
 
     @if ($phase === 'preview')
+        @if ($fill_notice)
+            <p class="mb-4 rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-800">{{ $fill_notice }}</p>
+        @endif
+
         <div class="flex items-center justify-between gap-3 mb-4">
             <h2 class="text-lg font-semibold text-[#3D2B1F]">Preview with articles</h2>
             <button type="button" wire:click="backToSetup" class="text-sm text-[#3D2B1F]/60 hover:text-[#3D2B1F]">Change filters</button>
@@ -828,6 +870,10 @@ $toggleFeatureGuide = function () {
                 ·
                 <span class="text-red-700 font-semibold">{{ $incorrect_count }} incorrect</span>
             </p>
+            <livewire:learn.components.quiz-gamification-result
+                activity-type="article_quiz"
+                :source-id="$saved_session_id"
+            />
             @auth
                 @if ($saved_session_id)
                     <p class="text-xs text-[#3D2B1F]/45 mt-2">Saved to your history.</p>
@@ -914,8 +960,9 @@ $toggleFeatureGuide = function () {
                 Practice again
             </flux:button>
             @auth
-                <a href="{{ route('learn.der-die-das.history') }}" wire:navigate class="w-full sm:w-auto inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-[#3D2B1F] bg-[#FFF0E0]">
-                    History
+                <a href="{{ route('learn.der-die-das.history') }}" wire:navigate class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white bg-[#FF8C42] hover:bg-[#f07d33] transition">
+                    View progress
+                    <span aria-hidden="true">→</span>
                 </a>
             @endauth
         </div>

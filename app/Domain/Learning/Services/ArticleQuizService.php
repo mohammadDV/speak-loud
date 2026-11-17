@@ -18,6 +18,8 @@ use Illuminate\Validation\ValidationException;
 
 class ArticleQuizService
 {
+    private ?string $lastFillNotice = null;
+
     public const MAX_EXAMPLES_PER_CARD = 5;
 
     public const MAX_COLLOCATIONS_PER_CARD = 5;
@@ -87,9 +89,15 @@ class ArticleQuizService
         return collect($rows)->values();
     }
 
+    public function lastFillNotice(): ?string
+    {
+        return $this->lastFillNotice;
+    }
+
     /**
      * @param  list<string>  $levelCodes
      * @param  list<string>  $categoryCodes
+     * @param  list<int>  $focusedSenseIds
      * @return list<array{
      *     sense_id: int,
      *     lemma: string,
@@ -110,7 +118,10 @@ class ArticleQuizService
         array $categoryCodes,
         string $translationLanguageCode,
         ?User $user = null,
+        ?string $focus = null,
+        array $focusedSenseIds = [],
     ): array {
+        $this->lastFillNotice = null;
         $levelCodes = $this->normalizeLevelCodes($levelCodes);
         $categoryCodes = $this->normalizeCategoryCodes($categoryCodes);
 
@@ -130,7 +141,7 @@ class ArticleQuizService
         }
 
         $wordCount = min($wordCount, count($pool));
-        $selectedIds = $this->selectFromPool($pool, $wordCount, $user);
+        $selectedIds = $this->selectFromPool($pool, $wordCount, $user, SenseFlagContext::Article, $focus, $focusedSenseIds);
         $cards = $this->hydrateCards($selectedIds, $translationLanguageCode, $user);
 
         if (count($cards) < 5) {
@@ -308,6 +319,7 @@ class ArticleQuizService
 
     /**
      * @param  list<int>  $pool
+     * @param  list<int>  $focusedSenseIds
      * @return list<int>
      */
     public function selectFromPool(
@@ -315,12 +327,51 @@ class ArticleQuizService
         int $wordCount,
         ?User $user = null,
         SenseFlagContext $flagContext = SenseFlagContext::Article,
+        ?string $focus = null,
+        array $focusedSenseIds = [],
     ): array {
         $ids = array_values(array_unique(array_map(static fn (mixed $id): int => (int) $id, $pool)));
         $idSet = array_fill_keys($ids, true);
         $selectedIds = [];
+        $this->lastFillNotice = null;
 
-        if ($user !== null) {
+        if ($user !== null && in_array($focus, ['important', 'difficult'], true)) {
+            $focusedInPool = array_values(array_filter(
+                array_map(static fn (mixed $id): int => (int) $id, $focusedSenseIds),
+                static fn (int $id): bool => isset($idSet[$id]),
+            ));
+            shuffle($focusedInPool);
+            $focusedPick = array_slice($focusedInPool, 0, $wordCount);
+            $selectedIds = $focusedPick;
+            $remaining = $wordCount - count($selectedIds);
+
+            if ($remaining > 0) {
+                $flags = UserSenseFlag::query()
+                    ->where('user_id', $user->id)
+                    ->where('context', $flagContext)
+                    ->get(['sense_id', 'is_learned'])
+                    ->filter(fn (UserSenseFlag $flag): bool => isset($idSet[(int) $flag->sense_id]));
+                $learnedIds = $flags->where('is_learned', true)->pluck('sense_id')->all();
+                $nonLearned = array_values(array_diff($ids, $learnedIds, $selectedIds));
+                shuffle($nonLearned);
+                $fill = array_slice($nonLearned, 0, $remaining);
+                $selectedIds = [...$selectedIds, ...$fill];
+                $remaining = $wordCount - count($selectedIds);
+
+                if ($remaining > 0) {
+                    $rest = array_values(array_diff($ids, $selectedIds));
+                    shuffle($rest);
+                    $fill = array_slice($rest, 0, $remaining);
+                    $selectedIds = [...$selectedIds, ...$fill];
+                }
+
+                $filled = $wordCount - count($focusedPick);
+                if ($filled > 0) {
+                    $label = $focus === 'important' ? 'important words' : 'recently missed words';
+                    $this->lastFillNotice = 'Only '.count($focusedPick)." {$label} matched your filters — added {$filled} other words to complete the quiz.";
+                }
+            }
+        } elseif ($user !== null) {
             // Avoid binding the entire pool into WHERE IN when the dictionary is large.
             $flags = UserSenseFlag::query()
                 ->where('user_id', $user->id)

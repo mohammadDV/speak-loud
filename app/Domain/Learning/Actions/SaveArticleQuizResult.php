@@ -33,6 +33,12 @@ class SaveArticleQuizResult
      */
     public function execute(User $user, array $payload): ArticleQuizSession
     {
+        if ($user->status !== 'active') {
+            throw ValidationException::withMessages([
+                'answers' => 'Your account must be active to save quiz results.',
+            ]);
+        }
+
         $session = DB::transaction(function () use ($user, $payload): ArticleQuizSession {
             $incoming = $payload['answers'];
             $senseIds = array_map(static fn (array $answer): int => (int) $answer['sense_id'], $incoming);
@@ -88,6 +94,8 @@ class SaveArticleQuizResult
 
             return $session->load('answers');
         });
+
+        event($session->completionEvent());
 
         TelegramNotifier::notify(
             "Article quiz completed: #{$session->id} by user #{$user->id} ({$user->email})"

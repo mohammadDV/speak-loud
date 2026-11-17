@@ -2,6 +2,10 @@
 
 namespace App\Models;
 
+use App\Domain\Gamification\Models\ProcessedEvent;
+use App\Domain\Gamification\Models\UserDailyActivity;
+use App\Domain\Gamification\Models\UserGamificationProfile;
+use App\Domain\Gamification\Models\XpTransaction;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Models\MeaningQuizSession;
 use App\Domain\Learning\Models\UserSenseFlag;
@@ -232,6 +236,38 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function senseFlags(): HasMany
     {
         return $this->hasMany(UserSenseFlag::class);
+    }
+
+    /**
+     * @return HasOne<UserGamificationProfile, $this>
+     */
+    public function gamificationProfile(): HasOne
+    {
+        return $this->hasOne(UserGamificationProfile::class);
+    }
+
+    /**
+     * @return HasMany<XpTransaction, $this>
+     */
+    public function xpTransactions(): HasMany
+    {
+        return $this->hasMany(XpTransaction::class);
+    }
+
+    /**
+     * @return HasMany<UserDailyActivity, $this>
+     */
+    public function dailyActivities(): HasMany
+    {
+        return $this->hasMany(UserDailyActivity::class);
+    }
+
+    /**
+     * @return HasMany<ProcessedEvent, $this>
+     */
+    public function gamificationProcessedEvents(): HasMany
+    {
+        return $this->hasMany(ProcessedEvent::class);
     }
 
     public function blockedUsers(): BelongsToMany
