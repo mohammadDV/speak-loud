@@ -7,6 +7,7 @@ use App\Domain\Learning\Models\MeaningQuizSession;
 use App\Domain\Learning\Services\MeaningAnswerChecker;
 use App\Domain\Learning\Services\MeaningQuizService;
 use App\Models\User;
+use App\Support\TelegramNotifier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -36,14 +37,14 @@ class SaveMeaningQuizResult
      */
     public function execute(User $user, array $payload): MeaningQuizSession
     {
-        return DB::transaction(function () use ($user, $payload): MeaningQuizSession {
-            $quizType = MeaningQuizType::tryFrom((string) $payload['quiz_type']);
-            if ($quizType === null) {
-                throw ValidationException::withMessages([
-                    'quiz_type' => 'Choose a valid quiz type.',
-                ]);
-            }
+        $quizType = MeaningQuizType::tryFrom((string) $payload['quiz_type']);
+        if ($quizType === null) {
+            throw ValidationException::withMessages([
+                'quiz_type' => 'Choose a valid quiz type.',
+            ]);
+        }
 
+        $session = DB::transaction(function () use ($user, $payload, $quizType): MeaningQuizSession {
             $incoming = $payload['answers'];
             $senseIds = array_map(static fn (array $answer): int => (int) $answer['sense_id'], $incoming);
             $resolved = $this->quizService->resolveMeaningsBySenseId(
@@ -128,5 +129,12 @@ class SaveMeaningQuizResult
 
             return $session->load('answers');
         });
+
+        TelegramNotifier::notify(
+            "Meaning quiz completed: #{$session->id} by user #{$user->id} ({$user->email})"
+            ." — {$session->correct_count}/{$session->word_count} ({$session->percentage}%) [{$quizType->value}]"
+        );
+
+        return $session;
     }
 }

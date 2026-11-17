@@ -6,6 +6,7 @@ use App\Domain\Dictionary\Enums\GermanArticle;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Services\ArticleQuizService;
 use App\Models\User;
+use App\Support\TelegramNotifier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -32,7 +33,7 @@ class SaveArticleQuizResult
      */
     public function execute(User $user, array $payload): ArticleQuizSession
     {
-        return DB::transaction(function () use ($user, $payload): ArticleQuizSession {
+        $session = DB::transaction(function () use ($user, $payload): ArticleQuizSession {
             $incoming = $payload['answers'];
             $senseIds = array_map(static fn (array $answer): int => (int) $answer['sense_id'], $incoming);
             $resolved = $this->quizService->resolveArticlesBySenseId($senseIds);
@@ -87,5 +88,12 @@ class SaveArticleQuizResult
 
             return $session->load('answers');
         });
+
+        TelegramNotifier::notify(
+            "Article quiz completed: #{$session->id} by user #{$user->id} ({$user->email})"
+            ." — {$session->correct_count}/{$session->word_count} ({$session->percentage}%)"
+        );
+
+        return $session;
     }
 }

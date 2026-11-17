@@ -8,6 +8,9 @@ use App\Actions\RejectClaim;
 use App\Actions\ReplyToTicket;
 use App\Actions\SendClaim;
 use App\Actions\WithdrawClaim;
+use App\Domain\Learning\Actions\SaveArticleQuizResult;
+use App\Domain\Learning\Actions\SaveMeaningQuizResult;
+use App\Domain\Learning\Enums\MeaningQuizType;
 use App\Jobs\SendTelegramMessage;
 use App\Models\Language;
 use App\Models\Schedule;
@@ -16,6 +19,8 @@ use App\Models\Ticket;
 use App\Models\User;
 use App\Models\UserProfile;
 use App\Support\ScheduleDescription;
+use Database\Seeders\DictionaryReferenceSeeder;
+use Database\Seeders\LanguageSeeder;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Hash;
 
@@ -162,6 +167,82 @@ test('changing a password queues a telegram notification', function () {
             && str_contains($job->text, 'Password changed')
             && str_contains($job->text, 'password-tg@speakloudmate.test')
             && ! str_contains($job->text, 'NewPassword1!');
+    });
+});
+
+test('completing an article quiz queues a telegram notification', function () {
+    Bus::fake();
+    enableTelegramActionConfig();
+    $this->seed(LanguageSeeder::class);
+    $this->seed(DictionaryReferenceSeeder::class);
+
+    $user = User::factory()->create(['email' => 'article-quiz-tg@speakloudmate.test']);
+    $senses = createPublishedGermanNouns(3);
+
+    $answers = [];
+    foreach ($senses as $index => $sense) {
+        $answers[] = [
+            'sense_id' => $sense->id,
+            'selected_article' => strtolower((string) $sense->germanNounDetail->article->value),
+            'position' => $index,
+        ];
+    }
+
+    $session = app(SaveArticleQuizResult::class)->execute($user, [
+        'level_codes' => ['A1'],
+        'category_codes' => [],
+        'word_count' => 3,
+        'translation_language_code' => 'en',
+        'answers' => $answers,
+    ]);
+
+    Bus::assertDispatched(SendTelegramMessage::class, function (SendTelegramMessage $job) use ($session): bool {
+        return $job->chatId === '@notif'
+            && str_contains($job->text, 'Article quiz completed')
+            && str_contains($job->text, "#{$session->id}")
+            && str_contains($job->text, 'article-quiz-tg@speakloudmate.test')
+            && str_contains($job->text, '3/3 (100%)');
+    });
+});
+
+test('completing a meaning quiz queues a telegram notification', function () {
+    Bus::fake();
+    enableTelegramActionConfig();
+    $this->seed(LanguageSeeder::class);
+    $this->seed(DictionaryReferenceSeeder::class);
+
+    $user = User::factory()->create(['email' => 'meaning-quiz-tg@speakloudmate.test']);
+    $senses = createPublishedGermanNouns(3);
+
+    $answers = [];
+    $optionsBySenseId = [];
+    foreach ($senses as $index => $sense) {
+        $meaning = 'word '.$index;
+        $answers[] = [
+            'sense_id' => $sense->id,
+            'selected_meaning' => $meaning,
+            'position' => $index,
+        ];
+        $optionsBySenseId[$sense->id] = [$meaning, 'distractor-a', 'distractor-b', 'distractor-c'];
+    }
+
+    $session = app(SaveMeaningQuizResult::class)->execute($user, [
+        'level_codes' => ['A1'],
+        'category_codes' => [],
+        'word_count' => 3,
+        'translation_language_code' => 'en',
+        'quiz_type' => MeaningQuizType::MultipleChoice->value,
+        'answers' => $answers,
+        'options_by_sense_id' => $optionsBySenseId,
+    ]);
+
+    Bus::assertDispatched(SendTelegramMessage::class, function (SendTelegramMessage $job) use ($session): bool {
+        return $job->chatId === '@notif'
+            && str_contains($job->text, 'Meaning quiz completed')
+            && str_contains($job->text, "#{$session->id}")
+            && str_contains($job->text, 'meaning-quiz-tg@speakloudmate.test')
+            && str_contains($job->text, '3/3 (100%)')
+            && str_contains($job->text, '['.MeaningQuizType::MultipleChoice->value.']');
     });
 });
 
