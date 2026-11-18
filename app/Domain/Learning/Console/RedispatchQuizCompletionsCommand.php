@@ -3,6 +3,7 @@
 namespace App\Domain\Learning\Console;
 
 use App\Domain\Learning\Models\ArticleQuizSession;
+use App\Domain\Learning\Models\GrammarQuizSession;
 use App\Domain\Learning\Models\MeaningQuizSession;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
@@ -11,7 +12,7 @@ class RedispatchQuizCompletionsCommand extends Command
 {
     protected $signature = 'learning:redispatch-completions
         {--since= : Completed sessions on or after this date (required, Y-m-d)}
-        {--activity= : Optional activity type filter (article_quiz|meaning_quiz)}';
+        {--activity= : Optional activity type filter (article_quiz|meaning_quiz|grammar_quiz)}';
 
     protected $description = 'Re-dispatch QuizCompleted events for completed sessions (idempotent recovery)';
 
@@ -50,6 +51,16 @@ class RedispatchQuizCompletionsCommand extends Command
                 ->where('completed_at', '>=', $from)
                 ->orderBy('id')
                 ->each(function (MeaningQuizSession $session) use (&$dispatched): void {
+                    event($session->completionEvent());
+                    $dispatched++;
+                });
+        }
+
+        if ($activity === null || $activity === 'grammar_quiz') {
+            GrammarQuizSession::query()
+                ->where('completed_at', '>=', $from)
+                ->orderBy('id')
+                ->each(function (GrammarQuizSession $session) use (&$dispatched): void {
                     event($session->completionEvent());
                     $dispatched++;
                 });

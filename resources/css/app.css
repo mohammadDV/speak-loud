@@ -27,6 +27,144 @@ html {
     color-scheme: light only;
 }
 
+@layer components {
+    .lesson-content {
+        color: rgb(61 43 31 / 0.88);
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .lesson-content > *:first-child {
+        margin-top: 0;
+    }
+
+    .lesson-content > *:last-child {
+        margin-bottom: 0;
+    }
+
+    .lesson-content h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.5rem;
+        line-height: 1.25;
+        font-weight: 800;
+        color: #3d2b1f;
+    }
+
+    .lesson-content h2 {
+        margin: 2rem 0 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid rgb(61 43 31 / 0.1);
+        font-size: 1.2rem;
+        line-height: 1.35;
+        font-weight: 800;
+        color: #3d2b1f;
+    }
+
+    .lesson-content h3 {
+        margin: 1.4rem 0 0.55rem;
+        font-size: 1.05rem;
+        line-height: 1.4;
+        font-weight: 700;
+        color: #3d2b1f;
+    }
+
+    .lesson-content p,
+    .lesson-content ul,
+    .lesson-content ol {
+        margin: 0.75rem 0;
+    }
+
+    .lesson-content ul,
+    .lesson-content ol {
+        padding-inline-start: 1.25rem;
+    }
+
+    .lesson-content li + li {
+        margin-top: 0.35rem;
+    }
+
+    .lesson-content strong {
+        color: #3d2b1f;
+        font-weight: 700;
+    }
+
+    .lesson-content em {
+        font-style: italic;
+        color: rgb(61 43 31 / 0.78);
+    }
+
+    .lesson-content hr {
+        margin: 1.75rem 0;
+        border: 0;
+        border-top: 1px solid rgb(61 43 31 / 0.1);
+    }
+
+    .lesson-content a {
+        color: #ff8c42;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .lesson-table-wrap {
+        margin: 1rem 0 1.25rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid rgb(61 43 31 / 0.12);
+        border-radius: 1rem;
+        background: #fffaf5;
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+    }
+
+    .lesson-content table {
+        width: 100%;
+        min-width: 28rem;
+        border-collapse: collapse;
+        font-size: 0.925rem;
+        line-height: 1.45;
+    }
+
+    .lesson-content thead th {
+        background: #3d2b1f;
+        color: #fff8f0;
+        font-weight: 700;
+        text-align: start;
+        padding: 0.7rem 0.85rem;
+        white-space: nowrap;
+    }
+
+    .lesson-content tbody td {
+        padding: 0.65rem 0.85rem;
+        border-top: 1px solid rgb(61 43 31 / 0.08);
+        vertical-align: top;
+        color: #3d2b1f;
+    }
+
+    .lesson-content tbody tr:nth-child(even) td {
+        background: rgb(255 140 66 / 0.06);
+    }
+
+    .lesson-content tbody tr:hover td {
+        background: rgb(255 140 66 / 0.12);
+    }
+
+    .lesson-content--rtl h1,
+    .lesson-content--rtl h2,
+    .lesson-content--rtl h3,
+    .lesson-content--rtl p,
+    .lesson-content--rtl li {
+        text-align: right;
+    }
+
+    .lesson-content--rtl .lesson-table-wrap {
+        direction: ltr;
+    }
+
+    .lesson-content--rtl table {
+        text-align: left;
+    }
+}
+
 @layer base {
     [x-cloak] {
         display: none !important;

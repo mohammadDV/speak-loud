@@ -51,6 +51,18 @@ return [
                 'write_in' => ['xp' => []],
             ],
         ],
+        'grammar_quiz' => [
+            'label' => 'Grammar Lessons',
+            'url' => '/learn/grammar',
+            'flag_context' => 'grammar',
+            'seconds_per_question' => 20,
+            'qualifies_for_streak' => true,
+            'xp' => [],
+            'modes' => [
+                'multiple_choice' => ['xp' => []],
+                'fill_blank' => ['xp' => []],
+            ],
+        ],
     ],
 
     'daily_goal' => [

@@ -10,6 +10,7 @@ use App\Domain\Gamification\Models\UserGamificationProfile;
 use App\Domain\Gamification\Models\XpTransaction;
 use App\Domain\Learning\Events\QuizCompleted;
 use App\Domain\Learning\Models\ArticleQuizSession;
+use App\Domain\Learning\Models\GrammarQuizSession;
 use App\Domain\Learning\Models\MeaningQuizSession;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -91,6 +92,31 @@ test('perfect quiz awards perfect bonus', function () {
 
     expect((int) XpTransaction::query()->where('reason', XpReason::PerfectQuiz)->sum('amount'))->toBe(5)
         ->and((int) UserGamificationProfile::query()->where('user_id', $user->id)->value('total_xp'))->toBe(45); // 35 + goal bonus
+});
+
+test('grammar quiz completion awards xp via verifier', function () {
+    $user = User::factory()->create();
+    $session = GrammarQuizSession::factory()->create([
+        'user_id' => $user->id,
+        'word_count' => 10,
+        'correct_count' => 9,
+        'incorrect_count' => 1,
+        'percentage' => 90,
+        'completed_at' => now(),
+    ]);
+
+    app(ProcessQuizCompletion::class)->execute(new QuizCompleted(
+        userId: $user->id,
+        activityType: 'grammar_quiz',
+        sourceId: (string) $session->id,
+        totalQuestions: 10,
+        correctAnswers: 9,
+        completedAt: CarbonImmutable::now('UTC'),
+        mode: 'fill_blank',
+    ));
+
+    expect(ProcessedEvent::query()->where('activity_type', 'grammar_quiz')->count())->toBe(1)
+        ->and((int) UserGamificationProfile::query()->where('user_id', $user->id)->value('total_xp'))->toBeGreaterThan(0);
 });
 
 test('below minimum awards only answer xp', function () {

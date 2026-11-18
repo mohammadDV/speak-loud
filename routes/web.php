@@ -80,6 +80,13 @@ Volt::route('/discover', 'discover.index')->name('discover');
 Volt::route('/learn', 'learn.index')->name('learn.index');
 Volt::route('/learn/der-die-das', 'learn.der-die-das')->name('learn.der-die-das');
 Volt::route('/learn/vocabulary-meaning', 'learn.vocabulary-meaning')->name('learn.vocabulary-meaning');
+Volt::route('/learn/grammar', 'learn.grammar.index')->name('learn.grammar');
+Volt::route('/learn/grammar/quiz', 'learn.grammar.quiz')->name('learn.grammar.quiz');
+Route::middleware(['auth', 'active', 'verified'])->group(function () {
+    Volt::route('/learn/grammar/history', 'learn.grammar.history')->name('learn.grammar.history');
+});
+Volt::route('/learn/grammar/{course}', 'learn.grammar.course')->name('learn.grammar.course');
+Volt::route('/learn/grammar/{course}/{lesson}', 'learn.grammar.lesson')->name('learn.grammar.lesson');
 Volt::route('/learn/leaderboard', 'learn.leaderboard')->name('learn.leaderboard');
 Volt::route('/u/{profileSlug}', 'users.show')->name('users.show');
 

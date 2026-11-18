@@ -4,6 +4,7 @@ namespace App\Domain\Learning\Services;
 
 use App\Domain\Learning\Events\QuizCompleted;
 use App\Domain\Learning\Models\ArticleQuizSession;
+use App\Domain\Learning\Models\GrammarQuizSession;
 use App\Domain\Learning\Models\MeaningQuizSession;
 use InvalidArgumentException;
 
@@ -19,6 +20,7 @@ final class QuizCompletionVerifier
         $session = match ($event->activityType) {
             'article_quiz' => ArticleQuizSession::query()->find($event->sourceId),
             'meaning_quiz' => MeaningQuizSession::query()->find($event->sourceId),
+            'grammar_quiz' => GrammarQuizSession::query()->find($event->sourceId),
             default => null,
         };
 
