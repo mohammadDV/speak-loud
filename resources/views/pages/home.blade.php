@@ -187,6 +187,47 @@
     </div>
 </section>
 
+{{-- ─── Learn ──────────────────────────────────────────────── --}}
+<section class="relative overflow-hidden border-t border-black/[0.06] bg-[#3D2B1F] py-14 sm:py-20">
+    <div
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_20%,rgba(255,140,66,0.42),transparent_42%),radial-gradient(circle_at_8%_90%,rgba(255,240,224,0.12),transparent_40%)] transition-opacity duration-700"
+        aria-hidden="true"
+    ></div>
+    <div class="relative max-w-6xl mx-auto px-5">
+        <div class="max-w-2xl">
+            <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">Learn</span>
+            <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#FFF8F0] tracking-tight mt-2">
+                Practice German on your own between conversations.
+            </h2>
+            <p class="text-sm sm:text-[15px] text-[#FFF0E0]/70 mt-3 leading-relaxed max-w-lg">
+                Articles, vocabulary meaning, prepositions, and grammar lessons with quizzes, earn XP and keep a streak.
+            </p>
+            <a
+                href="{{ route('learn.index') }}"
+                class="group inline-flex items-center gap-2 mt-6 sm:mt-7 rounded-full bg-[#FF8C42] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_2px_12px_rgba(255,140,66,.35)] hover:bg-[#e67a35] transition-colors duration-200"
+            >
+                Open Learn
+                <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+            </a>
+        </div>
+
+        <div class="mt-10 sm:mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
+            <a href="{{ route('learn.der-die-das') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
+                Der / Die / Das
+            </a>
+            <a href="{{ route('learn.vocabulary-meaning') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
+                Vocabulary meaning
+            </a>
+            <a href="{{ route('learn.prepositions') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
+                Prepositions
+            </a>
+            <a href="{{ route('learn.grammar') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
+                Grammar lessons
+            </a>
+        </div>
+    </div>
+</section>
+
 {{-- ─── Video section ──────────────────────────────────────── --}}
 @php
     $demoVideo = \App\Support\HomeDemoVideo::embed();
@@ -289,6 +330,46 @@
     </div>
 </section>
 @endif
+
+{{-- ─── Donate ─────────────────────────────────────────────── --}}
+<section class="relative overflow-hidden border-t border-black/[0.06] py-14 sm:py-20">
+    <div
+        class="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#FFF0E0] via-[#FFE4C8] to-[#FFD4A8] transition-opacity duration-700"
+        aria-hidden="true"
+    ></div>
+    <div
+        class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#FF8C42]/20 blur-3xl"
+        aria-hidden="true"
+    ></div>
+    <div
+        class="pointer-events-none absolute -left-12 bottom-0 h-44 w-44 rounded-full bg-[#3D2B1F]/10 blur-3xl"
+        aria-hidden="true"
+    ></div>
+
+    <div class="relative max-w-6xl mx-auto px-5">
+        <div class="max-w-2xl">
+            <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">Donate</span>
+            <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#3D2B1F] tracking-tight mt-2">
+                Keep free language practice open for everyone.
+            </h2>
+            <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-3 leading-relaxed max-w-lg">
+                SpeakLoudMate is free for learners. Donations help cover hosting, email, and the tools that keep schedules, chats, and Learn running.
+            </p>
+            <div class="mt-6 sm:mt-7 flex flex-col sm:flex-row sm:items-center gap-3">
+                <a
+                    href="{{ route('donate') }}"
+                    class="group inline-flex items-center justify-center gap-2 rounded-full bg-[#FF8C42] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_2px_12px_rgba(255,140,66,.35)] hover:bg-[#e67a35] transition-colors duration-200"
+                >
+                    Support SpeakLoudMate
+                    <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                </a>
+                <p class="text-xs sm:text-sm text-[#3D2B1F]/45 sm:pl-1">
+                    Secure checkout with PayPal · any amount helps
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <x-site-footer />
 

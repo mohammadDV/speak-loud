@@ -148,21 +148,41 @@ test('home page shows how-to steps and video section above blog', function () {
         ->assertSee('images/screenshots/talk-and-message.webp', false)
         ->assertSee('"@type":"HowTo"', false)
         ->assertSee('"name":"Create your profile"', false)
+        ->assertSee('Practice German on your own between conversations.', false)
+        ->assertSee('Open Learn', false)
+        ->assertSee('Grammar lessons', false)
+        ->assertSee(route('learn.index'), false)
         ->assertSee('See it in 60 seconds.', false)
         ->assertSee('From the blog', false)
         ->assertSee('How-to blog marker', false)
+        ->assertSee('Keep free language practice open for everyone.', false)
+        ->assertSee('Support SpeakLoudMate', false)
         ->assertDontSee('Watch how a session goes.', false)
         ->getContent();
 
     $howToPos = strpos($html, 'Get from signup to your first practice session.');
+    $learnPos = strpos($html, 'Practice German on your own between conversations.');
     $videoPos = strpos($html, 'See it in 60 seconds.');
     $blogPos = strpos($html, 'From the blog');
+    $donatePos = strpos($html, 'Keep free language practice open for everyone.');
 
     expect($howToPos)->not->toBeFalse()
+        ->and($learnPos)->not->toBeFalse()
         ->and($videoPos)->not->toBeFalse()
         ->and($blogPos)->not->toBeFalse()
-        ->and($howToPos)->toBeLessThan($videoPos)
-        ->and($videoPos)->toBeLessThan($blogPos);
+        ->and($donatePos)->not->toBeFalse()
+        ->and($howToPos)->toBeLessThan($learnPos)
+        ->and($learnPos)->toBeLessThan($videoPos)
+        ->and($videoPos)->toBeLessThan($blogPos)
+        ->and($blogPos)->toBeLessThan($donatePos);
+});
+
+test('home page shows donate section even without blog posts', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('Keep free language practice open for everyone.', false)
+        ->assertSee('Support SpeakLoudMate', false)
+        ->assertSee(route('donate'), false);
 });
 
 test('home page no longer shows the old short how it works strip copy alone', function () {
