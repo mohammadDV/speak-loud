@@ -51,6 +51,15 @@ return [
                 'write_in' => ['xp' => []],
             ],
         ],
+        'plural_quiz' => [
+            'label' => 'Noun Plurals',
+            'url' => '/learn/plurals',
+            'flag_context' => 'plural',
+            'seconds_per_question' => 18,
+            'qualifies_for_streak' => true,
+            'xp' => [],
+            'modes' => [],
+        ],
         'grammar_quiz' => [
             'label' => 'Grammar Lessons',
             'url' => '/learn/grammar',

@@ -200,7 +200,7 @@
                 Practice German on your own between conversations.
             </h2>
             <p class="text-sm sm:text-[15px] text-[#FFF0E0]/70 mt-3 leading-relaxed max-w-lg">
-                Articles, vocabulary meaning, prepositions, and grammar lessons with quizzes, earn XP and keep a streak.
+                Articles, plurals, vocabulary meaning, prepositions, and grammar lessons with quizzes, earn XP and keep a streak.
             </p>
             <a
                 href="{{ route('learn.index') }}"
@@ -214,6 +214,9 @@
         <div class="mt-10 sm:mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
             <a href="{{ route('learn.der-die-das') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
                 Der / Die / Das
+            </a>
+            <a href="{{ route('learn.plurals') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
+                Noun Plurals
             </a>
             <a href="{{ route('learn.vocabulary-meaning') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
                 Vocabulary meaning

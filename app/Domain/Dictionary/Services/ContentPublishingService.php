@@ -12,6 +12,7 @@ use App\Domain\Dictionary\Models\Sense;
 use App\Domain\Dictionary\Support\EnumValue;
 use App\Domain\Learning\Services\ArticleQuizCache;
 use App\Domain\Learning\Services\MeaningQuizCache;
+use App\Domain\Learning\Services\PluralQuizCache;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -22,6 +23,7 @@ class ContentPublishingService
         private readonly DictionaryCache $cache,
         private readonly ArticleQuizCache $articleQuizCache,
         private readonly MeaningQuizCache $meaningQuizCache,
+        private readonly PluralQuizCache $pluralQuizCache,
     ) {}
 
     public function submitForReview(Lexeme $lexeme, User $actor): Lexeme
@@ -157,6 +159,8 @@ class ContentPublishingService
         $this->articleQuizCache->forgetCardsForSenses($senseIds);
         $this->meaningQuizCache->forgetPools();
         $this->meaningQuizCache->forgetCardsForSenses($senseIds);
+        $this->pluralQuizCache->forgetPools();
+        $this->pluralQuizCache->forgetCardsForSenses($senseIds);
     }
 
     private function transitionLexeme(Lexeme $lexeme, ContentStatus $next, User $actor, string $summary): Lexeme

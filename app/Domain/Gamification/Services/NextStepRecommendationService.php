@@ -81,24 +81,37 @@ final class NextStepRecommendationService
         $activityType = $this->mostRecentActivityType($user) ?? ($this->registry->keys()[0] ?? 'article_quiz');
         $detail = '';
 
-        if (max($important['article'], $important['meaning']) >= $importantMin) {
+        $importantMax = max($important['article'], $important['meaning'], $important['plural']);
+        $difficultMax = max($difficult['article'], $difficult['meaning'], $difficult['plural']);
+
+        if ($importantMax >= $importantMin) {
             $focus = 'important';
-            if ($important['article'] === $important['meaning']) {
-                $activityType = $this->tieBreakActivity($user, ['article_quiz', 'meaning_quiz']);
-            } else {
-                $activityType = $important['article'] > $important['meaning'] ? 'article_quiz' : 'meaning_quiz';
-            }
-            $count = $activityType === 'article_quiz' ? $important['article'] : $important['meaning'];
+            $activityType = $this->pickFocusActivity($user, $important, [
+                'article_quiz' => 'article',
+                'meaning_quiz' => 'meaning',
+                'plural_quiz' => 'plural',
+            ]);
+            $countKey = match ($activityType) {
+                'article_quiz' => 'article',
+                'plural_quiz' => 'plural',
+                default => 'meaning',
+            };
+            $count = $important[$countKey];
             $detail = "You have {$count} important words waiting for practice.";
             $targetQuestions = min($targetQuestions, $focusMax);
-        } elseif (max($difficult['article'], $difficult['meaning']) >= $difficultMin) {
+        } elseif ($difficultMax >= $difficultMin) {
             $focus = 'difficult';
-            if ($difficult['article'] === $difficult['meaning']) {
-                $activityType = $this->tieBreakActivity($user, ['article_quiz', 'meaning_quiz']);
-            } else {
-                $activityType = $difficult['article'] > $difficult['meaning'] ? 'article_quiz' : 'meaning_quiz';
-            }
-            $count = $activityType === 'article_quiz' ? $difficult['article'] : $difficult['meaning'];
+            $activityType = $this->pickFocusActivity($user, $difficult, [
+                'article_quiz' => 'article',
+                'meaning_quiz' => 'meaning',
+                'plural_quiz' => 'plural',
+            ]);
+            $countKey = match ($activityType) {
+                'article_quiz' => 'article',
+                'plural_quiz' => 'plural',
+                default => 'meaning',
+            };
+            $count = $difficult[$countKey];
             $detail = "Review {$count} words you got wrong recently.";
             $targetQuestions = min($targetQuestions, $focusMax);
         } else {
@@ -148,6 +161,23 @@ final class NextStepRecommendationService
             ->where('user_id', $user->id)
             ->orderByDesc('processed_at')
             ->value('activity_type');
+    }
+
+    /**
+     * @param  array{article: int, meaning: int, plural: int}  $counts
+     * @param  array<string, string>  $activityToCountKey
+     */
+    private function pickFocusActivity(User $user, array $counts, array $activityToCountKey): string
+    {
+        $max = max(array_values($counts));
+        $tied = [];
+        foreach ($activityToCountKey as $activity => $countKey) {
+            if (($counts[$countKey] ?? 0) === $max) {
+                $tied[] = $activity;
+            }
+        }
+
+        return $this->tieBreakActivity($user, $tied !== [] ? $tied : array_keys($activityToCountKey));
     }
 
     /**

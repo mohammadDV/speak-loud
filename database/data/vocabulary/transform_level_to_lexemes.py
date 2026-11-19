@@ -154,11 +154,22 @@ NUMBER_WORDS = {
 
 
 def add_umlaut(word: str) -> str:
+    """Apply German stem umlaut from the rightmost eligible vowel.
+
+    Important: when scanning right-to-left, the *u* in *au* is encountered
+    before *a*. Treat *au* → *äu* when landing on that *u*, otherwise
+    *Haus* incorrectly becomes *Haüs* instead of *Häus*.
+    """
     chars = list(word)
     for idx in range(len(chars) - 1, -1, -1):
+        # au → äu (must run before bare-u → ü)
+        if chars[idx].lower() == "u" and idx > 0 and chars[idx - 1].lower() == "a":
+            chars[idx - 1] = "Ä" if chars[idx - 1].isupper() else "ä"
+            chars[idx] = "U" if chars[idx].isupper() else "u"
+            return "".join(chars)
         if idx + 1 < len(chars) and chars[idx].lower() == "a" and chars[idx + 1].lower() == "u":
             chars[idx] = "Ä" if chars[idx].isupper() else "ä"
-            chars[idx + 1] = "u"
+            chars[idx + 1] = "U" if chars[idx + 1].isupper() else "u"
             return "".join(chars)
         mapping = {"a": "ä", "o": "ö", "u": "ü", "A": "Ä", "O": "Ö", "U": "Ü"}
         if chars[idx] in mapping:

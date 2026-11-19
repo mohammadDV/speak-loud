@@ -270,6 +270,25 @@ $skipGoalSetup = function (SkipDailyGoalOnboarding $action) {
             </p>
         @endauth
 
+        <a href="{{ route('learn.plurals') }}" wire:navigate class="block group rounded-3xl bg-white border border-[#3D2B1F]/10 p-5 md:p-6 shadow-sm hover:border-[#FF8C42]/40 hover:shadow-md transition">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <h3 class="text-lg font-bold text-[#3D2B1F] group-hover:text-[#FF8C42] transition-colors">Noun Plurals</h3>
+                    <p class="text-sm text-[#3D2B1F]/65 mt-1">
+                        Practice German noun plurals. Filter by CEFR level and category, then type each plural form.
+                    </p>
+                </div>
+                <span class="shrink-0 text-[#FF8C42] font-semibold text-sm mt-1" aria-hidden="true">→</span>
+            </div>
+        </a>
+        @auth
+            <p class="-mt-2 px-1">
+                <a href="{{ route('learn.plurals.history') }}" wire:navigate class="text-xs font-semibold text-[#FF8C42] hover:underline">
+                    View plural quiz history
+                </a>
+            </p>
+        @endauth
+
         <a href="{{ route('learn.vocabulary-meaning') }}" wire:navigate class="block group rounded-3xl bg-white border border-[#3D2B1F]/10 p-5 md:p-6 shadow-sm hover:border-[#FF8C42]/40 hover:shadow-md transition">
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">

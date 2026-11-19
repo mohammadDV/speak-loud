@@ -5,6 +5,7 @@ namespace App\Domain\Learning\Services;
 use App\Domain\Learning\Enums\SenseFlagContext;
 use App\Domain\Learning\Models\ArticleQuizAnswer;
 use App\Domain\Learning\Models\MeaningQuizAnswer;
+use App\Domain\Learning\Models\PluralQuizAnswer;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,13 +14,14 @@ use Illuminate\Support\Facades\DB;
 final class LearningInsightsService
 {
     /**
-     * @return array{article: int, meaning: int}
+     * @return array{article: int, meaning: int, plural: int}
      */
     public function importantUnlearnedCounts(User $user): array
     {
         return [
             'article' => $this->flagCount($user, SenseFlagContext::Article, important: true, learned: false),
             'meaning' => $this->flagCount($user, SenseFlagContext::Meaning, important: true, learned: false),
+            'plural' => $this->flagCount($user, SenseFlagContext::Plural, important: true, learned: false),
         ];
     }
 
@@ -33,13 +35,14 @@ final class LearningInsightsService
     }
 
     /**
-     * @return array{article: int, meaning: int}
+     * @return array{article: int, meaning: int, plural: int}
      */
     public function difficultWordCounts(User $user): array
     {
         return [
             'article' => $this->countDifficultSenses($user, 'article_quiz'),
             'meaning' => $this->countDifficultSenses($user, 'meaning_quiz'),
+            'plural' => $this->countDifficultSenses($user, 'plural_quiz'),
         ];
     }
 
@@ -81,7 +84,7 @@ final class LearningInsightsService
     }
 
     /**
-     * @return Builder<ArticleQuizAnswer>|Builder<MeaningQuizAnswer>
+     * @return Builder<ArticleQuizAnswer>|Builder<MeaningQuizAnswer>|Builder<PluralQuizAnswer>
      */
     private function difficultSenseQuery(User $user, string $activityType): Builder
     {
@@ -105,6 +108,25 @@ final class LearningInsightsService
                         ->where('user_sense_flags.is_learned', true);
                 })
                 ->groupBy('meaning_quiz_answers.sense_id')
+                ->havingRaw('COUNT(*) >= ?', [$minMistakes]);
+        }
+
+        if ($activityType === 'plural_quiz') {
+            return PluralQuizAnswer::query()
+                ->select('plural_quiz_answers.sense_id')
+                ->join('plural_quiz_sessions', 'plural_quiz_sessions.id', '=', 'plural_quiz_answers.plural_quiz_session_id')
+                ->where('plural_quiz_sessions.user_id', $user->id)
+                ->where('plural_quiz_answers.is_correct', false)
+                ->where('plural_quiz_sessions.completed_at', '>=', $since)
+                ->whereNotExists(function ($query) use ($user): void {
+                    $query->select(DB::raw(1))
+                        ->from('user_sense_flags')
+                        ->whereColumn('user_sense_flags.sense_id', 'plural_quiz_answers.sense_id')
+                        ->where('user_sense_flags.user_id', $user->id)
+                        ->where('user_sense_flags.context', SenseFlagContext::Plural->value)
+                        ->where('user_sense_flags.is_learned', true);
+                })
+                ->groupBy('plural_quiz_answers.sense_id')
                 ->havingRaw('COUNT(*) >= ?', [$minMistakes]);
         }
 

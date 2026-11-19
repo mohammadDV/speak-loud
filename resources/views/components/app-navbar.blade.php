@@ -37,6 +37,7 @@
         ['profile.security', 'Security'],
         ['tickets.index', 'Support tickets'],
         ['learn.der-die-das.history', 'Article quiz progress'],
+        ['learn.plurals.history', 'Plural quiz progress'],
         ['learn.vocabulary-meaning.history', 'Meaning quiz progress'],
     ];
 
@@ -45,6 +46,7 @@
         ['faq.index', 'FAQ'],
         ['learn.index', 'Learn'],
         ['learn.der-die-das', 'Learn der/die/das'],
+        ['learn.plurals', 'Learn noun plurals'],
         ['learn.vocabulary-meaning', 'Learn vocabulary meaning'],
         ['about', 'About'],
         ['contact', 'Contact'],
@@ -57,6 +59,7 @@
         $patterns = match ($route) {
             'learn.index' => ['learn.index', 'learn.*'],
             'learn.der-die-das' => ['learn.der-die-das', 'learn.der-die-das.*'],
+            'learn.plurals' => ['learn.plurals', 'learn.plurals.*'],
             'learn.vocabulary-meaning' => ['learn.vocabulary-meaning', 'learn.vocabulary-meaning.*'],
             'schedule' => ['schedule', 'schedules.*'],
             'messages' => ['messages', 'messages.*'],

@@ -56590,7 +56590,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Haüser",
+          "form": "Häuser",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -56755,7 +56755,7 @@
           "german_noun": {
             "article": "das",
             "grammatical_gender": "neuter",
-            "plural_form": "Haüser"
+            "plural_form": "Häuser"
           }
         }
       ]
@@ -57858,7 +57858,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Rathaüser",
+          "form": "Rathäuser",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -58023,7 +58023,7 @@
           "german_noun": {
             "article": "das",
             "grammatical_gender": "neuter",
-            "plural_form": "Rathaüser"
+            "plural_form": "Rathäuser"
           }
         }
       ]
@@ -61328,7 +61328,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Raüme",
+          "form": "Räume",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -61493,7 +61493,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Raüme"
+            "plural_form": "Räume"
           }
         }
       ]
@@ -72018,7 +72018,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Krankenhaüser",
+          "form": "Krankenhäuser",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -72183,7 +72183,7 @@
           "german_noun": {
             "article": "das",
             "grammatical_gender": "neuter",
-            "plural_form": "Krankenhaüser"
+            "plural_form": "Krankenhäuser"
           }
         }
       ]
@@ -73489,7 +73489,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Baüche",
+          "form": "Bäuche",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -73654,7 +73654,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Baüche"
+            "plural_form": "Bäuche"
           }
         }
       ]
@@ -102949,7 +102949,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Kaufhaüser",
+          "form": "Kaufhäuser",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -103114,7 +103114,7 @@
           "german_noun": {
             "article": "das",
             "grammatical_gender": "neuter",
-            "plural_form": "Kaufhaüser"
+            "plural_form": "Kaufhäuser"
           }
         }
       ]
@@ -105138,11 +105138,11 @@
       ],
       "source_topic": "Einkaufen & Geld",
       "source_topic_en": "Shopping & Money",
-      "source_german": "der Cent, -s",
+      "source_german": "der Cent, -",
       "status": "published",
       "forms": [
         {
-          "form": "Cents",
+          "form": "Cent",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -105307,7 +105307,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Cents"
+            "plural_form": "Cent"
           }
         }
       ]
@@ -105327,7 +105327,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Einkaüfe",
+          "form": "Einkäufe",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -105492,7 +105492,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Einkaüfe"
+            "plural_form": "Einkäufe"
           }
         }
       ]
@@ -105860,11 +105860,11 @@
       ],
       "source_topic": "Einkaufen & Geld",
       "source_topic_en": "Shopping & Money",
-      "source_german": "der Euro, -s",
+      "source_german": "der Euro, -",
       "status": "published",
       "forms": [
         {
-          "form": "Euros",
+          "form": "Euro",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -106029,7 +106029,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Euros"
+            "plural_form": "Euro"
           }
         }
       ]
@@ -148661,7 +148661,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Baüme",
+          "form": "Bäume",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -148826,7 +148826,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Baüme"
+            "plural_form": "Bäume"
           }
         }
       ]
@@ -165914,7 +165914,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Traüme",
+          "form": "Träume",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -166079,7 +166079,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Traüme"
+            "plural_form": "Träume"
           }
         }
       ]

@@ -8,6 +8,7 @@ use App\Domain\Gamification\Models\UserGamificationProfile;
 use App\Domain\Gamification\Models\XpTransaction;
 use App\Domain\Learning\Models\ArticleQuizSession;
 use App\Domain\Learning\Models\MeaningQuizSession;
+use App\Domain\Learning\Models\PluralQuizSession;
 use App\Domain\Learning\Models\UserSenseFlag;
 use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
@@ -220,6 +221,14 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
     public function articleQuizSessions(): HasMany
     {
         return $this->hasMany(ArticleQuizSession::class);
+    }
+
+    /**
+     * @return HasMany<PluralQuizSession, $this>
+     */
+    public function pluralQuizSessions(): HasMany
+    {
+        return $this->hasMany(PluralQuizSession::class);
     }
 
     /**

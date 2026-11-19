@@ -52,4 +52,11 @@ class UserSenseFlagFactory extends Factory
             'context' => SenseFlagContext::Meaning,
         ]);
     }
+
+    public function forPlural(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'context' => SenseFlagContext::Plural,
+        ]);
+    }
 }

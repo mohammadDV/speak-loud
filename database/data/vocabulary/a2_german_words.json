@@ -64615,7 +64615,7 @@
       ],
       "source_topic": "Tiere & Pflanzen",
       "source_topic_en": "Animals & Plants",
-      "source_german": "der Vogel, -",
+      "source_german": "der Vogel, -̈",
       "status": "published",
       "forms": [],
       "senses": [
@@ -64775,7 +64775,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Vogel"
+            "plural_form": "Vögel"
           }
         }
       ]
@@ -90611,7 +90611,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Lebenslaüfe",
+          "form": "Lebensläufe",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -90776,7 +90776,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Lebenslaüfe"
+            "plural_form": "Lebensläufe"
           }
         }
       ]

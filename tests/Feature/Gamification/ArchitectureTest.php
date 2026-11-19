@@ -23,7 +23,7 @@ test('gamification does not import dictionary or quiz models', function () {
             $violations[] = $file->getPathname().' imports Learning models';
         }
 
-        if (preg_match('/ArticleQuizXpService|MeaningQuizXpService/', $contents)) {
+        if (preg_match('/ArticleQuizXpService|MeaningQuizXpService|PluralQuizXpService/', $contents)) {
             $violations[] = $file->getPathname().' defines quiz-specific XP service';
         }
     }

@@ -26347,7 +26347,7 @@
       "status": "published",
       "forms": [
         {
-          "form": "Umtaüsche",
+          "form": "Umtäusche",
           "form_type": "inflected",
           "is_primary": false,
           "grammatical_features": {
@@ -26512,7 +26512,7 @@
           "german_noun": {
             "article": "der",
             "grammatical_gender": "masculine",
-            "plural_form": "Umtaüsche"
+            "plural_form": "Umtäusche"
           }
         }
       ]

@@ -109,10 +109,16 @@ class UserSenseFlagListService
             ->whereNull('lexemes.deleted_at')
             ->whereNull('senses.deleted_at');
 
-        if ($context === SenseFlagContext::Article) {
-            $query->addSelect('german_noun_details.article')
-                ->join('german_noun_details', 'german_noun_details.sense_id', '=', 'senses.id')
-                ->whereNotNull('german_noun_details.article');
+        if ($context === SenseFlagContext::Article || $context === SenseFlagContext::Plural) {
+            $query->addSelect(['german_noun_details.article', 'german_noun_details.plural_form'])
+                ->join('german_noun_details', 'german_noun_details.sense_id', '=', 'senses.id');
+
+            if ($context === SenseFlagContext::Article) {
+                $query->whereNotNull('german_noun_details.article');
+            } else {
+                $query->whereNotNull('german_noun_details.plural_form')
+                    ->where('german_noun_details.plural_form', '!=', '');
+            }
         } else {
             $query->whereExists(function ($exists): void {
                 $exists->selectRaw('1')
@@ -139,9 +145,10 @@ class UserSenseFlagListService
             }
 
             $article = null;
-            if ($context === SenseFlagContext::Article) {
-                $article = strtolower((string) $row->article);
-                if (! GermanArticle::isValid($article)) {
+            if ($context === SenseFlagContext::Article || $context === SenseFlagContext::Plural) {
+                $articleRaw = strtolower((string) ($row->article ?? ''));
+                $article = GermanArticle::isValid($articleRaw) ? $articleRaw : null;
+                if ($context === SenseFlagContext::Article && $article === null) {
                     continue;
                 }
             }
@@ -151,6 +158,9 @@ class UserSenseFlagListService
                 'sense_id' => $senseId,
                 'lemma' => (string) $row->lemma,
                 'article' => $article,
+                'plural_form' => $context === SenseFlagContext::Plural
+                    ? (isset($row->plural_form) ? (string) $row->plural_form : null)
+                    : null,
                 'translation' => $row->translation !== null ? (string) $row->translation : null,
                 'is_important' => (bool) $row->is_important,
                 'is_learned' => (bool) $row->is_learned,

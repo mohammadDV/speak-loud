@@ -56,6 +56,11 @@ class ToggleUserSenseFlag
 
         if ($context === SenseFlagContext::Article) {
             $query->whereHas('germanNounDetail', fn ($detail) => $detail->whereNotNull('article'));
+        } elseif ($context === SenseFlagContext::Plural) {
+            $query->whereHas(
+                'germanNounDetail',
+                fn ($detail) => $detail->whereNotNull('plural_form')->where('plural_form', '!=', ''),
+            );
         } else {
             $query->whereHas('translations', fn ($translations) => $translations
                 ->where('status', ContentStatus::Published->value));
