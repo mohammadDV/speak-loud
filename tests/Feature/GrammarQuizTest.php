@@ -31,7 +31,7 @@ function createGrammarLessonWithQuestions(int $questionCount = 10): array
     CourseTranslation::factory()->create([
         'course_id' => $course->id,
         'language_code' => 'en',
-        'title' => 'German Grammar A1',
+        'title' => 'German Grammar A1/A2',
         'description' => 'Pronouns and present tense',
     ]);
 
@@ -87,7 +87,7 @@ test('guests can view grammar hub and learn index lists grammar lessons', functi
 
     $this->get(route('learn.grammar'))
         ->assertOk()
-        ->assertSee('German Grammar A1');
+        ->assertSee('German Grammar A1/A2');
 });
 
 test('learn hub features prepositions practice with lesson and quiz links', function () {
@@ -221,11 +221,43 @@ test('course lists later lessons and soft-links from lesson one', function () {
         'body_markdown' => "# Prepositions\n\n| Question | Case |\n| --- | --- |\n| Wo? | Dative |\n",
     ]);
 
+    $seventh = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'possessives-welcher-dieser',
+        'status' => LessonContentStatus::Published,
+        'position' => 7,
+        'cefr_level' => 'A2',
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $seventh->id,
+        'language_code' => 'en',
+        'title' => 'Possessives, welcher & dieser',
+        'body_markdown' => "# Possessives\n\n| Stem | Owner |\n| --- | --- |\n| mein- | ich |\n",
+    ]);
+
+    $eighth = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'dative-verbs-wer-wen-wem',
+        'status' => LessonContentStatus::Published,
+        'position' => 8,
+        'cefr_level' => 'A2',
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $eighth->id,
+        'language_code' => 'en',
+        'title' => 'Dative Verbs & wer/wen/wem',
+        'body_markdown' => "# Dative Verbs\n\n| Verb | Case |\n| --- | --- |\n| helfen | Dative |\n",
+    ]);
+
     expect($fixture['lesson']->nextLesson()?->code)->toBe('modal-verbs')
         ->and($second->nextLesson()?->code)->toBe('questions-and-word-order')
         ->and($third->nextLesson()?->code)->toBe('plurals-articles-negation')
         ->and($fourth->nextLesson()?->code)->toBe('cases-pronouns-objects')
-        ->and($fifth->nextLesson()?->code)->toBe('prepositions-time-and-place');
+        ->and($fifth->nextLesson()?->code)->toBe('prepositions-time-and-place')
+        ->and($sixth->nextLesson()?->code)->toBe('possessives-welcher-dieser')
+        ->and($seventh->nextLesson()?->code)->toBe('dative-verbs-wer-wen-wem');
 
     $this->get(route('learn.grammar.course', ['course' => 'de-grammar-a1']))
         ->assertOk()
@@ -234,7 +266,9 @@ test('course lists later lessons and soft-links from lesson one', function () {
         ->assertSee('Questions & Word Order')
         ->assertSee('Plurals, Articles & Negation')
         ->assertSee('Cases, Pronouns & Objects')
-        ->assertSee('Prepositions: Time & Place');
+        ->assertSee('Prepositions: Time & Place')
+        ->assertSee('Possessives, welcher & dieser')
+        ->assertSee('Dative Verbs & wer/wen/wem');
 
     $this->get(route('learn.grammar.lesson', [
         'course' => 'de-grammar-a1',
@@ -289,8 +323,28 @@ test('course lists later lessons and soft-links from lesson one', function () {
     ]))
         ->assertOk()
         ->assertSee('Prepositions: Time & Place')
+        ->assertSee('Possessives, welcher & dieser')
         ->assertSee('Practice this lesson')
         ->assertSee('Wo?');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'possessives-welcher-dieser',
+    ]))
+        ->assertOk()
+        ->assertSee('Possessives, welcher & dieser')
+        ->assertSee('Dative Verbs & wer/wen/wem')
+        ->assertSee('Practice this lesson')
+        ->assertSee('mein-');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'dative-verbs-wer-wen-wem',
+    ]))
+        ->assertOk()
+        ->assertSee('Dative Verbs & wer/wen/wem')
+        ->assertSee('Practice this lesson')
+        ->assertSee('helfen');
 });
 
 test('guest can complete a grammar quiz without persisting', function () {

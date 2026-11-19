@@ -20,7 +20,7 @@ test('lessons import upserts course lesson and questions idempotently', function
             'status' => 'published',
             'position' => 1,
             'translations' => [
-                ['language_code' => 'en', 'title' => 'German Grammar A1', 'description' => 'Test course'],
+                ['language_code' => 'en', 'title' => 'German Grammar A1/A2', 'description' => 'Test course'],
             ],
         ],
         'lessons' => [
@@ -95,7 +95,8 @@ test('lessons import resolves course and all question bank files', function () {
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_03_questions.json'))
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_04_questions.json'))
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_05_questions.json'))
-        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_06_questions.json'));
+        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_06_questions.json'))
+        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_07_questions.json'));
 });
 
 test('lessons import dry run does not write', function () {

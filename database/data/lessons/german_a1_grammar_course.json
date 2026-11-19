@@ -7,7 +7,9 @@
       "questions-and-word-order",
       "plurals-articles-negation",
       "cases-pronouns-objects",
-      "prepositions-time-and-place"
+      "prepositions-time-and-place",
+      "possessives-welcher-dieser",
+      "dative-verbs-wer-wen-wem"
     ],
     "translation_languages": [
       "en",
@@ -19,34 +21,34 @@
   },
   "course": {
     "code": "de-grammar-a1",
-    "cefr_level": "A1",
+    "cefr_level": "A1-A2",
     "status": "published",
     "position": 1,
     "translations": [
       {
         "language_code": "en",
-        "title": "German Grammar A1",
-        "description": "Step-by-step A1 German grammar: pronouns, modals, questions, articles, cases, and prepositions of time and place."
+        "title": "German Grammar A1/A2",
+        "description": "Step-by-step German grammar A1–A2: pronouns, modals, questions, articles, cases, prepositions, possessives, and dative verbs."
       },
       {
         "language_code": "es",
-        "title": "Gramática alemana A1",
-        "description": "Gramática alemana A1 paso a paso: pronombres, modales, preguntas, artículos, casos y preposiciones de tiempo y lugar."
+        "title": "Gramática alemana A1/A2",
+        "description": "Gramática alemana A1–A2 paso a paso: pronombres, modales, preguntas, artículos, casos, preposiciones, posesivos y verbos dativos."
       },
       {
         "language_code": "fa",
-        "title": "گرامر آلمانی A1",
-        "description": "گرامر آلمانی A1 گام‌به‌گام: ضمایر، افعال کمکی، سؤال‌ها، حروف تعریف، حالت‌ها و حروف اضافهٔ زمان و مکان."
+        "title": "گرامر آلمانی A1/A2",
+        "description": "گرامر آلمانی A1–A2 گام‌به‌گام: ضمایر، افعال کمکی، سؤال‌ها، حروف تعریف، حالت‌ها، حروف اضافه، ملکی‌ها و افعال داتیو."
       },
       {
         "language_code": "ar",
-        "title": "قواعد الألمانية A1",
-        "description": "قواعد ألمانية A1 خطوة بخطوة: الضمائر والأفعال المساعدة والأسئلة وأدوات التعريف والحالات وحروف جر الزمان والمكان."
+        "title": "قواعد الألمانية A1/A2",
+        "description": "قواعد ألمانية A1–A2 خطوة بخطوة: الضمائر والأفعال المساعدة والأسئلة وأدوات التعريف والحالات وحروف الجر وضمائر الملكية وأفعال الداتيف."
       },
       {
         "language_code": "tr",
-        "title": "Almanca Dilbilgisi A1",
-        "description": "Adım adım A1 Almanca dilbilgisi: zamirler, modaller, sorular, artikeller, haller ve zaman-yer edatları."
+        "title": "Almanca Dilbilgisi A1/A2",
+        "description": "Adım adım Almanca dilbilgisi A1–A2: zamirler, modaller, sorular, artikeller, haller, edatlar, iyelikler ve datif fiiller."
       }
     ]
   },
@@ -246,6 +248,72 @@
           "language_code": "tr",
           "title": "Edatlar: zaman ve yer",
           "body_markdown": "# Edatlar: zaman ve yer (A1/A2)\n\n**Zaman edatları**, **yalnızca datif**, **yalnızca akkuzatif (FUDOG)**, **Wechselpräpositionen** ve **Wohin? / Wo? / Woher?** sistemini öğrenin.\n\n---\n\n## Adım 1: Zaman\n\n| Edat | Kullanım | Örnekler |\n| --- | --- | --- |\n| **im** | mevsimler, aylar | **im** Sommer |\n| **am** | günler, günün saatleri | **am** Montag |\n| **in der** | gece | **in der** Nacht |\n| **um** | saat | **um** 9 Uhr |\n| **seit** | -dir / -dır (+ Dat.) | **seit** zwei Jahren |\n\nYıllar **edatsız**: *2025*.\n\n---\n\n## Adım 2: Her zaman datif\n\n**aus, bei, mit, nach, seit, von, zu** — kısaltmalar: **beim, vom, zum, zur**\n\n---\n\n## Adım 3: Her zaman akkuzatif (FUDOG)\n\n**für, um, durch, ohne, gegen**\n\n---\n\n## Adım 4: Wechselpräpositionen\n\n* **Wo?** → **Datif**\n* **Wohin?** → **Akkuzatif**\n\n---\n\n## Adım 5: Yer matrisi\n\nArtikelsiz şehir: *nach / in / aus* · ev: *nach Hause / zu Hause / von zu Hause*\n"
+        }
+      ]
+    },
+    {
+      "code": "possessives-welcher-dieser",
+      "cefr_level": "A2",
+      "status": "published",
+      "position": 7,
+      "translations": [
+        {
+          "language_code": "en",
+          "title": "Possessives, welcher & dieser",
+          "body_markdown": "# German Possessive, Interrogative & Demonstrative Articles (A2)\n\nLearn **possessive articles** (*mein, dein, sein…*), **interrogative** *welch-*, and **demonstrative** *dies-* in Nominativ, Akkusativ, and Dativ.\n\n---\n\n## Step 1: Possessive Articles (*Possessivartikel*)\n\nPossessive articles show ownership (*my, your, his, her, our, their*).\n\n### 1. Choose the stem (who owns it?)\n\n| Owner | Stem | Meaning |\n| :--- | :--- | :--- |\n| **ich** | **mein-** | my |\n| **du** | **dein-** | your (singular informal) |\n| **er / es** | **sein-** | his / its |\n| **sie** (she) | **ihr-** | her |\n| **wir** | **unser-** | our |\n| **ihr** (you pl.) | **euer- / eur-** | your (plural informal) |\n| **sie** (they) | **ihr-** | their |\n| **Sie** (formal) | **Ihr-** | Your (always capitalized) |\n\n> **euer rule:** When *euer* takes an ending (*-e, -en, -em, -er*), it drops the inner **-e-**: **eure**, **euren**, **eurem**, **eurer**.\n\n### 2. Choose the ending (gender & case of the noun)\n\nPossessive articles take the **same endings as *kein-***:\n\n| Case | Masculine (*der Vater*) | Neuter (*das Kind*) | Feminine (*die Mutter*) | Plural (*die Eltern*) |\n| :--- | :--- | :--- | :--- | :--- |\n| **Nominativ** | mein / euer Vater | mein / euer Kind | mein**e** / eur**e** Mutter | mein**e** / eur**e** Eltern |\n| **Akkusativ** | mein**en** / eur**en** Vater | mein / euer Kind | mein**e** / eur**e** Mutter | mein**e** / eur**e** Eltern |\n| **Dativ** | mein**em** / eur**em** Vater | mein**em** / eur**em** Kind | mein**er** / eur**er** Mutter | mein**en** / eur**en** Eltern |\n\n> **sein vs. ihr:** The stem depends on the **owner**; the ending depends on the **owned noun**.\n> * *Das ist Jörg und **seine** Tasche.* (male owner + feminine noun)\n> * *Das ist Jasmin und **ihr** Laptop.* (female owner + masculine noun)\n\n---\n\n## Step 2: *welch-* and *dies-*\n\n*Welch-* (*which…?*) and *dies-* (*this…*) take endings like the **definite articles** (*der / das / die*).\n\n| Case | Masculine | Neuter | Feminine | Plural |\n| :--- | :--- | :--- | :--- | :--- |\n| **Nominativ** | welch**er** / dies**er** | welch**es** / dies**es** | welch**e** / dies**e** | welch**e** / dies**e** |\n| **Akkusativ** | welch**en** / dies**en** | welch**es** / dies**es** | welch**e** / dies**e** | welch**e** / dies**e** |\n| **Dativ** | welch**em** / dies**em** | welch**em** / dies**em** | welch**er** / dies**er** | welch**en** / dies**en** |\n\n### Standing alone as pronouns\n\nIf the noun was already mentioned, keep the same ending:\n\n* *Welch**er** Mantel? — Dies**er**!*\n* *Welch**es** Kleid? — Dies**es**!*\n* *Welch**e** Tasche findest du schöner? — Ich finde dies**e** schöner.*\n\n---\n\n## Step 3: Useful Examples\n\n### Possessives\n* Das ist **mein** Vater. / Ich sehe **meinen** Vater. / Ich helfe **meinem** Vater.\n* Das ist **ihre** Tasche. / Er kauft **seine** Jacke.\n* Ist das **euer** Auto? / Wo sind **eure** Kinder?\n* Mit **Ihrer** Erlaubnis… (formal)\n\n### welch- / dies-\n* **Welcher** Mantel gefällt dir? — **Dieser**!\n* Mit **welcher** Freundin gehst du? — Mit Anna.\n* Zu **welchem** Arzt gehst du?\n* Ich mag **diesen** Film.\n"
+        },
+        {
+          "language_code": "es",
+          "title": "Posesivos, welcher y dieser",
+          "body_markdown": "# Posesivos, welcher y dieser (A2)\n\nAprende **artículos posesivos** (*mein, dein, sein…*), **welch-** y **dies-** en Nominativ, Akkusativ y Dativ.\n\n---\n\n## Paso 1: Posesivos\n\n| Dueño | Raíz |\n| --- | --- |\n| ich | mein- |\n| du | dein- |\n| er / es | sein- |\n| sie (ella) | ihr- |\n| wir | unser- |\n| ihr (vosotros) | euer- / eur- |\n| sie (ellos) | ihr- |\n| Sie | Ihr- |\n\n*euer* pierde la **-e-** interior con terminación: *eure, euren, eurem, eurer*.\n\nLas terminaciones son como **kein-**.\n\n---\n\n## Paso 2: welch- / dies-\n\nTerminaciones como **der / das / die**.\n\n| Caso | Masc. | Neut. | Fem. | Pl. |\n| --- | --- | --- | --- | --- |\n| Nom. | -er | -es | -e | -e |\n| Akk. | -en | -es | -e | -e |\n| Dat. | -em | -em | -er | -en |\n"
+        },
+        {
+          "language_code": "fa",
+          "title": "ملکی، welcher و dieser",
+          "body_markdown": "# ملکی، welcher و dieser (A2)\n\nیاد بگیرید **حروف تعریف ملکی** (*mein, dein, sein…*)، **welch-** و **dies-** در Nominativ، Akkusativ و Dativ.\n\n---\n\n## گام ۱: ملکی‌ها\n\n| مالک | ریشه |\n| --- | --- |\n| ich | mein- |\n| du | dein- |\n| er / es | sein- |\n| sie (او مؤنث) | ihr- |\n| wir | unser- |\n| ihr (شما جمع) | euer- / eur- |\n| sie (آن‌ها) | ihr- |\n| Sie | Ihr- |\n\n*euer* با پایان **-e-** میانی را از دست می‌دهد: *eure, euren…*\n\nپایان‌ها مانند **kein-**.\n\n---\n\n## گام ۲: welch- / dies-\n\nپایان‌ها مانند **der / das / die**.\n"
+        },
+        {
+          "language_code": "ar",
+          "title": "ضمائر الملكية و welcher و dieser",
+          "body_markdown": "# ضمائر الملكية و welcher و dieser (A2)\n\nتعلّم **أدوات التعريف الملكية** (*mein, dein, sein…*) و**welch-** و**dies-** في Nominativ و Akkusativ و Dativ.\n\n---\n\n## الخطوة 1: الملكية\n\n| المالك | الجذر |\n| --- | --- |\n| ich | mein- |\n| du | dein- |\n| er / es | sein- |\n| sie (هي) | ihr- |\n| wir | unser- |\n| ihr (أنتم) | euer- / eur- |\n| sie (هم) | ihr- |\n| Sie | Ihr- |\n\n*euer* تسقط **-e-** الداخلية مع النهاية: *eure, euren…*\n\nالنهايات مثل **kein-**.\n\n---\n\n## الخطوة 2: welch- / dies-\n\nالنهايات مثل **der / das / die**.\n"
+        },
+        {
+          "language_code": "tr",
+          "title": "İyelikler, welcher ve dieser",
+          "body_markdown": "# İyelikler, welcher ve dieser (A2)\n\n**İyelik artikelleri** (*mein, dein, sein…*), **welch-** ve **dies-** biçimlerini Nominativ, Akkuzatif ve Datifte öğrenin.\n\n---\n\n## Adım 1: İyelikler\n\n| Sahip | Gövde |\n| --- | --- |\n| ich | mein- |\n| du | dein- |\n| er / es | sein- |\n| sie (o, dişil) | ihr- |\n| wir | unser- |\n| ihr (siz, çoğul) | euer- / eur- |\n| sie (onlar) | ihr- |\n| Sie | Ihr- |\n\n*euer* ek alınca iç **-e-** düşer: *eure, euren…*\n\nEkler **kein-** ile aynıdır.\n\n---\n\n## Adım 2: welch- / dies-\n\nEkler **der / das / die** gibidir.\n"
+        }
+      ]
+    },
+    {
+      "code": "dative-verbs-wer-wen-wem",
+      "cefr_level": "A2",
+      "status": "published",
+      "position": 8,
+      "translations": [
+        {
+          "language_code": "en",
+          "title": "Dative Verbs & wer/wen/wem",
+          "body_markdown": "# German Dative Verbs & Case Question Words (A2)\n\nLearn verbs that take a **Dative** object, fixed dative expressions, and the question words **wer / was / wen / wem**.\n\n---\n\n## Step 1: Verbs with Nominative and Dative\n\nNormally a sentence has a subject (**Nominativ**) and a direct object (**Akkusativ**). Some German verbs always take a **Dative** object instead.\n\n### Group A: Person (Nominativ) → Person (Dativ)\n\nA person does an action directed toward another person (Dative):\n\n| Verb | Meaning | Example |\n| :--- | :--- | :--- |\n| **antworten** | to answer | *Der Mann antwortet **der Frau**.* |\n| **gratulieren** | to congratulate | *Die Eltern gratulieren **der Tochter**.* |\n| **helfen** | to help | *Das Kind hilft **dem Mann**.* |\n| **zuhören** | to listen to *(separable)* | *Die Kinder hören **der Oma** zu.* |\n| **glauben** | to believe | *Ich glaube **dir**.* |\n| **danken** | to thank | *Ich danke **Ihnen**.* |\n\n> **helfen** has a stem change: *helfen* → er/sie/es **hilft**.\n\n### Group B: Thing (Nominativ) → Person (Dativ)\n\nThe **thing** is the grammatical subject (it controls the verb). The person who experiences it is in the **Dative**:\n\n| Verb | Meaning | Example |\n| :--- | :--- | :--- |\n| **schmecken** | to taste good to | *Die Torte schmeckt **der Frau**.* |\n| **gefallen** | to please / to like | *Das Haus gefällt **den Leuten**.* |\n| **gehören** | to belong to | *Das Auto gehört **dem Chef**.* |\n| **passen** | to fit / to suit | *Die Schuhe passen **dem Mann** gut.* |\n| **stehen** | to look good on | *Die Jacke steht **dem Mädchen** nicht gut.* |\n| **wehtun** | to hurt *(separable)* | *Der Kopf tut **der Frau** weh.* |\n\n### Group C: Fixed Dative Expressions\n\n| Expression | Meaning | Examples |\n| :--- | :--- | :--- |\n| **Es tut [Dativ] leid.** | to be sorry | *Es tut **mir** leid.* / *Es tut **ihm** leid.* |\n| **Wie geht es [Dativ]?** | How are you / is he…? | *Wie geht es **Ihnen**?* / *Es geht **ihr** schlecht.* |\n\n---\n\n## Step 2: Question Words by Case (*wer, was, wen, wem*)\n\n| Case | People | Things |\n| :--- | :--- | :--- |\n| **Nominativ** (subject) | **Wer?** | **Was?** |\n| **Akkusativ** (direct object) | **Wen?** | **Was?** |\n| **Dativ** (indirect object) | **Wem?** | *(no bare dative “what?” — dative objects without a preposition are people)* |\n\nMemory tip: *wer → der/er*, *wen → den/ihn*, *wem → dem/ihm*, *was → das/es*.\n\n### Prepositions + *wen* / *wem*\n\nThe preposition decides the case:\n\n**Dative prepositions** (*mit, bei, von, zu*) + **wem**\n\n- ***Mit wem** gehst du ins Kino?*\n- ***Bei wem** wohnst du?*\n- ***Von wem** ist die Mail?*\n- ***Zu wem** gehst du?*\n\n**Accusative prepositions** (*für, ohne*) + **wen**\n\n- ***Für wen** kaufst du das Geschenk?*\n- ***Ohne wen** willst du nicht Urlaub machen?*\n\n---\n\n## Step 3: Useful Contrasts\n\n| Accusative verb | Dative verb |\n| :--- | :--- |\n| *Der Chef **fragt** die Assistentin.* | *Die Assistentin **antwortet** dem Chef.* |\n| *Der Mann **schenkt** der Frau Blumen.* | *Die Blumen **gefallen** der Frau.* |\n| *Der Kellner **serviert** den Gästen das Essen.* | *Das Essen **schmeckt** den Gästen.* |\n| *Die Eltern **schenken** dem Sohn ein Auto.* | *Das Auto **gehört** dem Sohn.* |\n\nAlways add **-n** in **Dative plural**: *den Leuten*, *den Freunden*, *den Gästen*.\n"
+        },
+        {
+          "language_code": "es",
+          "title": "Verbos dativos y wer/wen/wem",
+          "body_markdown": "# Verbos dativos y wer/wen/wem (A2)\n\nAprende verbos con objeto **dativo**, expresiones fijas y las palabras interrogativas **wer / was / wen / wem**.\n\n---\n\n## Paso 1: Verbos con dativo\n\n### Grupo A: persona → persona (Dativ)\n\n*antworten, gratulieren, helfen, zuhören, glauben, danken*\n\n*Das Kind hilft **dem Mann**.* · *Ich glaube **dir**.*\n\n*helfen* → er/sie/es **hilft**.\n\n### Grupo B: cosa (Nominativ) → persona (Dativ)\n\n*schmecken, gefallen, gehören, passen, stehen, wehtun*\n\n*Das Auto gehört **dem Chef**.* · *Der Kopf tut **der Frau** weh.*\n\n### Grupo C: expresiones fijas\n\n*Es tut **mir** leid.* · *Wie geht es **Ihnen**?*\n\n---\n\n## Paso 2: wer / was / wen / wem\n\n| Caso | Personas | Cosas |\n| --- | --- | --- |\n| Nominativ | **Wer?** | **Was?** |\n| Akkusativ | **Wen?** | **Was?** |\n| Dativ | **Wem?** | — |\n\n*mit/bei/von/zu* + **wem** · *für/ohne* + **wen**\n"
+        },
+        {
+          "language_code": "fa",
+          "title": "افعال داتیو و wer/wen/wem",
+          "body_markdown": "# افعال داتیو و wer/wen/wem (A2)\n\nیاد بگیرید افعالی که مفعول **داتیو** می‌گیرند، عبارت‌های ثابت، و واژه‌های پرسشی **wer / was / wen / wem**.\n\n---\n\n## گام ۱: افعال با داتیو\n\n### گروه A: شخص → شخص (داتیو)\n\n*antworten, gratulieren, helfen, zuhören, glauben, danken*\n\n*Das Kind hilft **dem Mann**.* · *Ich glaube **dir**.*\n\n*helfen* → er/sie/es **hilft**.\n\n### گروه B: چیز (Nominativ) → شخص (داتیو)\n\n*schmecken, gefallen, gehören, passen, stehen, wehtun*\n\n*Das Auto gehört **dem Chef**.* · *Der Kopf tut **der Frau** weh.*\n\n### گروه C: عبارت‌های ثابت\n\n*Es tut **mir** leid.* · *Wie geht es **Ihnen**?*\n\n---\n\n## گام ۲: wer / was / wen / wem\n\n| حالت | افراد | چیزها |\n| --- | --- | --- |\n| Nominativ | **Wer?** | **Was?** |\n| Akkusativ | **Wen?** | **Was?** |\n| Dativ | **Wem?** | — |\n\n*mit/bei/von/zu* + **wem** · *für/ohne* + **wen**\n"
+        },
+        {
+          "language_code": "ar",
+          "title": "أفعال الداتيف و wer/wen/wem",
+          "body_markdown": "# أفعال الداتيف و wer/wen/wem (A2)\n\nتعلّم الأفعال التي تأخذ مفعولاً في **الداتيف**، والتعابير الثابتة، وأسئلة **wer / was / wen / wem**.\n\n---\n\n## الخطوة 1: أفعال مع الداتيف\n\n### المجموعة A: شخص → شخص (داتيف)\n\n*antworten, gratulieren, helfen, zuhören, glauben, danken*\n\n*Das Kind hilft **dem Mann**.* · *Ich glaube **dir**.*\n\n*helfen* → er/sie/es **hilft**.\n\n### المجموعة B: شيء (Nominativ) → شخص (داتيف)\n\n*schmecken, gefallen, gehören, passen, stehen, wehtun*\n\n*Das Auto gehört **dem Chef**.* · *Der Kopf tut **der Frau** weh.*\n\n### المجموعة C: تعابير ثابتة\n\n*Es tut **mir** leid.* · *Wie geht es **Ihnen**?*\n\n---\n\n## الخطوة 2: wer / was / wen / wem\n\n| الحالة | الأشخاص | الأشياء |\n| --- | --- | --- |\n| Nominativ | **Wer?** | **Was?** |\n| Akkusativ | **Wen?** | **Was?** |\n| Dativ | **Wem?** | — |\n\n*mit/bei/von/zu* + **wem** · *für/ohne* + **wen**\n"
+        },
+        {
+          "language_code": "tr",
+          "title": "Datif fiiller ve wer/wen/wem",
+          "body_markdown": "# Datif fiiller ve wer/wen/wem (A2)\n\n**Datif** nesne alan fiilleri, kalıp ifadeleri ve **wer / was / wen / wem** soru sözcüklerini öğrenin.\n\n---\n\n## Adım 1: Datif alan fiiller\n\n### Grup A: kişi → kişi (Datif)\n\n*antworten, gratulieren, helfen, zuhören, glauben, danken*\n\n*Das Kind hilft **dem Mann**.* · *Ich glaube **dir**.*\n\n*helfen* → er/sie/es **hilft**.\n\n### Grup B: şey (Nominativ) → kişi (Datif)\n\n*schmecken, gefallen, gehören, passen, stehen, wehtun*\n\n*Das Auto gehört **dem Chef**.* · *Der Kopf tut **der Frau** weh.*\n\n### Grup C: kalıp ifadeler\n\n*Es tut **mir** leid.* · *Wie geht es **Ihnen**?*\n\n---\n\n## Adım 2: wer / was / wen / wem\n\n| Hâl | Kişiler | Şeyler |\n| --- | --- | --- |\n| Nominativ | **Wer?** | **Was?** |\n| Akkusativ | **Wen?** | **Was?** |\n| Dativ | **Wem?** | — |\n\n*mit/bei/von/zu* + **wem** · *für/ohne* + **wen**\n"
         }
       ]
     }
