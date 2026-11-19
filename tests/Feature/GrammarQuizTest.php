@@ -14,6 +14,7 @@ use App\Domain\Learning\Services\GrammarQuizService;
 use App\Domain\Learning\Services\QuizCompletionVerifier;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
+use Livewire\Exceptions\MethodNotFoundException;
 use Livewire\Volt\Volt;
 
 /**
@@ -80,11 +81,48 @@ test('guests can view grammar hub and learn index lists grammar lessons', functi
 
     $this->get(route('learn.index'))
         ->assertOk()
-        ->assertSee('Grammar lessons');
+        ->assertSee('Grammar lessons')
+        ->assertSee('Prepositions')
+        ->assertSee(route('learn.prepositions'), false);
 
     $this->get(route('learn.grammar'))
         ->assertOk()
         ->assertSee('German Grammar A1');
+});
+
+test('learn hub features prepositions practice with lesson and quiz links', function () {
+    $fixture = createGrammarLessonWithQuestions(5);
+
+    $lesson = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'prepositions-time-and-place',
+        'status' => LessonContentStatus::Published,
+        'position' => 6,
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $lesson->id,
+        'language_code' => 'en',
+        'title' => 'Prepositions: Time & Place',
+        'body_markdown' => "# Prepositions\n\nWo? uses dative.",
+    ]);
+
+    $this->get(route('learn.prepositions'))
+        ->assertOk()
+        ->assertSee('Prepositions')
+        ->assertSee('Practice prepositions')
+        ->assertSee('Study the lesson')
+        ->assertSee(route('learn.grammar.lesson', [
+            'course' => 'de-grammar-a1',
+            'lesson' => 'prepositions-time-and-place',
+        ]), false)
+        ->assertSee('/learn/grammar/quiz?', false)
+        ->assertSee('lessons='.$lesson->id, false)
+        ->assertSee('course=de-grammar-a1', false);
+});
+
+test('grammar course pages render published lessons', function () {
+    createGrammarLessonWithQuestions(5);
 
     $this->get(route('learn.grammar.course', ['course' => 'de-grammar-a1']))
         ->assertOk()
@@ -169,10 +207,25 @@ test('course lists later lessons and soft-links from lesson one', function () {
         'body_markdown' => "# Cases\n\n| Case | Example |\n| --- | --- |\n| Accusative | den Mann |\n",
     ]);
 
+    $sixth = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'prepositions-time-and-place',
+        'status' => LessonContentStatus::Published,
+        'position' => 6,
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $sixth->id,
+        'language_code' => 'en',
+        'title' => 'Prepositions: Time & Place',
+        'body_markdown' => "# Prepositions\n\n| Question | Case |\n| --- | --- |\n| Wo? | Dative |\n",
+    ]);
+
     expect($fixture['lesson']->nextLesson()?->code)->toBe('modal-verbs')
         ->and($second->nextLesson()?->code)->toBe('questions-and-word-order')
         ->and($third->nextLesson()?->code)->toBe('plurals-articles-negation')
-        ->and($fourth->nextLesson()?->code)->toBe('cases-pronouns-objects');
+        ->and($fourth->nextLesson()?->code)->toBe('cases-pronouns-objects')
+        ->and($fifth->nextLesson()?->code)->toBe('prepositions-time-and-place');
 
     $this->get(route('learn.grammar.course', ['course' => 'de-grammar-a1']))
         ->assertOk()
@@ -180,7 +233,8 @@ test('course lists later lessons and soft-links from lesson one', function () {
         ->assertSee('Modal Verbs')
         ->assertSee('Questions & Word Order')
         ->assertSee('Plurals, Articles & Negation')
-        ->assertSee('Cases, Pronouns & Objects');
+        ->assertSee('Cases, Pronouns & Objects')
+        ->assertSee('Prepositions: Time & Place');
 
     $this->get(route('learn.grammar.lesson', [
         'course' => 'de-grammar-a1',
@@ -225,8 +279,18 @@ test('course lists later lessons and soft-links from lesson one', function () {
     ]))
         ->assertOk()
         ->assertSee('Cases, Pronouns & Objects')
+        ->assertSee('Prepositions: Time & Place')
         ->assertSee('Practice this lesson')
         ->assertSee('den Mann');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'prepositions-time-and-place',
+    ]))
+        ->assertOk()
+        ->assertSee('Prepositions: Time & Place')
+        ->assertSee('Practice this lesson')
+        ->assertSee('Wo?');
 });
 
 test('guest can complete a grammar quiz without persisting', function () {
@@ -245,6 +309,7 @@ test('guest can complete a grammar quiz without persisting', function () {
         ->call('startQuiz')
         ->assertSet('phase', 'quiz')
         ->tap(function ($component) use ($answersById) {
+            expect($component->get('full_cards') ?? null)->toBeNull();
             $answers = [];
             foreach ($component->get('cards') as $card) {
                 expect($card)->toHaveKey('options')
@@ -259,6 +324,17 @@ test('guest can complete a grammar quiz without persisting', function () {
         ->assertSet('percentage', 100);
 
     expect(GrammarQuizSession::query()->count())->toBe(0);
+});
+
+test('grammar quiz does not expose a loadCards action that leaks answers', function () {
+    $fixture = createGrammarLessonWithQuestions(8);
+
+    $component = Volt::test('learn.grammar.quiz')
+        ->set('lesson_ids', [$fixture['lesson']->id])
+        ->set('word_count', 5)
+        ->set('quiz_type', GrammarQuizType::MultipleChoice->value);
+
+    expect(fn () => $component->call('loadCards'))->toThrow(MethodNotFoundException::class);
 });
 
 test('authenticated user grammar quiz results are persisted and award progress', function () {

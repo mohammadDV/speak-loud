@@ -20,7 +20,7 @@ state([
 mount(function (GetGamificationDashboard $dashboard, LeaderboardService $leaderboard) {
     Seo::share([
         'seoTitle' => 'Learn German',
-        'seoDescription' => 'Practice German with article quizzes and vocabulary meaning quizzes. Track XP, streaks, and weekly progress.',
+        'seoDescription' => 'Practice German with article quizzes, vocabulary meaning, prepositions, and grammar lessons. Track XP, streaks, and weekly progress.',
         'seoUrl' => route('learn.index'),
     ]);
 
@@ -288,6 +288,21 @@ $skipGoalSetup = function (SkipDailyGoalOnboarding $action) {
                 </a>
             </p>
         @endauth
+
+        <a href="{{ route('learn.prepositions') }}" wire:navigate class="block group rounded-3xl bg-white border border-[#3D2B1F]/10 p-5 md:p-6 shadow-sm hover:border-[#FF8C42]/40 hover:shadow-md transition">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-lg font-bold text-[#3D2B1F] group-hover:text-[#FF8C42] transition-colors">Prepositions</h3>
+                        <span class="rounded-full bg-[#FFF0E0] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#FF8C42]">Essential</span>
+                    </div>
+                    <p class="text-sm text-[#3D2B1F]/65 mt-1">
+                        Time and place prepositions: im/am/um, mit/zu/nach, FUDOG, Wechselpräpositionen, and Wohin/Wo/Woher.
+                    </p>
+                </div>
+                <span class="shrink-0 text-[#FF8C42] font-semibold text-sm mt-1" aria-hidden="true">→</span>
+            </div>
+        </a>
 
         <a href="{{ route('learn.grammar') }}" wire:navigate class="block group rounded-3xl bg-white border border-[#3D2B1F]/10 p-5 md:p-6 shadow-sm hover:border-[#FF8C42]/40 hover:shadow-md transition">
             <div class="flex items-start justify-between gap-3">

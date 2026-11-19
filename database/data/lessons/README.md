@@ -12,6 +12,7 @@ JSON content for Learning courses, lessons, and grammar quiz question banks.
 | `german_grammar_lesson_03.md` / `*_03_questions.json` / `generate_lesson_03_questions.py` | Questions & word order |
 | `german_grammar_lesson_04.md` / `*_04_questions.json` / `generate_lesson_04_questions.py` | Plurals, articles & negation |
 | `german_grammar_lesson_05.md` / `*_05_questions.json` / `generate_lesson_05_questions.py` | Cases, pronouns & objects |
+| `german_grammar_lesson_06.md` / `*_06_questions.json` / `generate_lesson_06_questions.py` | Prepositions: time & place |
 | `update_course_lesson_0N.py` | Upsert localized lesson N into the course JSON |
 
 ## Import

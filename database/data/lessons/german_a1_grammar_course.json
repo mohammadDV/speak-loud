@@ -6,7 +6,8 @@
       "modal-verbs",
       "questions-and-word-order",
       "plurals-articles-negation",
-      "cases-pronouns-objects"
+      "cases-pronouns-objects",
+      "prepositions-time-and-place"
     ],
     "translation_languages": [
       "en",
@@ -25,27 +26,27 @@
       {
         "language_code": "en",
         "title": "German Grammar A1",
-        "description": "Step-by-step A1 German grammar: from pronouns and modals to cases, articles, and object word order."
+        "description": "Step-by-step A1 German grammar: pronouns, modals, questions, articles, cases, and prepositions of time and place."
       },
       {
         "language_code": "es",
         "title": "Gramática alemana A1",
-        "description": "Gramática alemana A1 paso a paso: de pronombres y modales a casos, artículos y orden de objetos."
+        "description": "Gramática alemana A1 paso a paso: pronombres, modales, preguntas, artículos, casos y preposiciones de tiempo y lugar."
       },
       {
         "language_code": "fa",
         "title": "گرامر آلمانی A1",
-        "description": "گرامر آلمانی A1 گام‌به‌گام: از ضمایر و افعال کمکی تا حالت‌ها، حروف تعریف و ترتیب مفعول‌ها."
+        "description": "گرامر آلمانی A1 گام‌به‌گام: ضمایر، افعال کمکی، سؤال‌ها، حروف تعریف، حالت‌ها و حروف اضافهٔ زمان و مکان."
       },
       {
         "language_code": "ar",
         "title": "قواعد الألمانية A1",
-        "description": "قواعد ألمانية A1 خطوة بخطوة: من الضمائر والأفعال المساعدة إلى الحالات وأدوات التعريف وترتيب المفاعيل."
+        "description": "قواعد ألمانية A1 خطوة بخطوة: الضمائر والأفعال المساعدة والأسئلة وأدوات التعريف والحالات وحروف جر الزمان والمكان."
       },
       {
         "language_code": "tr",
         "title": "Almanca Dilbilgisi A1",
-        "description": "Adım adım A1 Almanca dilbilgisi: zamirlerden ve modallardan hallere, artikellere ve nesne sırasına."
+        "description": "Adım adım A1 Almanca dilbilgisi: zamirler, modaller, sorular, artikeller, haller ve zaman-yer edatları."
       }
     ]
   },
@@ -212,6 +213,39 @@
           "language_code": "tr",
           "title": "Hallar, zamirler ve nesneler",
           "body_markdown": "# Hallar, zamirler ve nesneler (A1/A2)\n\n**Akkuzatif**, **datif**, **kişi zamirleri** ve **iki nesneli sözdizimini** öğrenin.\n\n---\n\n## Adım 1: Akkuzatif\n\nYalnızca **eril** değişir: *der/ein → den/einen*.\n\n| Cins | Nominativ | Akkuzatif |\n| --- | --- | --- |\n| Eril | der / ein Mann | **den / einen** Mann |\n| Nötr | das / ein Kind | das / ein Kind |\n| Dişil | die / eine Frau | die / eine Frau |\n| Çoğul | die / – Leute | die / – Leute |\n\nSoru: **Wen?** / **Was?**\n\n---\n\n## Adım 2: Datif\n\n* Eril/nötr: **dem / einem**\n* Dişil: **der / einer**\n* Çoğul: **den** + genelde isme **-n** (*den Kindern*)\n\nEdatlar: *mit, zu, bei, nach*. Soru: **Wem?**\n\n---\n\n## Adım 3: Zamirler\n\n| Nom. | Akk. | Dat. |\n| --- | --- | --- |\n| ich | mich | mir |\n| du | dich | dir |\n| er | ihn | ihm |\n| sie | sie | ihr |\n| es | es | ihm |\n| wir | uns | uns |\n| ihr | euch | euch |\n| sie | sie | ihnen |\n| Sie | Sie | Ihnen |\n\nDatif fiiller: *helfen, antworten, gefallen, passen*\n\n---\n\n## Adım 4: Sıra\n\nİki isim nesnesinde: **datif (kişi) akkuzatiften (nesne) önce**.\n"
+        }
+      ]
+    },
+    {
+      "code": "prepositions-time-and-place",
+      "cefr_level": "A1",
+      "status": "published",
+      "position": 6,
+      "translations": [
+        {
+          "language_code": "en",
+          "title": "Prepositions: Time & Place",
+          "body_markdown": "# German Prepositions (Time & Place): Step-by-Step Guide (A1/A2)\n\nLearn **temporal prepositions**, **dative-only** and **accusative-only (FUDOG)** prepositions, **two-way prepositions** (*Wechselpräpositionen*), and the **Wohin? / Wo? / Woher?** system.\n\n---\n\n## Step 1: Temporal Prepositions (Time)\n\n| Preposition | When to use it | Examples |\n| :--- | :--- | :--- |\n| **–** *(none)* | Years, *letzten Monat*, *nächstes Jahr* | **1997**, **2025**, letzten Monat |\n| **im** *(in + dem)* | Seasons, months | **im** Sommer, **im** Januar |\n| **am** *(an + dem)* | Days of the week, times of day (except night), dates | **am** Montag, **am** Morgen, **am** 12.5. |\n| **in der** | Night (exception) | **in der** Nacht |\n| **um** | Clock times, midnight | **um** 9.00 Uhr, **um** Mitternacht |\n| **bis (zum)** | Until / end point | **bis** morgen, **bis zum** Abend |\n| **ab / von … an** | From … on (future / from now) | **Ab** morgen, **Von** heute **an** |\n| **seit** | Since / for (+ Dative; started in the past, still true) | **seit** drei Monaten |\n| **vor / nach** | Before / after (+ Dative) | **vor** der Arbeit, **nach** dem Essen |\n| **zwischen** | Between two times (+ Dative) | **zwischen** 5 und 7 Uhr |\n| **von … bis (zum)** | From X to Y | **von** Montag **bis** Freitag |\n\n---\n\n## Step 2: Prepositions Always with Dative\n\nThese seven always take the **dative**: **aus, bei, mit, nach, seit, von, zu**.\n\n### Common contractions\n* **bei + dem = beim** · **von + dem = vom** · **zu + dem = zum** · **zu + der = zur**\n\n### Meanings\n1. **aus** (*from / out of*): *Er geht **aus dem** Haus.* · *Der Stuhl ist **aus** Metall.*\n2. **bei** (*at / with / near*): *Ich bin **bei** Lisa.* · *Er arbeitet **bei** Siemens.* · *Augsburg liegt **bei** München.*\n3. **mit** (*with / by*): *Ich tanze **mit meinem** Freund.* · *Wir fahren **mit dem** Bus.*\n4. **nach** (*to / after*): cities & countries **without** an article — *Er fährt **nach** Hamburg.* · time: ***Nach** dem* Essen…\n5. **seit** (*since / for*): *Ich wohne **seit einem** Jahr in Berlin.*\n6. **von** (*from / of*): *Ich komme **vom** Zahnarzt.* · *Die Schwester **von meiner** Freundin.*\n7. **zu** (*to*): *Ich gehe **zum** Bahnhof / **zu meinen** Eltern / **zum** Frühstück.*\n\n---\n\n## Step 3: Prepositions Always with Accusative (FUDOG)\n\n| Letter | Preposition | Meaning | Example |\n| :--- | :--- | :--- | :--- |\n| **F** | **für** | for | *Der Fisch ist **für dich**.* |\n| **U** | **um** | around / at (time) | *Sie geht **um den** Tisch.* |\n| **D** | **durch** | through | *Er geht **durch den** Park.* |\n| **O** | **ohne** | without (often no article) | *Kaffee **ohne** Zucker.* |\n| **G** | **gegen** | against | *Das Auto fährt **gegen den** Baum.* |\n\n---\n\n## Step 4: Two-Way Prepositions (*Wechselpräpositionen*)\n\nNine prepositions can take **dative or accusative**:\n**in, an, auf, vor, hinter, über, unter, neben, zwischen**\n\n| Question | Meaning | Case | Example |\n| :--- | :--- | :--- | :--- |\n| **Wo?** | Static location | **Dative** | *Die Vase steht **auf dem** Tisch.* |\n| **Wohin?** | Movement toward | **Accusative** | *Sie stellt die Vase **auf den** Tisch.* |\n\nContractions: **im** / **am** (Dat.) · **ins** / **ans** (Akk.)\n\n### Position verb pairs\n* **liegen** (*Wo?* + Dat.) ↔ **legen** (*Wohin?* + Akk.)\n* **stehen** (*Wo?* + Dat.) ↔ **stellen** (*Wohin?* + Akk.)\n* **sitzen** (*Wo?* + Dat.) ↔ **setzen** (*Wohin?* + Akk.)\n\n---\n\n## Step 5: Local Matrix (*Wohin? / Wo? / Woher?*)\n\n| Location type | **Wohin?** | **Wo?** | **Woher?** |\n| :--- | :--- | :--- | :--- |\n| Cities & countries (no article) | **nach** | **in** | **aus** |\n| Countries with article, rooms, enclosed places | **in** + Akk. | **in** + Dat. | **aus** + Dat. |\n| Vertical edge / water / screen | **an** + Akk. | **an** + Dat. | **von** + Dat. |\n| Horizontal surface | **auf** + Akk. | **auf** + Dat. | **von** + Dat. |\n| People, activities, companies | **zu** + Dat. | **bei** + Dat. | **von** + Dat. |\n\n> **Home:** *nach Hause* (Wohin?) · *zu Hause* (Wo?) · *von zu Hause* (Woher?)\n\n---\n\n## Step 6: Useful Examples\n\n### Time\n* **Im** Sommer fahren wir nach Italien.\n* Wir treffen uns **am** Montag **um** 10 Uhr.\n* Ich wohne **seit** zwei Jahren hier.\n* **Nach** dem Essen gehen wir spazieren.\n\n### Dative / Accusative prepositions\n* Ich fahre **mit dem** Bus **zum** Bahnhof.\n* Der Brief ist **für dich**.\n* Wir gehen **durch den** Park.\n\n### Wo? vs Wohin?\n* Das Buch liegt **auf dem** Tisch. *(Wo?)*\n* Ich lege das Buch **auf den** Tisch. *(Wohin?)*\n\n### Local system\n* Ich fahre **nach** Berlin. / Ich bin **in** Berlin. / Ich komme **aus** Berlin.\n* Ich gehe **ins** Kino. / Ich bin **im** Kino. / Ich komme **aus dem** Kino.\n* Ich gehe **zum** Arzt. / Ich bin **beim** Arzt. / Ich komme **vom** Arzt.\n* Ich gehe **nach Hause**. / Ich bin **zu Hause**. / Ich komme **von zu Hause**.\n"
+        },
+        {
+          "language_code": "es",
+          "title": "Preposiciones: tiempo y lugar",
+          "body_markdown": "# Preposiciones: tiempo y lugar (A1/A2)\n\nAprende **preposiciones temporales**, **solo dativo**, **solo acusativo (FUDOG)**, **Wechselpräpositionen** y el sistema **Wohin? / Wo? / Woher?**.\n\n---\n\n## Paso 1: Tiempo\n\n| Preposición | Uso | Ejemplos |\n| --- | --- | --- |\n| **im** | estaciones, meses | **im** Sommer, **im** Januar |\n| **am** | días, partes del día (excepto noche), fechas | **am** Montag, **am** Morgen |\n| **in der** | noche | **in der** Nacht |\n| **um** | horas | **um** 9 Uhr |\n| **seit** | desde / durante (+ Dat.) | **seit** zwei Jahren |\n| **vor / nach** | antes / después (+ Dat.) | **nach** dem Essen |\n\nLos años van **sin** preposición: *1997*, *2025*.\n\n---\n\n## Paso 2: Siempre dativo\n\n**aus, bei, mit, nach, seit, von, zu**\n\nContracciones: **beim, vom, zum, zur**\n\n* *mit dem Bus* · *zum Bahnhof* · *nach Berlin* (ciudad sin artículo)\n\n---\n\n## Paso 3: Siempre acusativo (FUDOG)\n\n**für, um, durch, ohne, gegen**\n\n* *für dich* · *durch den Park* · *ohne Zucker*\n\n---\n\n## Paso 4: Wechselpräpositionen\n\n**in, an, auf, vor, hinter, über, unter, neben, zwischen**\n\n* **Wo?** → **Dativo** (*auf dem Tisch*)\n* **Wohin?** → **Acusativo** (*auf den Tisch*)\n\n---\n\n## Paso 5: Matriz local\n\n| Tipo | Wohin? | Wo? | Woher? |\n| --- | --- | --- | --- |\n| Ciudad sin artículo | nach | in | aus |\n| Lugar cerrado / país con artículo | in + Akk. | in + Dat. | aus + Dat. |\n| Personas / empresas | zu | bei | von |\n\nCasa: *nach Hause* · *zu Hause* · *von zu Hause*\n"
+        },
+        {
+          "language_code": "fa",
+          "title": "حروف اضافه: زمان و مکان",
+          "body_markdown": "# حروف اضافه: زمان و مکان (A1/A2)\n\nیاد بگیرید **حروف اضافهٔ زمانی**، **فقط Dativ**، **فقط Akkusativ (FUDOG)**، **Wechselpräpositionen** و سیستم **Wohin? / Wo? / Woher?**.\n\n---\n\n## گام ۱: زمان\n\n| حرف اضافه | کاربرد | مثال |\n| --- | --- | --- |\n| **im** | فصل‌ها، ماه‌ها | **im** Sommer |\n| **am** | روزها، اوقات روز (جز شب) | **am** Montag |\n| **in der** | شب | **in der** Nacht |\n| **um** | ساعت | **um** 9 Uhr |\n| **seit** | از / به مدت (+ Dat.) | **seit** zwei Jahren |\n\nسال‌ها **بدون** حرف اضافه: *2025*.\n\n---\n\n## گام ۲: همیشه Dativ\n\n**aus, bei, mit, nach, seit, von, zu**\n\nانقباض: **beim, vom, zum, zur**\n\n---\n\n## گام ۳: همیشه Akkusativ (FUDOG)\n\n**für, um, durch, ohne, gegen**\n\n---\n\n## گام ۴: Wechselpräpositionen\n\n* **Wo?** → **Dativ**\n* **Wohin?** → **Akkusativ**\n\n---\n\n## گام ۵: ماتریس مکانی\n\nشهر بدون حرف تعریف: *nach / in / aus* · خانه: *nach Hause / zu Hause / von zu Hause*\n"
+        },
+        {
+          "language_code": "ar",
+          "title": "حروف الجر: الزمان والمكان",
+          "body_markdown": "# حروف الجر: الزمان والمكان (A1/A2)\n\nتعلّم **حروف الجر الزمنية** و**الداتيف فقط** و**الأكوزاتيف فقط (FUDOG)** و**Wechselpräpositionen** ونظام **Wohin? / Wo? / Woher?**.\n\n---\n\n## الخطوة 1: الزمان\n\n| حرف الجر | الاستخدام | أمثلة |\n| --- | --- | --- |\n| **im** | الفصول والأشهر | **im** Sommer |\n| **am** | الأيام وأوقات النهار | **am** Montag |\n| **in der** | الليل | **in der** Nacht |\n| **um** | الساعة | **um** 9 Uhr |\n| **seit** | منذ / لمدة (+ Dat.) | **seit** zwei Jahren |\n\nالسنوات **بدون** حرف جر: *2025*.\n\n---\n\n## الخطوة 2: دائمًا Dativ\n\n**aus, bei, mit, nach, seit, von, zu** — اختصارات: **beim, vom, zum, zur**\n\n---\n\n## الخطوة 3: دائمًا Akkusativ (FUDOG)\n\n**für, um, durch, ohne, gegen**\n\n---\n\n## الخطوة 4: Wechselpräpositionen\n\n* **Wo?** → **Dativ**\n* **Wohin?** → **Akkusativ**\n\n---\n\n## الخطوة 5: المصفوفة المكانية\n\nمدينة بلا أداة: *nach / in / aus* · المنزل: *nach Hause / zu Hause / von zu Hause*\n"
+        },
+        {
+          "language_code": "tr",
+          "title": "Edatlar: zaman ve yer",
+          "body_markdown": "# Edatlar: zaman ve yer (A1/A2)\n\n**Zaman edatları**, **yalnızca datif**, **yalnızca akkuzatif (FUDOG)**, **Wechselpräpositionen** ve **Wohin? / Wo? / Woher?** sistemini öğrenin.\n\n---\n\n## Adım 1: Zaman\n\n| Edat | Kullanım | Örnekler |\n| --- | --- | --- |\n| **im** | mevsimler, aylar | **im** Sommer |\n| **am** | günler, günün saatleri | **am** Montag |\n| **in der** | gece | **in der** Nacht |\n| **um** | saat | **um** 9 Uhr |\n| **seit** | -dir / -dır (+ Dat.) | **seit** zwei Jahren |\n\nYıllar **edatsız**: *2025*.\n\n---\n\n## Adım 2: Her zaman datif\n\n**aus, bei, mit, nach, seit, von, zu** — kısaltmalar: **beim, vom, zum, zur**\n\n---\n\n## Adım 3: Her zaman akkuzatif (FUDOG)\n\n**für, um, durch, ohne, gegen**\n\n---\n\n## Adım 4: Wechselpräpositionen\n\n* **Wo?** → **Datif**\n* **Wohin?** → **Akkuzatif**\n\n---\n\n## Adım 5: Yer matrisi\n\nArtikelsiz şehir: *nach / in / aus* · ev: *nach Hause / zu Hause / von zu Hause*\n"
         }
       ]
     }

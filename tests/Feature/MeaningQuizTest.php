@@ -36,7 +36,8 @@ test('guests can view the learn hub and meaning quiz page', function () {
         ->assertOk()
         ->assertSee('Learn')
         ->assertSee('Der / Die / Das')
-        ->assertSee('Vocabulary meaning');
+        ->assertSee('Vocabulary meaning')
+        ->assertSee('Prepositions');
 
     $this->get(route('learn.vocabulary-meaning'))
         ->assertOk()

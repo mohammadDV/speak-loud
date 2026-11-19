@@ -25,7 +25,6 @@ state([
     'error_message' => null,
     'show_error_modal' => false,
     'scroll_to_id' => null,
-    'full_cards' => [],
 ]);
 
 state([
@@ -109,7 +108,21 @@ $resolvedQuizType = function (): GrammarQuizType {
     return GrammarQuizType::tryFrom((string) $this->quiz_type) ?? GrammarQuizType::MultipleChoice;
 };
 
-$loadCards = function (GrammarQuizService $quiz) {
+$startQuiz = function (GrammarQuizService $quiz) {
+    $startThrottleKey = 'grammar-quiz-start|'.(auth()->id() ?? request()->ip());
+    if (RateLimiter::tooManyAttempts($startThrottleKey, 20)) {
+        $seconds = RateLimiter::availableIn($startThrottleKey);
+        $this->showError('Too many quiz starts. Please try again in '.$seconds.' seconds.');
+
+        return;
+    }
+
+    if ($this->phase !== 'setup') {
+        $this->showError('Finish or reset the current quiz before starting again.');
+
+        return;
+    }
+
     $this->error_message = null;
     $this->show_error_modal = false;
 
@@ -127,7 +140,8 @@ $loadCards = function (GrammarQuizService $quiz) {
             'word_count.max' => 'Choose between 5 and 50 questions.',
         ]);
 
-        $this->full_cards = $quiz->buildQuiz(
+        // Keep answered cards in a local variable only — never put them in Livewire state.
+        $fullCards = $quiz->buildQuiz(
             array_values(array_map('intval', $this->lesson_ids)),
             (int) $this->word_count,
             $this->translation_language,
@@ -137,37 +151,10 @@ $loadCards = function (GrammarQuizService $quiz) {
         $this->setErrorBag($e->validator->getMessageBag());
         $message = collect($e->errors())->flatten()->first()
             ?? 'Something went wrong. Please check your choices and try again.';
-        $this->full_cards = [];
         $this->cards = [];
         $this->showError($message, 'quiz-setup');
 
-        return false;
-    }
-
-    $this->answers = [];
-    foreach ($this->full_cards as $card) {
-        $this->answers[(string) $card['question_id']] = '';
-    }
-
-    $this->results = [];
-    $this->saved_session_id = null;
-
-    return true;
-};
-
-$startQuiz = function (GrammarQuizService $quiz) {
-    $startThrottleKey = 'grammar-quiz-start|'.(auth()->id() ?? request()->ip());
-    if (RateLimiter::tooManyAttempts($startThrottleKey, 20)) {
-        $seconds = RateLimiter::availableIn($startThrottleKey);
-        $this->showError('Too many quiz starts. Please try again in '.$seconds.' seconds.');
-
         return;
-    }
-
-    if ($this->phase !== 'setup' || $this->full_cards === []) {
-        if (! $this->loadCards($quiz)) {
-            return;
-        }
     }
 
     RateLimiter::hit($startThrottleKey, 60);
@@ -176,8 +163,7 @@ $startQuiz = function (GrammarQuizService $quiz) {
     $this->session_quiz_type = $quizType->value;
     $this->session_translation_language = $this->translation_language;
     $this->session_lesson_ids = array_values(array_map('intval', $this->lesson_ids));
-    $this->cards = $quiz->toQuizPromptCards($this->full_cards);
-    $this->full_cards = [];
+    $this->cards = $quiz->toQuizPromptCards($fullCards);
     $this->quiz_question_ids = array_map(
         static fn (array $card): int => (int) $card['question_id'],
         $this->cards,
@@ -188,13 +174,14 @@ $startQuiz = function (GrammarQuizService $quiz) {
         $this->answers[(string) $questionId] = '';
     }
 
+    $this->results = [];
+    $this->saved_session_id = null;
     $this->phase = 'quiz';
 };
 
 $backToSetup = function () {
     $this->phase = 'setup';
     $this->cards = [];
-    $this->full_cards = [];
     $this->quiz_question_ids = [];
     $this->session_quiz_type = null;
     $this->session_translation_language = null;
@@ -347,7 +334,6 @@ $submitQuiz = function (SaveGrammarQuizResult $save, GrammarQuizService $quiz) {
     RateLimiter::hit($throttleKey, 60);
 
     $this->cards = [];
-    $this->full_cards = [];
     $this->quiz_question_ids = [];
     $this->phase = 'results';
 };

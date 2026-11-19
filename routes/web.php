@@ -80,6 +80,7 @@ Volt::route('/discover', 'discover.index')->name('discover');
 Volt::route('/learn', 'learn.index')->name('learn.index');
 Volt::route('/learn/der-die-das', 'learn.der-die-das')->name('learn.der-die-das');
 Volt::route('/learn/vocabulary-meaning', 'learn.vocabulary-meaning')->name('learn.vocabulary-meaning');
+Volt::route('/learn/prepositions', 'learn.prepositions')->name('learn.prepositions');
 Volt::route('/learn/grammar', 'learn.grammar.index')->name('learn.grammar');
 Volt::route('/learn/grammar/quiz', 'learn.grammar.quiz')->name('learn.grammar.quiz');
 Route::middleware(['auth', 'active', 'verified'])->group(function () {

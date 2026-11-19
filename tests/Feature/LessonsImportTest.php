@@ -94,7 +94,8 @@ test('lessons import resolves course and all question bank files', function () {
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_02_questions.json'))
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_03_questions.json'))
         ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_04_questions.json'))
-        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_05_questions.json'));
+        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_05_questions.json'))
+        ->and($files)->toContain(database_path('data/lessons/german_grammar_lesson_06_questions.json'));
 });
 
 test('lessons import dry run does not write', function () {

@@ -48,18 +48,39 @@ class SaveGrammarQuizResult
             ]);
         }
 
-        $session = DB::transaction(function () use ($user, $payload, $quizType): GrammarQuizSession {
+        $translationLanguage = (string) $payload['translation_language_code'];
+        if (! in_array($translationLanguage, GrammarQuizService::UI_LANGUAGES, true)) {
+            throw ValidationException::withMessages([
+                'translation_language_code' => 'Choose a supported translation language.',
+            ]);
+        }
+
+        $session = DB::transaction(function () use ($user, $payload, $quizType, $translationLanguage): GrammarQuizSession {
             $incoming = $payload['answers'];
             $questionIds = array_map(static fn (array $answer): int => (int) $answer['question_id'], $incoming);
             $resolved = $this->quizService->resolveQuestionsById(
                 $questionIds,
-                (string) $payload['translation_language_code'],
+                $translationLanguage,
             );
 
             if (count($resolved) !== count(array_unique($questionIds))) {
                 throw ValidationException::withMessages([
                     'answers' => 'One or more quiz questions are no longer available. Please start a new quiz.',
                 ]);
+            }
+
+            $claimedLessonIds = array_values(array_unique(array_map('intval', $payload['lesson_ids'])));
+            $questionLessonIds = array_values(array_unique(array_map(
+                static fn (array $row): int => (int) $row['lesson_id'],
+                $resolved,
+            )));
+
+            foreach ($questionLessonIds as $questionLessonId) {
+                if (! in_array($questionLessonId, $claimedLessonIds, true)) {
+                    throw ValidationException::withMessages([
+                        'lesson_ids' => 'Quiz answers must belong to the selected lessons.',
+                    ]);
+                }
             }
 
             /** @var array<int|string, list<string>> $optionsByQuestionId */
@@ -80,7 +101,12 @@ class SaveGrammarQuizResult
 
                 if ($quizType === GrammarQuizType::MultipleChoice) {
                     $options = $optionsByQuestionId[$questionId] ?? $optionsByQuestionId[(string) $questionId] ?? [];
-                    if ($options !== [] && ! in_array($selected, $options, true)) {
+                    if ($options === []) {
+                        throw ValidationException::withMessages([
+                            'answers.'.$questionId => 'Multiple-choice options are missing. Please start a new quiz.',
+                        ]);
+                    }
+                    if (! in_array($selected, $options, true)) {
                         throw ValidationException::withMessages([
                             'answers.'.$questionId => 'Choose one of the shown answers for every question.',
                         ]);
@@ -110,14 +136,15 @@ class SaveGrammarQuizResult
             $incorrect = $total - $correctCount;
             $percentage = $total > 0 ? (int) round(($correctCount / $total) * 100) : 0;
 
-            $lessonIds = array_values(array_unique(array_map('intval', $payload['lesson_ids'])));
+            // Progress only for lessons that actually appear in this quiz attempt.
+            $lessonIds = $questionLessonIds;
 
             $session = GrammarQuizSession::query()->create([
                 'user_id' => $user->id,
                 'lesson_ids' => $lessonIds,
                 'word_count' => $payload['word_count'],
                 'quiz_type' => $quizType,
-                'translation_language_code' => $payload['translation_language_code'],
+                'translation_language_code' => $translationLanguage,
                 'correct_count' => $correctCount,
                 'incorrect_count' => $incorrect,
                 'percentage' => $percentage,

@@ -287,7 +287,7 @@ class GrammarQuizService
 
     /**
      * @param  list<int>  $questionIds
-     * @return array<int, array{answer: string, prompt: string, distractors: list<string>}>
+     * @return array<int, array{lesson_id: int, answer: string, prompt: string, distractors: list<string>}>
      */
     public function resolveQuestionsById(array $questionIds, string $translationLanguageCode): array
     {
@@ -309,6 +309,7 @@ class GrammarQuizService
             $translation = $question->translationFor($translationLanguageCode);
             $distractors = $question->distractors ?? [];
             $resolved[(int) $question->id] = [
+                'lesson_id' => (int) $question->lesson_id,
                 'answer' => (string) $question->answer,
                 'prompt' => $translation === null ? '' : (string) $translation->prompt,
                 'distractors' => array_map(static fn (mixed $value): string => (string) $value, $distractors),
