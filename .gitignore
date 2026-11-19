@@ -31,3 +31,7 @@ language-service-spec.md
 gamification-spec.md
 learning-structure.md
 database/speakloud_testing.sqlite
+
+# Python bytecode from vocabulary transform scripts
+__pycache__/
+*.py[cod]
