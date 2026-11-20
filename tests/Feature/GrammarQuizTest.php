@@ -251,13 +251,61 @@ test('course lists later lessons and soft-links from lesson one', function () {
         'body_markdown' => "# Dative Verbs\n\n| Verb | Case |\n| --- | --- |\n| helfen | Dative |\n",
     ]);
 
+    $ninth = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'praeteritum-sein-haben-modals',
+        'status' => LessonContentStatus::Published,
+        'position' => 9,
+        'cefr_level' => 'A2',
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $ninth->id,
+        'language_code' => 'en',
+        'title' => 'Simple Past: sein, haben & Modals',
+        'body_markdown' => "# Präteritum\n\n| Pronoun | sein |\n| --- | --- |\n| ich | war |\n",
+    ]);
+
+    $tenth = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'perfekt-and-participles',
+        'status' => LessonContentStatus::Published,
+        'position' => 10,
+        'cefr_level' => 'A2',
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $tenth->id,
+        'language_code' => 'en',
+        'title' => 'Talking About the Past: Perfekt',
+        'body_markdown' => "# Perfekt\n\n| Infinitive | Partizip |\n| --- | --- |\n| gehen | gegangen |\n",
+    ]);
+
+    $eleventh = Lesson::factory()->create([
+        'course_id' => $fixture['course']->id,
+        'code' => 'reflexive-verbs-and-pronouns',
+        'status' => LessonContentStatus::Published,
+        'position' => 11,
+        'cefr_level' => 'A2',
+    ]);
+
+    LessonTranslation::factory()->create([
+        'lesson_id' => $eleventh->id,
+        'language_code' => 'en',
+        'title' => 'Reflexive Verbs & Pronouns',
+        'body_markdown' => "# Reflexive Verbs\n\n| Subject | Reflexive |\n| --- | --- |\n| ich | mich |\n",
+    ]);
+
     expect($fixture['lesson']->nextLesson()?->code)->toBe('modal-verbs')
         ->and($second->nextLesson()?->code)->toBe('questions-and-word-order')
         ->and($third->nextLesson()?->code)->toBe('plurals-articles-negation')
         ->and($fourth->nextLesson()?->code)->toBe('cases-pronouns-objects')
         ->and($fifth->nextLesson()?->code)->toBe('prepositions-time-and-place')
         ->and($sixth->nextLesson()?->code)->toBe('possessives-welcher-dieser')
-        ->and($seventh->nextLesson()?->code)->toBe('dative-verbs-wer-wen-wem');
+        ->and($seventh->nextLesson()?->code)->toBe('dative-verbs-wer-wen-wem')
+        ->and($eighth->nextLesson()?->code)->toBe('praeteritum-sein-haben-modals')
+        ->and($ninth->nextLesson()?->code)->toBe('perfekt-and-participles')
+        ->and($tenth->nextLesson()?->code)->toBe('reflexive-verbs-and-pronouns');
 
     $this->get(route('learn.grammar.course', ['course' => 'de-grammar-a1']))
         ->assertOk()
@@ -268,7 +316,10 @@ test('course lists later lessons and soft-links from lesson one', function () {
         ->assertSee('Cases, Pronouns & Objects')
         ->assertSee('Prepositions: Time & Place')
         ->assertSee('Possessives, welcher & dieser')
-        ->assertSee('Dative Verbs & wer/wen/wem');
+        ->assertSee('Dative Verbs & wer/wen/wem')
+        ->assertSee('Simple Past: sein, haben & Modals')
+        ->assertSee('Talking About the Past: Perfekt')
+        ->assertSee('Reflexive Verbs & Pronouns');
 
     $this->get(route('learn.grammar.lesson', [
         'course' => 'de-grammar-a1',
@@ -343,8 +394,38 @@ test('course lists later lessons and soft-links from lesson one', function () {
     ]))
         ->assertOk()
         ->assertSee('Dative Verbs & wer/wen/wem')
+        ->assertSee('Simple Past: sein, haben & Modals')
         ->assertSee('Practice this lesson')
         ->assertSee('helfen');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'praeteritum-sein-haben-modals',
+    ]))
+        ->assertOk()
+        ->assertSee('Simple Past: sein, haben & Modals')
+        ->assertSee('Talking About the Past: Perfekt')
+        ->assertSee('Practice this lesson')
+        ->assertSee('war');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'perfekt-and-participles',
+    ]))
+        ->assertOk()
+        ->assertSee('Talking About the Past: Perfekt')
+        ->assertSee('Reflexive Verbs & Pronouns')
+        ->assertSee('Practice this lesson')
+        ->assertSee('gegangen');
+
+    $this->get(route('learn.grammar.lesson', [
+        'course' => 'de-grammar-a1',
+        'lesson' => 'reflexive-verbs-and-pronouns',
+    ]))
+        ->assertOk()
+        ->assertSee('Reflexive Verbs & Pronouns')
+        ->assertSee('Practice this lesson')
+        ->assertSee('mich');
 });
 
 test('guest can complete a grammar quiz without persisting', function () {

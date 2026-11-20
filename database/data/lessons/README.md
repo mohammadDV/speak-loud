@@ -15,6 +15,9 @@ JSON content for Learning courses, lessons, and grammar quiz question banks.
 | `german_grammar_lesson_06.md` / `*_06_questions.json` / `generate_lesson_06_questions.py` | Prepositions: time & place |
 | `german_grammar_lesson_07.md` / `*_07_questions.json` / `generate_lesson_07_questions.py` | Possessives, welcher & dieser (A2) |
 | `german_grammar_lesson_08.md` / `*_08_questions.json` / `generate_lesson_08_questions.py` | Dative verbs & wer/wen/wem (A2) |
+| `german_grammar_lesson_09.md` / `*_09_questions.json` / `generate_lesson_09_questions.py` | Präteritum: sein, haben & modals (A2) |
+| `german_grammar_lesson_10.md` / `*_10_questions.json` / `generate_lesson_10_questions.py` | Perfekt & participles (A2) |
+| `german_grammar_lesson_11.md` / `*_11_questions.json` / `generate_lesson_11_questions.py` | Reflexive verbs & pronouns (A2) |
 | `update_course_lesson_0N.py` | Upsert localized lesson N into the course JSON |
 
 ## Import
