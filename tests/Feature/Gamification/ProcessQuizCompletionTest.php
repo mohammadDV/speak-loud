@@ -36,6 +36,10 @@ function makeArticleSession(User $user, int $correct, int $total, array $overrid
 
 test('processing a quiz awards aggregated xp and is idempotent', function () {
     $user = User::factory()->create();
+    UserGamificationProfile::factory()->create([
+        'user_id' => $user->id,
+        'daily_goal' => 20,
+    ]);
     $session = makeArticleSession($user, 8, 10);
 
     $event = new QuizCompleted(
@@ -71,6 +75,10 @@ test('processing a quiz awards aggregated xp and is idempotent', function () {
 
 test('perfect quiz awards perfect bonus', function () {
     $user = User::factory()->create();
+    UserGamificationProfile::factory()->create([
+        'user_id' => $user->id,
+        'daily_goal' => 20,
+    ]);
     $session = MeaningQuizSession::factory()->create([
         'user_id' => $user->id,
         'word_count' => 10,
@@ -160,6 +168,10 @@ test('daily activity cap reduces later rewards', function () {
 
 test('qualifying activity updates streak and can complete daily goal', function () {
     $user = User::factory()->create();
+    UserGamificationProfile::factory()->create([
+        'user_id' => $user->id,
+        'daily_goal' => 20,
+    ]);
     $session = makeArticleSession($user, 8, 10);
 
     app(ProcessQuizCompletion::class)->execute(new QuizCompleted(
