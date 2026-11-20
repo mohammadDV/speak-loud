@@ -148,6 +148,7 @@ test('home page shows how-to steps and video section above blog', function () {
         ->assertSee('images/screenshots/publish-practice-hours.webp', false)
         ->assertSee('images/screenshots/claim-or-accept-partners.webp', false)
         ->assertSee('images/screenshots/talk-and-message.webp', false)
+        ->assertSee('images/screenshots/practice-with-learn.webp', false)
         ->assertSee('"@type":"HowTo"', false)
         ->assertSee('"name":"Create your profile"', false)
         ->assertSee('"name":"Practice with Learn"', false)

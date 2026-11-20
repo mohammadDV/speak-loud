@@ -49,10 +49,10 @@
                     </div>
                     <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                         <span class="text-[10px] font-semibold uppercase tracking-wide text-[#3D2B1F]/40 sm:text-[11px]">
-                            Screenshot placeholder
+                            {{ $label }}
                         </span>
                         <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold text-white" style="background:{{ $accent }}">
-                            UI
+                            Preview
                         </span>
                     </div>
                 </div>

@@ -48,7 +48,7 @@ Route::get('/', function () {
             'title' => 'Practice with Learn',
             'body' => 'Between conversations, open Learn for German articles, plurals, vocabulary, prepositions, and grammar lessons with quizzes.',
             'label' => 'Practice with Learn',
-            'src' => null,
+            'src' => 'images/screenshots/practice-with-learn.webp',
             'accent' => '#E67A35',
             'href' => 'learn.index',
         ],
