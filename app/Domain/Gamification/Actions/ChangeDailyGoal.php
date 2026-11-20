@@ -19,7 +19,7 @@ final class ChangeDailyGoal
     public function execute(User $user, int $dailyGoal): void
     {
         $min = (int) config('gamification.daily_goal.minimum', 5);
-        $max = (int) config('gamification.daily_goal.maximum', 100);
+        $max = (int) config('gamification.daily_goal.maximum', 500);
 
         if ($dailyGoal < $min || $dailyGoal > $max) {
             throw ValidationException::withMessages([

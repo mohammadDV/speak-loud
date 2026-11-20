@@ -23,7 +23,7 @@ class UserDailyActivityFactory extends Factory
             'quizzes_completed' => 0,
             'questions_answered' => 0,
             'qualifying_activity_count' => 0,
-            'daily_goal' => (int) config('gamification.daily_goal.default', 20),
+            'daily_goal' => (int) config('gamification.daily_goal.default', 250),
             'goal_completed_at' => null,
         ];
     }

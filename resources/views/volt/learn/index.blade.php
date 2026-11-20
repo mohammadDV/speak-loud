@@ -27,7 +27,7 @@ mount(function (GetGamificationDashboard $dashboard, LeaderboardService $leaderb
     if (auth()->check()) {
         $this->dashboard = $dashboard->execute(auth()->user());
         $this->needs_goal_setup = (bool) ($this->dashboard['profile']['needs_goal_setup'] ?? false);
-        $this->onboarding_goal = (int) ($this->dashboard['profile']['daily_goal'] ?? config('gamification.daily_goal.default', 20));
+        $this->onboarding_goal = (int) ($this->dashboard['profile']['daily_goal'] ?? config('gamification.daily_goal.default', 250));
     } elseif (config('gamification.leaderboard.enabled', true) && config('gamification.leaderboard.public', false)) {
         $this->public_leaderboard = $leaderboard->forPeriod(CompetitionPeriod::forDate(), null, 10);
     }
@@ -84,7 +84,7 @@ $skipGoalSetup = function (SkipDailyGoalOnboarding $action) {
                     </div>
 
                     @php
-                        $presets = config('gamification.daily_goal.presets', ['easy' => 10, 'medium' => 20, 'hard' => 40]);
+                        $presets = config('gamification.daily_goal.presets', ['easy' => 100, 'medium' => 250, 'hard' => 500]);
                     @endphp
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -106,7 +106,7 @@ $skipGoalSetup = function (SkipDailyGoalOnboarding $action) {
                             <input
                                 type="number"
                                 min="{{ (int) config('gamification.daily_goal.minimum', 5) }}"
-                                max="{{ (int) config('gamification.daily_goal.maximum', 100) }}"
+                                max="{{ (int) config('gamification.daily_goal.maximum', 500) }}"
                                 wire:model="onboarding_goal"
                                 class="w-full rounded-xl border-0 bg-white/90 text-[#3D2B1F] px-3 py-2.5 font-semibold focus:ring-2 focus:ring-white"
                             >

@@ -38,10 +38,10 @@ test('learn dashboard prompts for daily goal when not chosen yet', function () {
     Volt::test('learn.index')
         ->assertOk()
         ->assertSee('Set a daily XP goal')
-        ->call('chooseGoal', 20)
+        ->call('chooseGoal', 250)
         ->assertSet('needs_goal_setup', false);
 
-    expect(UserGamificationProfile::query()->where('user_id', $user->id)->value('daily_goal'))->toBe(20)
+    expect(UserGamificationProfile::query()->where('user_id', $user->id)->value('daily_goal'))->toBe(250)
         ->and(UserGamificationProfile::query()->where('user_id', $user->id)->value('daily_goal_chosen_at'))->not->toBeNull();
 });
 

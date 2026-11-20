@@ -10,7 +10,7 @@ use function Livewire\Volt\{mount, state, title};
 
 state([
     'step' => 1,
-    'daily_goal' => 20,
+    'daily_goal' => 250,
     'timezone' => 'Europe/Berlin',
     'show_on_leaderboard' => false,
     'leaderboard_display_name' => '',
@@ -90,7 +90,7 @@ $backToGoal = function () {
 
     @if ($step === 1)
         @php
-            $presets = config('gamification.daily_goal.presets', ['easy' => 10, 'medium' => 20, 'hard' => 40]);
+            $presets = config('gamification.daily_goal.presets', ['easy' => 100, 'medium' => 250, 'hard' => 500]);
         @endphp
         <section class="rounded-3xl bg-gradient-to-br from-[#FFF0E0] to-[#FFE4C8] p-5 md:p-6 space-y-5 ring-1 ring-[#FF8C42]/10">
             <div>
@@ -117,7 +117,7 @@ $backToGoal = function () {
 
             <flux:field>
                 <flux:label>Custom goal</flux:label>
-                <flux:input type="number" wire:model="daily_goal" min="{{ (int) config('gamification.daily_goal.minimum', 5) }}" max="{{ (int) config('gamification.daily_goal.maximum', 100) }}" />
+                <flux:input type="number" wire:model="daily_goal" min="{{ (int) config('gamification.daily_goal.minimum', 5) }}" max="{{ (int) config('gamification.daily_goal.maximum', 500) }}" />
                 <flux:error name="daily_goal" />
             </flux:field>
 

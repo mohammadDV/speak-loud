@@ -26,7 +26,7 @@ return [
     'rewards' => [
         'minimum_questions' => 5,
         'question_milestone_size' => 10,
-        'daily_activity_xp_cap' => 300,
+        'daily_activity_xp_cap' => 500,
     ],
 
     'activities' => [
@@ -75,13 +75,13 @@ return [
     ],
 
     'daily_goal' => [
-        'default' => 20,
+        'default' => 250,
         'minimum' => 5,
-        'maximum' => 100,
+        'maximum' => 500,
         'presets' => [
-            'easy' => 10,
-            'medium' => 20,
-            'hard' => 40,
+            'easy' => 100,
+            'medium' => 250,
+            'hard' => 500,
         ],
     ],
 

@@ -18,7 +18,7 @@ final class GamificationProfileService
                 'current_streak' => 0,
                 'longest_streak' => 0,
                 'last_activity_date' => null,
-                'daily_goal' => (int) config('gamification.daily_goal.default', 20),
+                'daily_goal' => (int) config('gamification.daily_goal.default', 250),
                 'daily_goal_chosen_at' => null,
                 'timezone' => (string) config('gamification.default_user_timezone', 'Europe/Berlin'),
                 'show_on_leaderboard' => (bool) config('gamification.leaderboard.default_visible', false),

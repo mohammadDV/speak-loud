@@ -128,7 +128,7 @@ final class ProcessQuizCompletion
                     $localDate = $profile->last_activity_date->toDateString();
                 }
 
-                $cap = (int) config('gamification.rewards.daily_activity_xp_cap', 300);
+                $cap = (int) config('gamification.rewards.daily_activity_xp_cap', 500);
                 $earnedToday = $this->transactions->activityXpForDate($event->userId, $localDate);
                 $remainingCap = max(0, $cap - $earnedToday);
 
