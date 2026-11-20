@@ -141,52 +141,6 @@
     </div>
 </section>
 
-{{-- ─── How to use ─────────────────────────────────────────── --}}
-<section class="border-t border-black/[0.06] py-14 sm:py-20">
-    <div class="max-w-6xl mx-auto px-5">
-        <div class="max-w-2xl mb-10 sm:mb-14">
-            <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">How to use</span>
-            <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#3D2B1F] tracking-tight mt-2">
-                Get from signup to your first practice session.
-            </h2>
-            <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-3 leading-relaxed">
-                Four steps. Publish when you are free, match with a partner, and start talking.
-            </p>
-        </div>
-
-        <div class="space-y-12 sm:space-y-16">
-            @foreach ($howToSteps as $i => $step)
-                <div @class([
-                    'grid md:grid-cols-2 gap-6 md:gap-10 items-center',
-                ])>
-                    <div @class(['md:order-2' => $i % 2 === 1])>
-                        <div class="flex items-center gap-3">
-                            <div class="inline-flex shrink-0 items-center justify-center w-9 h-9 rounded-full border border-[#3D2B1F]/15 text-[13px] font-bold text-[#3D2B1F]/45">
-                                {{ $step['n'] }}
-                            </div>
-                            <h3 class="text-xl sm:text-[1.35rem] font-bold text-[#3D2B1F] tracking-tight">
-                                {{ $step['title'] }}
-                            </h3>
-                        </div>
-                        <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-2.5 leading-relaxed max-w-md">
-                            {{ $step['body'] }}
-                        </p>
-                    </div>
-
-                    <div @class(['md:order-1' => $i % 2 === 1])>
-                        <x-home-screenshot-placeholder
-                            :label="$step['label']"
-                            :accent="$step['accent']"
-                            :src="$step['src']"
-                            :alt="$step['title']"
-                        />
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
 {{-- ─── Learn ──────────────────────────────────────────────── --}}
 <section class="relative overflow-hidden border-t border-black/[0.06] bg-[#3D2B1F] py-14 sm:py-20">
     <div
@@ -227,6 +181,61 @@
             <a href="{{ route('learn.grammar') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
                 Grammar lessons
             </a>
+        </div>
+    </div>
+</section>
+
+{{-- ─── How to use ─────────────────────────────────────────── --}}
+<section class="border-t border-black/[0.06] py-14 sm:py-20">
+    <div class="max-w-6xl mx-auto px-5">
+        <div class="max-w-2xl mb-10 sm:mb-14">
+            <span class="text-[10px] sm:text-[11px] font-semibold text-[#FF8C42] uppercase tracking-widest">How to use</span>
+            <h2 class="text-[1.75rem] sm:text-[2rem] font-black text-[#3D2B1F] tracking-tight mt-2">
+                Get from signup to your first practice session.
+            </h2>
+            <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-3 leading-relaxed">
+                Five steps. Publish when you are free, match with a partner, start talking, and keep improving with Learn.
+            </p>
+        </div>
+
+        <div class="space-y-12 sm:space-y-16">
+            @foreach ($howToSteps as $i => $step)
+                <div @class([
+                    'grid md:grid-cols-2 gap-6 md:gap-10 items-center',
+                ])>
+                    <div @class(['md:order-2' => $i % 2 === 1])>
+                        <div class="flex items-center gap-3">
+                            <div class="inline-flex shrink-0 items-center justify-center w-9 h-9 rounded-full border border-[#3D2B1F]/15 text-[13px] font-bold text-[#3D2B1F]/45">
+                                {{ $step['n'] }}
+                            </div>
+                            <h3 class="text-xl sm:text-[1.35rem] font-bold text-[#3D2B1F] tracking-tight">
+                                {{ $step['title'] }}
+                            </h3>
+                        </div>
+                        <p class="text-sm sm:text-[15px] text-[#3D2B1F]/55 mt-2.5 leading-relaxed max-w-md">
+                            {{ $step['body'] }}
+                        </p>
+                        @if (filled($step['href'] ?? null))
+                            <a
+                                href="{{ route($step['href']) }}"
+                                class="group inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-[#FF8C42] hover:underline"
+                            >
+                                Open Learn
+                                <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                            </a>
+                        @endif
+                    </div>
+
+                    <div @class(['md:order-1' => $i % 2 === 1])>
+                        <x-home-screenshot-placeholder
+                            :label="$step['label']"
+                            :accent="$step['accent']"
+                            :src="$step['src']"
+                            :alt="$step['title']"
+                        />
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 </section>

@@ -27,7 +27,6 @@
         ['schedule', 'Schedule'],
         ['claims', 'Claims'],
         ['discover', 'Discover'],
-        ['learn.index', 'Learn'],
         ['messages', 'Messages'],
     ];
 
@@ -196,7 +195,7 @@
                         <div class="space-y-0.5">
                             <a href="{{ route('home') }}" wire:navigate class="{{ $drawerLinkClass('home') }}">Home</a>
                             <a href="{{ route('discover') }}" wire:navigate class="{{ $drawerLinkClass('discover') }}">Discover</a>
-                            <a href="{{ route('learn.index') }}" wire:navigate class="{{ $drawerLinkClass('learn.index') }}">Learn</a>
+                            <a href="{{ route('schedule') }}" wire:navigate class="{{ $drawerLinkClass('schedule') }}">Schedule</a>
                             <a href="{{ route('login') }}" wire:navigate class="{{ $drawerLinkClass('login') }}">Sign in</a>
                             <a href="{{ route('register') }}" wire:navigate class="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-[#FF8C42]">Start free</a>
                         </div>

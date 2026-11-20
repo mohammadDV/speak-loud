@@ -82,7 +82,7 @@ $complete = function (CompleteGoogleRegistration $action) {
 
 ?>
 
-<div class="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
+<div class="min-h-screen flex items-center justify-center bg-[#FFF8F0] px-5 py-8">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
             <h1 class="flex justify-center mb-3">

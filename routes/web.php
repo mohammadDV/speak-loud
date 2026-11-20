@@ -43,6 +43,15 @@ Route::get('/', function () {
             'src' => 'images/screenshots/talk-and-message.webp',
             'accent' => '#FF8C42',
         ],
+        [
+            'n' => '5',
+            'title' => 'Practice with Learn',
+            'body' => 'Between conversations, open Learn for German articles, plurals, vocabulary, prepositions, and grammar lessons with quizzes.',
+            'label' => 'Practice with Learn',
+            'src' => null,
+            'accent' => '#E67A35',
+            'href' => 'learn.index',
+        ],
     ];
 
     Seo::share([
@@ -54,12 +63,19 @@ Route::get('/', function () {
             Seo::websiteSchema(),
             Seo::howToSchema(
                 'Get from signup to your first practice session',
-                'Four steps. Publish when you are free, match with a partner, and start talking.',
-                array_map(fn (array $step): array => [
-                    'name' => $step['title'],
-                    'text' => $step['body'],
-                    'image' => asset($step['src']),
-                ], $howToSteps),
+                'Five steps. Publish when you are free, match with a partner, start talking, and keep improving with Learn.',
+                array_map(function (array $step): array {
+                    $item = [
+                        'name' => $step['title'],
+                        'text' => $step['body'],
+                    ];
+
+                    if (filled($step['src'] ?? null)) {
+                        $item['image'] = asset($step['src']);
+                    }
+
+                    return $item;
+                }, $howToSteps),
             ),
         ],
     ]);
