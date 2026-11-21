@@ -12,20 +12,37 @@
     if (! in_array($action, Recaptcha::AllowedActions, true) || ! in_array($method, $allowedMethods, true)) {
         throw new InvalidArgumentException('Invalid reCAPTCHA form configuration.');
     }
-
-    // $action / $method are whitelisted identifiers only — safe to interpolate into Alpine.
-    $submitHandler = 'if (submitting) return; submitting = true; window.SpeakLoudRecaptcha.execute('
-        .json_encode($action, JSON_THROW_ON_ERROR)
-        .').then((token) => $wire.set(\'recaptchaToken\', token)).then(() => $wire.'
-        .$method
-        .'()).catch(() => $wire.set(\'recaptchaToken\', \'\').then(() => $wire.'
-        .$method
-        .'())).finally(() => { submitting = false; })';
 @endphp
 
 <form
-    x-data="{ submitting: false }"
-    x-on:submit.prevent="{!! $submitHandler !!}"
+    x-data="{
+        submitting: false,
+        action: @js($action),
+        method: @js($method),
+        async submit() {
+            if (this.submitting) {
+                return;
+            }
+
+            this.submitting = true;
+
+            try {
+                let token = '';
+
+                try {
+                    token = await window.SpeakLoudRecaptcha.execute(this.action);
+                } catch (e) {
+                    token = '';
+                }
+
+                await $wire.set('recaptchaToken', token);
+                await $wire[this.method]();
+            } finally {
+                this.submitting = false;
+            }
+        }
+    }"
+    x-on:submit.prevent="submit()"
     {{ $attributes->class($class) }}
 >
     {{ $slot }}
