@@ -3,6 +3,7 @@
 use App\Support\AuthRedirect;
 use App\Support\AuthSession;
 use App\Support\NormalizeEmail;
+use App\Support\Recaptcha;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Auth;
@@ -21,8 +22,9 @@ mount(function () {
 title(fn () => Seo::pageTitle('Sign in'));
 
 state([
-    'email'    => '',
-    'password' => '',
+    'email'          => '',
+    'password'       => '',
+    'recaptchaToken' => '',
 ]);
 
 rules([
@@ -32,6 +34,15 @@ rules([
 
 $login = function () {
     $this->validate();
+
+    $recaptchaOk = Recaptcha::verify($this->recaptchaToken, 'login');
+    $this->recaptchaToken = '';
+
+    if (! $recaptchaOk) {
+        $this->addError('recaptchaToken', Recaptcha::FailureMessage);
+
+        return;
+    }
 
     $email = NormalizeEmail::normalize($this->email);
     $throttleKey = Str::transliterate($email.'|'.request()->ip());
@@ -97,7 +108,7 @@ $login = function () {
         @endif
 
         <flux:card class="bg-[#FFF0E0] p-8">
-            <form wire:submit="login" class="space-y-5">
+            <x-recaptcha-form action="login" method="login">
                 <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
                 <flux:input wire:model="password" label="Password" type="password" placeholder="••••••••" />
 
@@ -107,10 +118,12 @@ $login = function () {
                     </a>
                 </div>
 
-                <flux:button type="submit" variant="primary" class="w-full">
+                <x-recaptcha-v3 action="login" />
+
+                <flux:button type="submit" variant="primary" class="w-full" x-bind:disabled="submitting">
                     Sign in
                 </flux:button>
-            </form>
+            </x-recaptcha-form>
 
             <x-google-oauth-button class="mt-5" label="Continue with Google" />
 

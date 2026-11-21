@@ -37,6 +37,9 @@
         <env name="TELEGRAM_NOTIF_CHAT_ID" value=""/>
         <env name="TELEGRAM_ERROR_CHAT_ID" value=""/>
         <env name="TELEGRAM_QUEUE" value="low"/>
+        <env name="RECAPTCHA_ENABLED" value="false"/>
+        <env name="RECAPTCHA_SITE_KEY" value=""/>
+        <env name="RECAPTCHA_SECRET_KEY" value=""/>
         <env name="AWS_ACCESS_KEY_ID" value="testing"/>
         <env name="AWS_SECRET_ACCESS_KEY" value="testing"/>
         <env name="AWS_DEFAULT_REGION" value="us-east-1"/>

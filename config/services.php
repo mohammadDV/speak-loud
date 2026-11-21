@@ -59,6 +59,20 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+        'score_threshold' => (float) env('RECAPTCHA_SCORE_THRESHOLD', 0.5),
+        // On in production when keys exist. Local/staging stay off unless RECAPTCHA_ENABLED=true.
+        'enabled' => filter_var(
+            env(
+                'RECAPTCHA_ENABLED',
+                env('APP_ENV') === 'production' && filled(env('RECAPTCHA_SECRET_KEY')) && filled(env('RECAPTCHA_SITE_KEY'))
+            ),
+            FILTER_VALIDATE_BOOLEAN
+        ),
+    ],
+
     'home' => [
         'demo_video_url' => env('HOME_DEMO_VIDEO_URL'),
     ],

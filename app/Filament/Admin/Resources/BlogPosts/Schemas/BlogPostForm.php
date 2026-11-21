@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\BlogPosts\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,8 +31,15 @@ class BlogPostForm
                     ->required(),
                 Textarea::make('excerpt')
                     ->columnSpanFull(),
-                Textarea::make('body')
+                RichEditor::make('body')
                     ->required()
+                    ->toolbarButtons([
+                        ['bold', 'italic', 'link'],
+                        ['h2', 'h3'],
+                        ['blockquote', 'bulletList', 'orderedList'],
+                        ['undo', 'redo'],
+                    ])
+                    ->helperText('Select text and use the link button to point to other SpeakLoudMate pages (for example /learn or /discover).')
                     ->columnSpanFull(),
                 FileUpload::make('cover_image_path')
                     ->image()

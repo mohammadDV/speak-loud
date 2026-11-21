@@ -42,3 +42,23 @@ test('blog show does not render script tags from body', function () {
         ->assertDontSee('<script>', false)
         ->assertDontSee('alert(1)');
 });
+
+test('blog show renders safe internal links from body', function () {
+    $author = User::factory()->create();
+
+    BlogPost::create([
+        'author_id' => $author->id,
+        'title' => 'Linked post',
+        'slug' => 'linked-post',
+        'excerpt' => 'Excerpt',
+        'body' => '<p>Practice with <a href="/learn">Learn</a> between conversations.</p>',
+        'status' => 'published',
+        'published_at' => now(),
+    ]);
+
+    Volt::test('blog.show', ['slug' => 'linked-post'])
+        ->assertSee('Practice with')
+        ->assertSee('Learn')
+        ->assertSee('href="/learn"', false)
+        ->assertSee('rel="noopener noreferrer"', false);
+});

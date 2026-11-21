@@ -4,6 +4,7 @@ use App\Support\AuthSession;
 use App\Support\NormalizeEmail;
 use App\Support\PasswordRules;
 use App\Support\ProfileSlug;
+use App\Support\Recaptcha;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use App\Actions\RegisterUser;
@@ -27,6 +28,7 @@ state([
     'password'              => '',
     'password_confirmation' => '',
     'accepted_terms'        => false,
+    'recaptchaToken'        => '',
 ]);
 
 rules([
@@ -53,6 +55,15 @@ rules([
 
 $register = function (RegisterUser $action) {
     $this->validate();
+
+    $recaptchaOk = Recaptcha::verify($this->recaptchaToken, 'register');
+    $this->recaptchaToken = '';
+
+    if (! $recaptchaOk) {
+        $this->addError('recaptchaToken', Recaptcha::FailureMessage);
+
+        return;
+    }
 
     $throttleKey = 'register|'.request()->ip();
 
@@ -90,7 +101,7 @@ $register = function (RegisterUser $action) {
         </div>
 
         <flux:card class="bg-[#FFF0E0] p-8">
-            <form wire:submit="register" class="space-y-5">
+            <x-recaptcha-form action="register" method="register">
                 <flux:input wire:model="username" label="Username" placeholder="speakloudmate.com/ alex" />
                 <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
                 <div class="space-y-2">
@@ -115,10 +126,12 @@ $register = function (RegisterUser $action) {
                     <p class="text-sm text-red-600">{{ $message }}</p>
                 @enderror
 
-                <flux:button type="submit" variant="primary" class="w-full">
+                <x-recaptcha-v3 action="register" />
+
+                <flux:button type="submit" variant="primary" class="w-full" x-bind:disabled="submitting">
                     Create account
                 </flux:button>
-            </form>
+            </x-recaptcha-form>
 
             <x-google-oauth-button class="mt-5" label="Continue with Google" />
 

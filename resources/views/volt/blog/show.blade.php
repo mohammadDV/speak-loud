@@ -42,7 +42,7 @@ title(fn () => $this->post ? Seo::pageTitle(Seo::postTitle($this->post)) : Seo::
             @if ($post->category) · {{ $post->category->name }} @endif
         </p>
 
-        <article class="prose prose-stone max-w-none text-[#3D2B1F] prose-p:text-[#3D2B1F]/80 prose-headings:text-[#3D2B1F]">
+        <article class="prose prose-stone max-w-none text-[#3D2B1F] prose-p:text-[#3D2B1F]/80 prose-headings:text-[#3D2B1F] prose-a:text-[#FF8C42] prose-a:font-semibold prose-a:no-underline hover:prose-a:underline">
             {!! $post->body !!}
         </article>
 

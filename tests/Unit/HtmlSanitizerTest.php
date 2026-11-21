@@ -41,3 +41,14 @@ test('html sanitizer keeps safe links and formatting', function () {
         ->toContain('href="https://example.com"')
         ->toContain('rel="noopener noreferrer"');
 });
+
+test('html sanitizer keeps relative internal links', function () {
+    $html = '<p>Open <a href="/learn">Learn</a> or <a href="/discover">Discover</a>.</p>';
+
+    $clean = HtmlSanitizer::sanitize($html);
+
+    expect($clean)
+        ->toContain('href="/learn"')
+        ->toContain('href="/discover"')
+        ->toContain('rel="noopener noreferrer"');
+});

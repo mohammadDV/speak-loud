@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\Recaptcha;
 use App\Support\Seo;
 use function Livewire\Volt\{state, rules, mount, title};
 use Illuminate\Support\Facades\Password;
@@ -17,8 +18,9 @@ mount(function () {
 title(fn () => Seo::pageTitle('Forgot password'));
 
 state([
-    'email'  => '',
-    'status' => '',
+    'email'          => '',
+    'status'         => '',
+    'recaptchaToken' => '',
 ]);
 
 rules([
@@ -27,6 +29,15 @@ rules([
 
 $sendResetLink = function () {
     $this->validate();
+
+    $recaptchaOk = Recaptcha::verify($this->recaptchaToken, 'forgot_password');
+    $this->recaptchaToken = '';
+
+    if (! $recaptchaOk) {
+        $this->addError('recaptchaToken', Recaptcha::FailureMessage);
+
+        return;
+    }
 
     $throttleKey = 'password-reset|'.request()->ip();
 
@@ -66,13 +77,15 @@ $sendResetLink = function () {
                     Enter your email and we will send you a link to choose a new password.
                 </p>
 
-                <form wire:submit="sendResetLink" class="space-y-5">
+                <x-recaptcha-form action="forgot_password" method="sendResetLink">
                     <flux:input wire:model="email" label="Email" type="email" placeholder="you@example.com" />
 
-                    <flux:button type="submit" variant="primary" class="w-full">
+                    <x-recaptcha-v3 action="forgot_password" />
+
+                    <flux:button type="submit" variant="primary" class="w-full" x-bind:disabled="submitting">
                         Send reset link
                     </flux:button>
-                </form>
+                </x-recaptcha-form>
             @endif
 
             <p class="text-center text-sm text-[#3D2B1F]/60 mt-6">
