@@ -62,3 +62,24 @@ test('blog show renders safe internal links from body', function () {
         ->assertSee('href="/learn"', false)
         ->assertSee('rel="noopener noreferrer"', false);
 });
+
+test('blog show keeps headings and applies prose styles for rich html body', function () {
+    $author = User::factory()->create();
+
+    BlogPost::create([
+        'author_id' => $author->id,
+        'title' => 'Styled post',
+        'slug' => 'styled-post',
+        'excerpt' => 'Excerpt',
+        'body' => '<h2>Why consistency matters</h2><p>Open <a href="/learn">Learn</a> daily.</p><h3>Small steps</h3><p>Ten minutes is enough.</p>',
+        'status' => 'published',
+        'published_at' => now(),
+    ]);
+
+    $this->get(route('blog.show', 'styled-post'))
+        ->assertOk()
+        ->assertSee('<h2>Why consistency matters</h2>', false)
+        ->assertSee('<h3>Small steps</h3>', false)
+        ->assertSee('href="/learn"', false)
+        ->assertSee('blog-content', false);
+});

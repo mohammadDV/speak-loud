@@ -33,7 +33,7 @@
 
     <main class="flex-1 max-w-3xl mx-auto px-5 py-12 w-full">
         <h1 class="text-3xl font-black text-[#3D2B1F] tracking-tight mb-6">{{ $heading ?? $title }}</h1>
-        <div class="prose prose-stone max-w-none text-[#3D2B1F]/80 prose-p:leading-relaxed prose-headings:text-[#3D2B1F] prose-h2:text-xl prose-h2:font-bold prose-h2:mt-10 prose-h2:mb-3">
+        <div class="blog-content max-w-none">
             {{ $slot }}
         </div>
     </main>
