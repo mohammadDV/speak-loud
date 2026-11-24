@@ -39,10 +39,12 @@ test('schedule show routes use uuid instead of numeric id', function () {
     ]);
 
     $url = route('schedules.show', $schedule);
+    $path = parse_url($url, PHP_URL_PATH);
 
+    // Compare the path segment exactly — a UUID that starts with the numeric id
+    // (e.g. id 98 and uuid "98…") would false-positive on toContain('/schedules/98').
     expect($schedule->uuid)->not->toBeEmpty()
-        ->and($url)->toContain($schedule->uuid)
-        ->and($url)->not->toContain('/schedules/'.$schedule->id);
+        ->and($path)->toBe('/schedules/'.$schedule->uuid);
 
     $this->actingAs($host)
         ->get($url)
