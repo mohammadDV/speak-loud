@@ -1,0 +1,641 @@
+@layer components {
+    .article-hug-stage {
+        --hug-der: #3b82f6;
+        --hug-die: #ec4899;
+        --hug-das: #14b8a6;
+        position: relative;
+        isolation: isolate;
+    }
+
+    .article-hug-sky {
+        background:
+            radial-gradient(ellipse 80% 60% at 15% 20%, rgb(255 140 66 / 0.18), transparent 55%),
+            radial-gradient(ellipse 70% 50% at 85% 15%, rgb(59 130 246 / 0.14), transparent 50%),
+            radial-gradient(ellipse 60% 45% at 50% 100%, rgb(236 72 153 / 0.12), transparent 55%),
+            linear-gradient(180deg, #fff4e8 0%, #ffe8d2 45%, #fff8f0 100%);
+    }
+
+    .article-hug-blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(28px);
+        opacity: 0.45;
+        pointer-events: none;
+        animation: article-hug-drift 12s ease-in-out infinite;
+    }
+
+    .article-hug-blob--1 {
+        width: 9rem;
+        height: 9rem;
+        background: rgb(255 140 66 / 0.35);
+        top: 8%;
+        left: 6%;
+    }
+
+    .article-hug-blob--2 {
+        width: 7rem;
+        height: 7rem;
+        background: rgb(59 130 246 / 0.3);
+        top: 18%;
+        right: 8%;
+        animation-delay: -4s;
+    }
+
+    .article-hug-blob--3 {
+        width: 8rem;
+        height: 8rem;
+        background: rgb(20 184 166 / 0.28);
+        bottom: 12%;
+        left: 40%;
+        animation-delay: -7s;
+    }
+
+    .article-hug-arena {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 11rem;
+        width: 100%;
+    }
+
+    .article-hug-noun {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 4.5rem;
+        padding: 0.95rem 1.6rem;
+        border-radius: 1.5rem;
+        background: rgb(255 255 255 / 0.88);
+        box-shadow:
+            0 18px 40px -24px rgb(61 43 31 / 0.45),
+            inset 0 1px 0 rgb(255 255 255 / 0.9);
+        border: 1px solid rgb(61 43 31 / 0.08);
+        transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .article-hug-noun--embraced {
+        padding-left: 3.25rem;
+        transform: scale(1.04);
+        box-shadow:
+            0 22px 48px -18px rgb(255 140 66 / 0.45),
+            inset 0 1px 0 rgb(255 255 255 / 0.95);
+        animation: article-hug-bounce 0.85s ease 0.55s both;
+    }
+
+    .article-hug-noun--splattered {
+        animation: article-hug-shake 0.55s ease;
+    }
+
+    .article-hug-splash {
+        position: absolute;
+        left: 50%;
+        top: -0.4rem;
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #bef264, #65a30d);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .article-hug-noun--splattered .article-hug-splash {
+        animation: article-hug-splash 0.85s ease 0.35s both;
+    }
+
+    /* Bird that flies from a button up to hug the noun */
+    .article-hug-bird {
+        --bird: var(--hug-der);
+        --start-x: 0px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 6;
+        width: 5.5rem;
+        height: 4.25rem;
+        margin-left: -2.75rem;
+        margin-top: -2.1rem;
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .article-hug-bird[data-article='der'] {
+        --bird: var(--hug-der);
+        --start-x: -28vw;
+    }
+
+    .article-hug-bird[data-article='die'] {
+        --bird: var(--hug-die);
+        --start-x: 0px;
+    }
+
+    .article-hug-bird[data-article='das'] {
+        --bird: var(--hug-das);
+        --start-x: 28vw;
+    }
+
+    .article-hug-bird--flying {
+        animation: article-hug-bird-fly 1.15s cubic-bezier(0.22, 0.82, 0.2, 1) forwards;
+    }
+
+    .article-hug-bird--rescue {
+        animation-delay: 0.35s;
+    }
+
+    .article-hug-bird__body {
+        position: absolute;
+        inset: 0.55rem 0.9rem 0.35rem;
+        border-radius: 55% 55% 48% 48%;
+        background: linear-gradient(160deg, color-mix(in srgb, var(--bird) 78%, white), var(--bird));
+        box-shadow:
+            0 10px 20px -10px color-mix(in srgb, var(--bird) 70%, transparent),
+            inset 0 1px 0 rgb(255 255 255 / 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .article-hug-bird__label {
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.05rem;
+        letter-spacing: 0.02em;
+        text-shadow: 0 1px 0 rgb(0 0 0 / 0.15);
+        line-height: 1;
+    }
+
+    .article-hug-bird__beak {
+        position: absolute;
+        right: 0.55rem;
+        top: 48%;
+        width: 0;
+        height: 0;
+        border-top: 0.28rem solid transparent;
+        border-bottom: 0.28rem solid transparent;
+        border-left: 0.45rem solid #fbbf24;
+        transform: translateY(-50%);
+        z-index: 3;
+    }
+
+    .article-hug-bird__eye {
+        position: absolute;
+        top: 0.85rem;
+        width: 0.38rem;
+        height: 0.38rem;
+        border-radius: 9999px;
+        background: #fff;
+        box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.2);
+        z-index: 3;
+    }
+
+    .article-hug-bird__eye--left {
+        left: 1.55rem;
+    }
+
+    .article-hug-bird__eye--right {
+        left: 2.2rem;
+    }
+
+    .article-hug-bird__wing {
+        position: absolute;
+        top: 0.7rem;
+        width: 2.1rem;
+        height: 1.55rem;
+        z-index: 1;
+        transform-origin: center right;
+    }
+
+    .article-hug-bird__wing--left {
+        left: 0.05rem;
+        transform-origin: right center;
+    }
+
+    .article-hug-bird__wing--right {
+        right: 0.05rem;
+        transform-origin: left center;
+        transform: scaleX(-1);
+    }
+
+    .article-hug-bird__wing path {
+        fill: color-mix(in srgb, var(--bird) 70%, white);
+        stroke: color-mix(in srgb, var(--bird) 55%, #3d2b1f);
+        stroke-width: 0.6;
+    }
+
+    .article-hug-bird--flying .article-hug-bird__wing--left {
+        animation:
+            article-hug-flap-l 0.28s ease-in-out 4,
+            article-hug-wrap-l 0.5s ease 1.05s forwards;
+    }
+
+    .article-hug-bird--flying .article-hug-bird__wing--right {
+        animation:
+            article-hug-flap-r 0.28s ease-in-out 4,
+            article-hug-wrap-r 0.5s ease 1.05s forwards;
+    }
+
+    .article-hug-btn {
+        position: relative;
+        overflow: visible;
+        transition:
+            transform 0.18s ease,
+            box-shadow 0.18s ease,
+            filter 0.18s ease;
+    }
+
+    .article-hug-btn:not(:disabled):hover {
+        transform: translateY(-3px) scale(1.03);
+    }
+
+    .article-hug-btn:not(:disabled):active {
+        transform: translateY(1px) scale(0.98);
+    }
+
+    .article-hug-btn--der {
+        background: linear-gradient(160deg, #60a5fa, #2563eb);
+        box-shadow: 0 14px 28px -16px rgb(37 99 235 / 0.9);
+    }
+
+    .article-hug-btn--die {
+        background: linear-gradient(160deg, #f472b6, #db2777);
+        box-shadow: 0 14px 28px -16px rgb(219 39 119 / 0.9);
+    }
+
+    .article-hug-btn--das {
+        background: linear-gradient(160deg, #2dd4bf, #0d9488);
+        box-shadow: 0 14px 28px -16px rgb(13 148 136 / 0.9);
+    }
+
+    .article-hug-btn--dim {
+        filter: grayscale(0.35) brightness(0.92);
+        opacity: 0.55;
+    }
+
+    .article-hug-btn--winner {
+        transform: scale(1.05);
+        filter: none;
+        opacity: 1;
+        box-shadow: 0 18px 36px -12px rgb(255 140 66 / 0.55);
+    }
+
+    .article-hug-btn--wrong {
+        background: linear-gradient(160deg, #f87171, #dc2626) !important;
+        box-shadow: 0 14px 28px -16px rgb(220 38 38 / 0.9) !important;
+        filter: none;
+        opacity: 1;
+    }
+
+    .article-hug-btn--tremor {
+        animation: article-hug-tremor 0.55s ease;
+    }
+
+    .article-hug-btn--launch {
+        animation: article-hug-launch 0.45s ease forwards;
+    }
+
+    .article-hug-btn-wing {
+        position: absolute;
+        top: 28%;
+        width: 1.35rem;
+        height: 1rem;
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    .article-hug-btn-wing--left {
+        left: 0.35rem;
+    }
+
+    .article-hug-btn-wing--right {
+        right: 0.35rem;
+        transform: scaleX(-1);
+    }
+
+    .article-hug-btn-wing path {
+        fill: rgb(255 255 255 / 0.55);
+    }
+
+    .article-hug-face {
+        display: flex;
+        justify-content: center;
+        gap: 0.45rem;
+        margin-bottom: 0.2rem;
+        line-height: 1;
+    }
+
+    .article-hug-eye {
+        width: 0.45rem;
+        height: 0.45rem;
+        border-radius: 9999px;
+        background: rgb(255 255 255 / 0.95);
+        box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.15);
+    }
+
+    .article-hug-vomit {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: visible;
+        z-index: 4;
+    }
+
+    .article-hug-vomit-blob {
+        position: absolute;
+        left: 50%;
+        top: 18%;
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 60% 40% 55% 45%;
+        opacity: 0;
+        transform: translateX(-50%);
+    }
+
+    .article-hug-btn--sick .article-hug-vomit-blob {
+        animation: article-hug-vomit 0.9s ease-out forwards;
+    }
+
+    .article-hug-vomit-blob:nth-child(1) {
+        background: #84cc16;
+        animation-delay: 0.02s;
+        --vx: -28px;
+        --vy: -54px;
+    }
+
+    .article-hug-vomit-blob:nth-child(2) {
+        background: #a3e635;
+        width: 0.9rem;
+        height: 0.9rem;
+        animation-delay: 0.08s;
+        --vx: 6px;
+        --vy: -68px;
+    }
+
+    .article-hug-vomit-blob:nth-child(3) {
+        background: #65a30d;
+        animation-delay: 0.14s;
+        --vx: 32px;
+        --vy: -48px;
+    }
+
+    .article-hug-vomit-blob:nth-child(4) {
+        background: #bef264;
+        width: 0.55rem;
+        height: 0.55rem;
+        animation-delay: 0.2s;
+        --vx: -8px;
+        --vy: -78px;
+    }
+
+    .article-hug-vomit-blob:nth-child(5) {
+        background: #4d7c0f;
+        animation-delay: 0.26s;
+        --vx: 18px;
+        --vy: -42px;
+    }
+
+    .article-hug-level {
+        transition:
+            transform 0.15s ease,
+            background-color 0.15s ease,
+            color 0.15s ease,
+            box-shadow 0.15s ease;
+    }
+
+    .article-hug-level:hover {
+        transform: translateY(-1px);
+    }
+
+    .article-hug-level--on {
+        background: #ff8c42;
+        color: #fff;
+        box-shadow: 0 10px 24px -14px rgb(255 140 66 / 0.95);
+    }
+
+    @media (max-width: 640px) {
+        .article-hug-bird[data-article='der'] {
+            --start-x: -32vw;
+        }
+
+        .article-hug-bird[data-article='das'] {
+            --start-x: 32vw;
+        }
+
+        .article-hug-bird {
+            width: 4.6rem;
+            height: 3.6rem;
+            margin-left: -2.3rem;
+            margin-top: -1.8rem;
+        }
+
+        .article-hug-bird__label {
+            font-size: 0.92rem;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .article-hug-blob,
+        .article-hug-noun--embraced,
+        .article-hug-noun--splattered,
+        .article-hug-bird--flying,
+        .article-hug-bird--flying .article-hug-bird__wing--left,
+        .article-hug-bird--flying .article-hug-bird__wing--right,
+        .article-hug-btn--tremor,
+        .article-hug-btn--launch,
+        .article-hug-noun--splattered .article-hug-splash {
+            animation: none !important;
+        }
+
+        .article-hug-bird--flying {
+            opacity: 1;
+            transform: translate(-4.2rem, 0) scale(1);
+        }
+    }
+}
+
+@keyframes article-hug-drift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(12px, -18px, 0) scale(1.08);
+    }
+}
+
+@keyframes article-hug-bounce {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1.04);
+    }
+}
+
+@keyframes article-hug-shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px) rotate(-1deg);
+    }
+
+    40% {
+        transform: translateX(6px) rotate(1deg);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(3px);
+    }
+}
+
+@keyframes article-hug-bird-fly {
+    0% {
+        opacity: 0;
+        transform: translate(var(--start-x), 9.5rem) scale(0.55) rotate(-18deg);
+    }
+
+    12% {
+        opacity: 1;
+    }
+
+    45% {
+        opacity: 1;
+        transform: translate(calc(var(--start-x) * 0.35), -1.4rem) scale(1.08) rotate(8deg);
+    }
+
+    72% {
+        transform: translate(-4.6rem, -0.35rem) scale(1.05) rotate(-4deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-4.2rem, 0.1rem) scale(1) rotate(0deg);
+    }
+}
+
+@keyframes article-hug-flap-l {
+    0%,
+    100% {
+        transform: rotate(8deg);
+    }
+
+    50% {
+        transform: rotate(-28deg);
+    }
+}
+
+@keyframes article-hug-flap-r {
+    0%,
+    100% {
+        transform: scaleX(-1) rotate(8deg);
+    }
+
+    50% {
+        transform: scaleX(-1) rotate(-28deg);
+    }
+}
+
+@keyframes article-hug-wrap-l {
+    from {
+        transform: rotate(0deg) translateX(0);
+    }
+
+    to {
+        transform: rotate(-18deg) translateX(0.35rem) translateY(0.2rem);
+    }
+}
+
+@keyframes article-hug-wrap-r {
+    from {
+        transform: scaleX(-1) rotate(0deg) translateX(0);
+    }
+
+    to {
+        transform: scaleX(-1) rotate(-18deg) translateX(0.35rem) translateY(0.2rem);
+    }
+}
+
+@keyframes article-hug-launch {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    40% {
+        transform: scale(1.12) translateY(-6px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.85) translateY(4px);
+        opacity: 0.35;
+    }
+}
+
+@keyframes article-hug-tremor {
+    0%,
+    100% {
+        transform: translateX(0) rotate(0);
+    }
+
+    12% {
+        transform: translateX(-7px) rotate(-3deg);
+    }
+
+    24% {
+        transform: translateX(7px) rotate(3deg);
+    }
+
+    36% {
+        transform: translateX(-6px) rotate(-2deg);
+    }
+
+    48% {
+        transform: translateX(6px) rotate(2deg);
+    }
+
+    60% {
+        transform: translateX(-4px) rotate(-1deg);
+    }
+
+    72% {
+        transform: translateX(4px) rotate(1deg);
+    }
+
+    84% {
+        transform: translateX(-2px);
+    }
+}
+
+@keyframes article-hug-splash {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 0) scale(0.2);
+    }
+
+    35% {
+        opacity: 1;
+        transform: translate(-50%, -10px) scale(1.2);
+    }
+
+    100% {
+        opacity: 0.35;
+        transform: translate(-50%, 4px) scale(1);
+    }
+}

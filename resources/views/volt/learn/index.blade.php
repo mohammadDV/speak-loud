@@ -251,6 +251,26 @@ $skipGoalSetup = function (SkipDailyGoalOnboarding $action) {
     <div class="space-y-4">
         <h2 class="text-sm font-semibold uppercase tracking-wide text-[#3D2B1F]/45">Practice</h2>
 
+        <a
+            href="{{ route('learn.article-hug') }}"
+            wire:navigate
+            class="block group rounded-3xl p-5 md:p-6 text-white shadow-[0_14px_28px_-16px_rgba(219,39,119,0.9)] transition hover:brightness-105"
+            style="background: linear-gradient(160deg, #f472b6, #db2777);"
+        >
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-lg font-bold">Article Hug</h3>
+                        <span class="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">die</span>
+                    </div>
+                    <p class="text-sm text-white/85 mt-1">
+                        Train your brain with the article — pick a level, then der, die, or das.
+                    </p>
+                </div>
+                <span class="shrink-0 font-semibold text-sm mt-1 text-white/90" aria-hidden="true">→</span>
+            </div>
+        </a>
+
         <a href="{{ route('learn.der-die-das') }}" wire:navigate class="block group rounded-3xl bg-white border border-[#3D2B1F]/10 p-5 md:p-6 shadow-sm hover:border-[#FF8C42]/40 hover:shadow-md transition">
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">

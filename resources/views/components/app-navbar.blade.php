@@ -44,6 +44,7 @@
         ['blog.index', 'Blog'],
         ['faq.index', 'FAQ'],
         ['learn.index', 'Learn'],
+        ['learn.article-hug', 'Article Hug game'],
         ['learn.der-die-das', 'Learn der/die/das'],
         ['learn.plurals', 'Learn noun plurals'],
         ['learn.vocabulary-meaning', 'Learn vocabulary meaning'],
@@ -57,6 +58,7 @@
     $navRouteIs = function (string $route): bool {
         $patterns = match ($route) {
             'learn.index' => ['learn.index', 'learn.*'],
+            'learn.article-hug' => ['learn.article-hug'],
             'learn.der-die-das' => ['learn.der-die-das', 'learn.der-die-das.*'],
             'learn.plurals' => ['learn.plurals', 'learn.plurals.*'],
             'learn.vocabulary-meaning' => ['learn.vocabulary-meaning', 'learn.vocabulary-meaning.*'],

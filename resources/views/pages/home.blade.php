@@ -156,16 +156,29 @@
             <p class="text-sm sm:text-[15px] text-[#FFF0E0]/70 mt-3 leading-relaxed max-w-lg">
                 Articles, plurals, vocabulary meaning, prepositions, and grammar lessons with quizzes, earn XP and keep a streak.
             </p>
-            <a
-                href="{{ route('learn.index') }}"
-                class="group inline-flex items-center gap-2 mt-6 sm:mt-7 rounded-full bg-[#FF8C42] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_2px_12px_rgba(255,140,66,.35)] hover:bg-[#e67a35] transition-colors duration-200"
-            >
-                Open Learn
-                <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-            </a>
+            <div class="mt-6 sm:mt-7 flex flex-wrap items-center gap-3">
+                <a
+                    href="{{ route('learn.index') }}"
+                    class="group inline-flex items-center gap-2 rounded-full bg-[#FF8C42] px-6 py-3 text-[14px] font-semibold text-white shadow-[0_2px_12px_rgba(255,140,66,.35)] hover:bg-[#e67a35] transition-colors duration-200"
+                >
+                    Open Learn
+                    <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                </a>
+                <a
+                    href="{{ route('learn.article-hug') }}"
+                    class="group inline-flex items-center gap-2 rounded-full px-6 py-3 text-[14px] font-semibold text-white shadow-[0_2px_12px_rgba(219,39,119,.4)] hover:brightness-110 transition duration-200"
+                    style="background: linear-gradient(160deg, #f472b6, #db2777);"
+                >
+                    Article Hug
+                    <span aria-hidden="true" class="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+                </a>
+            </div>
         </div>
 
         <div class="mt-10 sm:mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-6">
+            <a href="{{ route('learn.article-hug') }}" class="text-sm font-semibold text-[#f472b6] hover:text-[#f9a8d4] underline-offset-4 hover:underline transition-colors duration-200">
+                Article Hug
+            </a>
             <a href="{{ route('learn.der-die-das') }}" class="text-sm font-semibold text-[#FFF0E0]/85 hover:text-[#FF8C42] underline-offset-4 hover:underline transition-colors duration-200">
                 Der / Die / Das
             </a>

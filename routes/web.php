@@ -95,6 +95,7 @@ Volt::route('/faq', 'faq.index')->name('faq.index');
 Volt::route('/discover', 'discover.index')->name('discover');
 Volt::route('/learn', 'learn.index')->name('learn.index');
 Volt::route('/learn/der-die-das', 'learn.der-die-das')->name('learn.der-die-das');
+Volt::route('/learn/article-hug', 'learn.article-hug')->name('learn.article-hug');
 Volt::route('/learn/plurals', 'learn.plural')->name('learn.plurals');
 Volt::route('/learn/vocabulary-meaning', 'learn.vocabulary-meaning')->name('learn.vocabulary-meaning');
 Volt::route('/learn/prepositions', 'learn.prepositions')->name('learn.prepositions');
